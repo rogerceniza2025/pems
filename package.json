@@ -1,0 +1,44 @@
+{
+  "name": "pems",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite dev --port 3000",
+    "build": "vite build",
+    "serve": "vite preview",
+    "test": "vitest run",
+    "lint": "eslint",
+    "format": "prettier",
+    "check": "prettier --write . && eslint --fix",
+    "start": "node .output/server/index.mjs"
+  },
+  "dependencies": {
+    "@fontsource/inter": "^5.2.8",
+    "@kobalte/core": "^0.13.11",
+    "@tailwindcss/vite": "^4.1.17",
+    "@tanstack/router-plugin": "^1.139.12",
+    "@tanstack/solid-router": "^1.139.12",
+    "@tanstack/solid-router-devtools": "^1.139.12",
+    "@tanstack/solid-start": "^1.139.12",
+    "axios": "^1.13.2",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "dotenv": "^17.2.3",
+    "lucide-solid": "^0.555.0",
+    "nitro": "latest",
+    "solid-js": "^1.9.10",
+    "tailwind-merge": "^3.4.0",
+    "tailwindcss": "^4.1.17",
+    "tailwindcss-animate": "^1.0.7",
+    "vite": "^7.2.4",
+    "vite-tsconfig-paths": "^5.1.4"
+  },
+  "devDependencies": {
+    "@tanstack/devtools-vite": "^0.3.11",
+    "@tanstack/eslint-config": "^0.3.3",
+    "prettier": "^3.7.3",
+    "typescript": "^5.9.3",
+    "vite": "^7.1.7",
+    "vite-plugin-solid": "^2.11.10"
+  }
+}
