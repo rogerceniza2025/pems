@@ -1,0 +1,22 @@
+{
+  "name": "@pems/config-eslint",
+  "private": true,
+  "type": "module",
+  "files": [
+    "base.json",
+    "solid.json"
+  ],
+  "scripts": {
+    "lint": "echo 'No TypeScript files to lint in config package'",
+    "lint:fix": "echo 'No TypeScript files to lint in config package'",
+    "type-check": "echo 'No TypeScript files to type-check in config package'"
+  },
+  "devDependencies": {
+    "@tanstack/eslint-config": "^0.3.3",
+    "@typescript-eslint/eslint-plugin": "^8.20.0",
+    "@typescript-eslint/parser": "^8.20.0",
+    "eslint": "^9.17.0",
+    "eslint-plugin-solid": "^0.14.4",
+    "typescript": "^5.9.3"
+  }
+}

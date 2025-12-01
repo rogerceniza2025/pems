@@ -1,0 +1,6 @@
+{
+  "name": "@pems/cache",
+  "private": true,
+  "type": "module",
+  "main": "index.ts"
+}

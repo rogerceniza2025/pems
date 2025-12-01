@@ -1,0 +1,11 @@
+{
+  "name": "@pems/config",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "eslint",
+    "prettier",
+    "tailwind",
+    "typescript"
+  ]
+}

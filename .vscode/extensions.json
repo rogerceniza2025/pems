@@ -1,0 +1,37 @@
+{
+  "recommendations": [
+    // Tailwind CSS Development
+    "bradlc.vscode-tailwindcss",
+    "phoenisx.cssvar",
+
+    // General Web Development
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint",
+    "stylelint.vscode-stylelint",
+
+    // TypeScript & JavaScript
+    "ms-vscode.vscode-typescript-next",
+    "bradlc.vscode-tailwindcss",
+
+    // Git & Workflow
+    "eamodio.gitlens",
+    "ms-vscode.vscode-json",
+
+    // Productivity
+    "ms-vscode.vscode-live-server",
+    "formulahendry.auto-rename-tag",
+    "christian-kohler.path-intellisense",
+
+    // Testing
+    "vitest.explorer",
+    "ms-playwright.playwright",
+
+    // Accessibility
+    "syler.sass-indented",
+    "austenc.linter-scss"
+  ],
+  "unwantedRecommendations": [
+    "ms-vscode.vscode-html-css-class-completion",
+    "zignd.html-css-class-completion"
+  ]
+}

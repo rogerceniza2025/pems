@@ -1,0 +1,243 @@
+{
+  "version": 1.1,
+  "properties": [
+    {
+      "name": "--background",
+      "description": "Background color for the page"
+    },
+    {
+      "name": "--foreground",
+      "description": "Text color for the page"
+    },
+    {
+      "name": "--card",
+      "description": "Background color for card components"
+    },
+    {
+      "name": "--card-foreground",
+      "description": "Text color for card components"
+    },
+    {
+      "name": "--popover",
+      "description": "Background color for popover components"
+    },
+    {
+      "name": "--popover-foreground",
+      "description": "Text color for popover components"
+    },
+    {
+      "name": "--primary",
+      "description": "Primary color for the theme"
+    },
+    {
+      "name": "--primary-foreground",
+      "description": "Primary text color"
+    },
+    {
+      "name": "--secondary",
+      "description": "Secondary color for the theme"
+    },
+    {
+      "name": "--secondary-foreground",
+      "description": "Secondary text color"
+    },
+    {
+      "name": "--muted",
+      "description": "Muted color for less important elements"
+    },
+    {
+      "name": "--muted-foreground",
+      "description": "Muted text color"
+    },
+    {
+      "name": "--accent",
+      "description": "Accent color for highlights"
+    },
+    {
+      "name": "--accent-foreground",
+      "description": "Accent text color"
+    },
+    {
+      "name": "--destructive",
+      "description": "Destructive color for error states"
+    },
+    {
+      "name": "--destructive-foreground",
+      "description": "Destructive text color"
+    },
+    {
+      "name": "--border",
+      "description": "Border color for elements"
+    },
+    {
+      "name": "--input",
+      "description": "Input field border and background color"
+    },
+    {
+      "name": "--ring",
+      "description": "Focus ring color"
+    },
+    {
+      "name": "--radius",
+      "description": "Default border radius for components"
+    },
+    {
+      "name": "--radius-sm",
+      "description": "Small border radius"
+    },
+    {
+      "name": "--radius-md",
+      "description": "Medium border radius"
+    },
+    {
+      "name": "--radius-lg",
+      "description": "Large border radius"
+    },
+    {
+      "name": "--radius-xl",
+      "description": "Extra large border radius"
+    },
+    {
+      "name": "--radius-2xl",
+      "description": "2X large border radius"
+    },
+    {
+      "name": "--radius-full",
+      "description": "Full border radius for circles"
+    },
+    {
+      "name": "--shadow-sm",
+      "description": "Small shadow for subtle elevation"
+    },
+    {
+      "name": "--shadow-md",
+      "description": "Medium shadow for standard elevation"
+    },
+    {
+      "name": "--shadow-lg",
+      "description": "Large shadow for significant elevation"
+    },
+    {
+      "name": "--shadow-xl",
+      "description": "Extra large shadow for maximum elevation"
+    },
+    {
+      "name": "--z-dropdown",
+      "description": "Z-index for dropdown menus"
+    },
+    {
+      "name": "--z-sticky",
+      "description": "Z-index for sticky elements"
+    },
+    {
+      "name": "--z-fixed",
+      "description": "Z-index for fixed elements"
+    },
+    {
+      "name": "--z-modal-backdrop",
+      "description": "Z-index for modal backdrops"
+    },
+    {
+      "name": "--z-modal",
+      "description": "Z-index for modal content"
+    },
+    {
+      "name": "--z-popover",
+      "description": "Z-index for popover content"
+    },
+    {
+      "name": "--z-tooltip",
+      "description": "Z-index for tooltip content"
+    },
+    {
+      "name": "--font-family-sans",
+      "description": "Sans-serif font family"
+    },
+    {
+      "name": "--font-family-mono",
+      "description": "Monospace font family"
+    },
+    {
+      "name": "--spacing-xs",
+      "description": "Extra small spacing (0.25rem)"
+    },
+    {
+      "name": "--spacing-sm",
+      "description": "Small spacing (0.5rem)"
+    },
+    {
+      "name": "--spacing-md",
+      "description": "Medium spacing (1rem)"
+    },
+    {
+      "name": "--spacing-lg",
+      "description": "Large spacing (1.5rem)"
+    },
+    {
+      "name": "--spacing-xl",
+      "description": "Extra large spacing (2rem)"
+    },
+    {
+      "name": "--spacing-2xl",
+      "description": "2X large spacing (3rem)"
+    }
+  ],
+  "atDirectives": [
+    {
+      "name": "@theme",
+      "description": "Tailwind CSS 4 theme directive for defining design tokens"
+    },
+    {
+      "name": "@layer",
+      "description": "CSS layer directive for organizing styles"
+    },
+    {
+      "name": "@apply",
+      "description": "Tailwind CSS apply directive for using utilities in components"
+    },
+    {
+      "name": "@config",
+      "description": "Tailwind CSS 4 config directive for inline configuration"
+    }
+  ],
+  "pseudoClasses": [
+    {
+      "name": ":hover",
+      "description": "Hover state for interactive elements"
+    },
+    {
+      "name": ":focus",
+      "description": "Focus state for keyboard navigation"
+    },
+    {
+      "name": ":active",
+      "description": "Active state when element is being clicked"
+    },
+    {
+      "name": ":disabled",
+      "description": "Disabled state for form elements"
+    },
+    {
+      "name": ":checked",
+      "description": "Checked state for checkboxes and radio buttons"
+    }
+  ],
+  "pseudoElements": [
+    {
+      "name": "::before",
+      "description": "Before pseudo-element for adding content"
+    },
+    {
+      "name": "::after",
+      "description": "After pseudo-element for adding content"
+    },
+    {
+      "name": "::first-child",
+      "description": "First child selector"
+    },
+    {
+      "name": "::last-child",
+      "description": "Last child selector"
+    }
+  ]
+}

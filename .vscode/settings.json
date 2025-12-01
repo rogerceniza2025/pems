@@ -7,5 +7,84 @@
   },
   "files.readonlyInclude": {
     "**/routeTree.gen.ts": true
+  },
+
+  // Tailwind CSS IntelliSense Configuration
+  "tailwindCSS.includeLanguages": {
+    "typescript": "javascript",
+    "typescriptreact": "javascript",
+    "javascript": "javascript",
+    "javascriptreact": "javascript"
+  },
+  "tailwindCSS.experimental.classRegex": [
+    ["clsx\\(([^)]*)\\)", "'([^']*)'"],
+    ["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"],
+    ["cn\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"]
+  ],
+  "tailwindCSS.classAttributes": ["class", "className", "ngClass"],
+  "tailwindCSS.files.exclude": [
+    "**/.git/**",
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/build/**"
+  ],
+  "tailwindCSS.validate": true,
+  "tailwindCSS.lint.cssConflict": "warning",
+  "tailwindCSS.lint.invalidScreen": "error",
+  "tailwindCSS.lint.invalidVariant": "error",
+  "tailwindCSS.lint.invalidConfigPath": "error",
+  "tailwindCSS.lint.recommendedVariantOrder": "warning",
+  "tailwindCSS.hovers": true,
+  "tailwindCSS.suggestions": true,
+  "tailwindCSS.codeActions": true,
+
+  // CSS Custom Properties IntelliSense
+  "css.customData": [".vscode/css-custom-data.json"],
+
+  // File associations for better syntax highlighting
+  "files.associations": {
+    "*.css": "tailwindcss",
+    "tailwind.config.*": "javascript"
+  },
+
+  // Editor suggestions and completions
+  "editor.quickSuggestions": {
+    "strings": true,
+    "comments": "on",
+    "other": "on"
+  },
+  "editor.suggest.insertMode": "replace",
+  "editor.acceptSuggestionOnEnter": "on",
+  "editor.tabCompletion": "on",
+  "editor.wordBasedSuggestions": "matchingDocuments",
+
+  // Emmet configuration for CSS
+  "emmet.includeLanguages": {
+    "typescript": "html",
+    "typescriptreact": "html",
+    "javascript": "html",
+    "javascriptreact": "html"
+  },
+
+  // Workspace settings for consistency
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit",
+    "source.organizeImports": "explicit"
+  },
+
+  // TypeScript and JavaScript settings
+  "typescript.preferences.importModuleSpecifier": "relative",
+  "typescript.suggest.autoImports": true,
+  "typescript.updateImportsOnFileMove.enabled": "always",
+
+  // File nesting for better organization
+  "explorer.fileNesting.enabled": true,
+  "explorer.fileNesting.patterns": {
+    "*.ts": "${capture}.js, ${capture}.d.ts, ${capture}.test.ts, ${capture}.spec.ts",
+    "*.tsx": "${capture}.js, ${capture}.d.ts, ${capture}.test.tsx, ${capture}.spec.tsx",
+    "tailwind.config.*": "postcss.config.*, tailwind.config.*",
+    "package.json": "package-lock.json, yarn.lock, pnpm-lock.yaml",
+    "*.css": "${capture}.min.css, ${capture}.map.css"
   }
 }

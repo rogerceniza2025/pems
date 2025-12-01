@@ -1,0 +1,11 @@
+{
+  "name": "@pems/infrastructure",
+  "private": true,
+  "type": "module",
+  "main": "index.ts",
+  "dependencies": {
+    "@pems/auth": "workspace:*",
+    "@pems/database": "workspace:*",
+    "@pems/rpc": "workspace:*"
+  }
+}

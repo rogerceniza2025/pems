@@ -1,0 +1,45 @@
+# Build outputs
+dist/
+build/
+.next/
+out/
+
+# Generated files
+**/*.min.css
+**/*.css.map
+routeTree.gen.ts
+
+# Dependencies
+node_modules/
+packages/*/node_modules/
+
+# Storybook build files
+storybook-static/
+
+# Third-party CSS
+**/vendor.css
+**/third-party.css
+
+# Tailwind CSS generated files
+**/.tailwind/
+**/tailwind.css
+
+# Configuration files that contain CSS
+tailwind.config.*
+postcss.config.*
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+.temp/
+
+# IDE files
+.vscode/settings.json
+
+# Test files that may have specific CSS needs
+**/test/**/*.css
+**/tests/**/*.css
+
+# Documentation files
+docs/**/*.css

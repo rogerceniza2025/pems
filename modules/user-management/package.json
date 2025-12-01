@@ -1,0 +1,25 @@
+{
+  "name": "@pems/user-management",
+  "private": true,
+  "type": "module",
+  "main": "./index.ts",
+  "scripts": {
+    "lint": "echo 'No TypeScript files to lint in user-management module'",
+    "lint:fix": "echo 'No TypeScript files to lint in user-management module'",
+    "type-check": "echo 'No TypeScript files to type-check in user-management module'",
+    "test": "vitest run",
+    "test:integration": "vitest run --config vitest.integration.config.ts"
+  },
+  "dependencies": {
+    "@pems/shared-types": "workspace:*",
+    "@pems/shared-utils": "workspace:*",
+    "@pems/database": "workspace:*",
+    "@pems/auth": "workspace:*",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.5",
+    "typescript": "^5.9.3",
+    "vitest": "^2.1.8"
+  }
+}

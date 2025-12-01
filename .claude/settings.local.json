@@ -1,8 +1,16 @@
 {
   "permissions": {
     "allow": [
-      "Bash(git ls-tree:*)",
-      "Bash(git restore:*)"
+      "Bash(pnpm dev:*)",
+      "Bash(pnpm install:*)",
+      "Bash(taskkill:*)",
+      "Bash(netstat:*)",
+      "Bash(findstr:*)",
+      "Bash(set:*)",
+      "Bash(pnpm run:*)",
+      "Bash(pnpm type-check:*)",
+      "Bash(pnpm lint)",
+      "Bash(pnpm lint:styles:*)"
     ],
     "deny": [],
     "ask": []

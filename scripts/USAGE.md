@@ -3,11 +3,13 @@
 ## Quick Start
 
 1. **Install dependencies** (if not already done):
+
 ```bash
 npm install axios dotenv
 ```
 
 2. **Verify your .env file** has the required Jira credentials:
+
 ```env
 JIRA_URL=https://your-domain.atlassian.net
 JIRA_EMAIL=your-email@example.com
@@ -16,6 +18,7 @@ JIRA_PROJECT_KEY=YOUR_PROJECT_KEY
 ```
 
 3. **Test with dry-run** (recommended first):
+
 ```bash
 # Test all stories
 node scripts/populate-jira-backlog.js --dry-run
@@ -25,6 +28,7 @@ node scripts/populate-jira-backlog.js --sprint 0 --dry-run
 ```
 
 4. **Run for real**:
+
 ```bash
 # Create all stories
 node scripts/populate-jira-backlog.js
@@ -59,17 +63,21 @@ The script will find 26 stories across 9 sprints:
 ## Troubleshooting
 
 ### Issues Creating Jira Issues
+
 1. Check your API token is valid and has proper permissions
 2. Verify the project key is correct
 3. Ensure you have permission to create issues in the project
 
 ### Script Not Finding Stories
+
 1. Check that `docs/sprint-plan.md` exists and is readable
 2. Verify the file format matches the expected structure
 3. Run with `--dry-run` to see parsing results
 
 ### Rate Limiting
+
 The script includes 500ms delays between API calls to avoid rate limiting. If you hit rate limits:
+
 - Wait a few minutes and try again
 - Consider running with `--sprint N` to process smaller batches
 
