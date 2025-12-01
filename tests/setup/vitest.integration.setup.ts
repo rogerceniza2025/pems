@@ -3,7 +3,10 @@ import { execSync } from 'child_process'
 import Redis from 'ioredis'
 
 // Setup test database
-const testDbUrl = process.env.TEST_DATABASE_URL ?? 'postgresql://test:test@localhost:5432/pems_test'
+
+const testDbUrl =
+  process.env.TEST_DATABASE_URL ??
+  'postgresql://test:test@localhost:5432/pems_test'
 const prisma = new PrismaClient({
   datasources: {
     db: { url: testDbUrl },
@@ -28,9 +31,10 @@ beforeAll(async () => {
       env: { ...process.env, DATABASE_URL: testDbUrl },
       stdio: 'pipe',
     })
-  } catch (error) {
-    console.error('Database setup failed:', error)
-    throw error
+  } catch {
+    // eslint-disable-next-line no-console
+    console.error('Database setup failed')
+    throw new Error('Database setup failed')
   }
 
   // Clear Redis

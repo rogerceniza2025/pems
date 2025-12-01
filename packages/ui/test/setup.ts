@@ -6,7 +6,7 @@
 // Vitest globals are available when globals: true is in config
 
 // Import CSS test utilities to make them globally available
-import '@pems/config-tailwind/test/utils/css-test-utils';
+import '@pems/config-tailwind/test/utils/css-test-utils'
 
 // Setup global test environment
 beforeEach(() => {
@@ -23,31 +23,35 @@ beforeEach(() => {
       removeEventListener: () => {},
       dispatchEvent: () => {},
     }),
-  });
+  })
 
   // Mock ResizeObserver
-  (globalThis as any).ResizeObserver = class ResizeObserver {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ;(globalThis as any).ResizeObserver = class ResizeObserver {
     observe() {}
     unobserve() {}
     disconnect() {}
-  };
+  }
 
   // Mock IntersectionObserver
-  (globalThis as any).IntersectionObserver = class IntersectionObserver {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ;(globalThis as any).IntersectionObserver = class IntersectionObserver {
     constructor() {}
     observe() {}
     unobserve() {}
     disconnect() {}
-    root: Element | null = null;
-    rootMargin: string = '';
-    thresholds: number[] = [];
-    scrollMargin: string = '';
-    takeRecords(): IntersectionObserverEntry[] { return []; }
-  };
-});
+    root: Element | null = null
+    rootMargin: string = ''
+    thresholds: number[] = []
+    scrollMargin: string = ''
+    takeRecords(): IntersectionObserverEntry[] {
+      return []
+    }
+  }
+})
 
 // Clean up after each test
 afterEach(() => {
-  document.body.innerHTML = '';
-  document.head.innerHTML = '';
-});
+  document.body.innerHTML = ''
+  document.head.innerHTML = ''
+})

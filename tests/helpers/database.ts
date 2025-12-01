@@ -5,7 +5,7 @@ let prisma: PrismaClient
 
 export async function setupTestDatabase() {
   const testDbUrl =
-    process.env.TEST_DATABASE_URL ||
+    process.env.TEST_DATABASE_URL ??
     'postgresql://test:test@localhost:5432/pems_test'
 
   prisma = new PrismaClient({
@@ -26,9 +26,10 @@ export async function setupTestDatabase() {
       env: { ...process.env, DATABASE_URL: testDbUrl },
       stdio: 'pipe',
     })
-  } catch (error) {
-    console.error('Database setup failed:', error)
-    throw error
+  } catch {
+    // eslint-disable-next-line no-console
+    console.error('Database setup failed')
+    throw new Error('Database setup failed')
   }
 
   return {
@@ -38,13 +39,17 @@ export async function setupTestDatabase() {
     },
     reset: async () => {
       // Clean all tables
-      const tablenames = await prisma.$queryRaw`SELECT tablename FROM pg_tables WHERE schemaname='public'`
-      
+      const tablenames =
+        await prisma.$queryRaw`SELECT tablename FROM pg_tables WHERE schemaname='public'`
+
       for (const { tablename } of tablenames) {
         if (tablename !== '_prisma_migrations') {
           try {
-            await prisma.$executeRawUnsafe(`TRUNCATE TABLE "public"."${tablename}" CASCADE;`)
-          } catch (error) {
+            await prisma.$executeRawUnsafe(
+              `TRUNCATE TABLE "public"."${tablename}" CASCADE;`,
+            )
+          } catch {
+            // eslint-disable-next-line no-console
             console.log(`Note: ${tablename} doesn't exist, skipping`)
           }
         }
@@ -64,11 +69,11 @@ export function getTestPrisma() {
 
 // Transaction helper for test isolation
 export async function withTransaction<T>(
-  callback: (tx: PrismaClient) => Promise<T>
+  callback: (tx: PrismaClient) => Promise<T>,
 ): Promise<T> {
   const tx = getTestPrisma()
-  
-  return await tx.$transaction(async (transaction) => {
-    return await callback(transaction as PrismaClient)
+
+  return await tx.$transaction(async (transaction: PrismaClient) => {
+    return await callback(transaction)
   })
 }

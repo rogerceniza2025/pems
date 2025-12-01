@@ -4,7 +4,7 @@ import { v7 as uuidv7 } from 'uuid'
 let prisma: PrismaClient
 
 export function createTestFactories(prismaClient?: PrismaClient) {
-  prisma = prismaClient || require('./database').getTestPrisma()
+  prisma = prismaClient ?? require('./database').getTestPrisma()
 }
 
 export const TenantFactory = {
