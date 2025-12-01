@@ -50,11 +50,13 @@ The following Architecture Decision Records (ADRs) guide the implementation acro
 ### User Stories
 
 #### Story 1: Development Environment Setup
+
 **As a** developer,  
 **I want** a fully configured development environment,  
 **So that** I can start building features without setup delays.
 
 **Acceptance Criteria:**
+
 - All team members can run `pnpm install` without errors
 - All applications (api, web, admin) start with `pnpm dev`
 - Database connection is established and migrations run successfully
@@ -62,6 +64,7 @@ The following Architecture Decision Records (ADRs) guide the implementation acro
 - Pre-commit hooks are configured and working
 
 **Technical Tasks:**
+
 - Configure Turborepo with pnpm workspaces (ADR-001)
 - Set up TypeScript configuration with strict mode
 - Configure ESLint, Prettier, and pre-commit hooks
@@ -74,17 +77,20 @@ The following Architecture Decision Records (ADRs) guide the implementation acro
 - Configure Tailwind v4 styling (ADR-021)
 
 #### Story 2: CI/CD Pipeline Foundation
+
 **As a** developer,  
 **I want** automated CI/CD pipelines,  
 **So that** code changes are automatically tested and validated.
 
 **Acceptance Criteria:**
+
 - All pull requests trigger automated tests
 - Code coverage reports are generated
 - Build artifacts are created and stored
 - Staging environment is automatically deployed on merge to main
 
 **Technical Tasks:**
+
 - Set up GitHub Actions workflows
 - Configure automated testing in CI
 - Set up build and deployment pipelines
@@ -104,11 +110,13 @@ The following Architecture Decision Records (ADRs) guide the implementation acro
 ### User Stories
 
 #### Story 1: Multi-Tenant Architecture
+
 **As a** system administrator,  
 **I want** to manage multiple schools/tenants,  
 **So that** each institution has isolated data and configuration.
 
 **Acceptance Criteria:**
+
 - New tenants can be created with unique identifiers
 - Tenant isolation is enforced at database level
 - Row-Level Security (RLS) is implemented (ADR-004)
@@ -116,6 +124,7 @@ The following Architecture Decision Records (ADRs) guide the implementation acro
 - Data leakage between tenants is prevented
 
 **Technical Tasks:**
+
 - Implement tenant management domain module (ADR-002)
 - Set up PostgreSQL RLS policies (ADR-004)
 - Create tenant isolation middleware
@@ -127,11 +136,13 @@ The following Architecture Decision Records (ADRs) guide the implementation acro
 - Write comprehensive tests for tenant isolation
 
 #### Story 2: User Authentication System
+
 **As a** user,  
 **I want** to securely log in to the system,  
 **So that** I can access my school's data.
 
 **Acceptance Criteria:**
+
 - Users can register with email and password
 - Login/logout functionality works correctly
 - Password reset functionality is implemented
@@ -140,6 +151,7 @@ The following Architecture Decision Records (ADRs) guide the implementation acro
 - Authentication is tenant-aware
 
 **Technical Tasks:**
+
 - Implement BetterAuth integration (ADR-018)
 - Create user management domain module (ADR-002)
 - Implement password hashing and validation
@@ -150,17 +162,20 @@ The following Architecture Decision Records (ADRs) guide the implementation acro
 - Write authentication tests
 
 #### Story 3: Permission-Based Navigation
+
 **As a** user,  
 **I want** to see only the menu items I have access to,  
 **So that** the interface is clean and relevant to my role.
 
 **Acceptance Criteria:**
+
 - Navigation menus are dynamically generated based on permissions
 - Role-based menu filtering works correctly
 - Permission checks are enforced on both frontend and backend
 - Navigation structure is configurable per tenant
 
 **Technical Tasks:**
+
 - Implement navigation management module (ADR-019)
 - Create permission-based menu filtering
 - Implement navigation caching for performance
@@ -180,11 +195,13 @@ The following Architecture Decision Records (ADRs) guide the implementation acro
 ### User Stories
 
 #### Story 1: Payment Processing
+
 **As a** cashier,  
 **I want** to process student payments,  
 **So that** the school can collect fees efficiently.
 
 **Acceptance Criteria:**
+
 - Multiple payment methods are supported (Cash, GCash, PayMaya)
 - Payment transactions are recorded accurately
 - Receipt numbers are generated sequentially
@@ -192,6 +209,7 @@ The following Architecture Decision Records (ADRs) guide the implementation acro
 - Daily collection reports can be generated
 
 **Technical Tasks:**
+
 - Implement cashiering management domain module (ADR-010, ADR-002)
 - Create payment processing service
 - Integrate with payment gateways (GCash, PayMaya)
@@ -204,11 +222,13 @@ The following Architecture Decision Records (ADRs) guide the implementation acro
 - Write cashiering tests
 
 #### Story 2: Official Receipt Generation
+
 **As a** cashier,  
 **I want** to generate official receipts,  
 **So that** payments are properly documented.
 
 **Acceptance Criteria:**
+
 - Official receipts follow Philippine tax requirements
 - Receipts can be printed or exported as PDF
 - Receipt numbers are unique and sequential
@@ -216,6 +236,7 @@ The following Architecture Decision Records (ADRs) guide the implementation acro
 - Receipt templates are customizable per tenant
 
 **Technical Tasks:**
+
 - Implement receipt generation service
 - Create receipt templates with tenant branding
 - Implement receipt numbering system
@@ -225,11 +246,13 @@ The following Architecture Decision Records (ADRs) guide the implementation acro
 - Write receipt generation tests
 
 #### Story 3: Cashier Session Management
+
 **As a** cashier,  
 **I want** to manage my daily cash drawer sessions,  
 **So that** cash accountability is maintained.
 
 **Acceptance Criteria:**
+
 - Cashiers can open and close daily sessions
 - Opening and closing balances are recorded
 - Session reconciliation identifies discrepancies
@@ -237,6 +260,7 @@ The following Architecture Decision Records (ADRs) guide the implementation acro
 - Multiple cashiers can work simultaneously
 
 **Technical Tasks:**
+
 - Implement cashier session management
 - Create cash till tracking
 - Implement session reconciliation
@@ -257,11 +281,13 @@ The following Architecture Decision Records (ADRs) guide the implementation acro
 ### User Stories
 
 #### Story 1: Student Registration
+
 **As a** registrar,  
 **I want** to register new students,  
 **So that** they can be enrolled in the school.
 
 **Acceptance Criteria:**
+
 - Student information can be captured with all required fields
 - LRN (Learner Reference Number) validation works for DepEd schools
 - Student numbers are generated automatically for HE institutions
@@ -269,6 +295,7 @@ The following Architecture Decision Records (ADRs) guide the implementation acro
 - Student records can be imported in bulk
 
 **Technical Tasks:**
+
 - Implement student management domain module (ADR-002)
 - Create student registration service
 - Implement LRN validation (DepEd)
@@ -280,11 +307,13 @@ The following Architecture Decision Records (ADRs) guide the implementation acro
 - Write student management tests
 
 #### Story 2: Student Profile Management
+
 **As a** student,  
 **I want** to view and update my profile information,  
 **So that** my records are accurate.
 
 **Acceptance Criteria:**
+
 - Students can view their personal information
 - Profile updates are validated and saved
 - Profile photos can be uploaded
@@ -292,6 +321,7 @@ The following Architecture Decision Records (ADRs) guide the implementation acro
 - Academic history is displayed
 
 **Technical Tasks:**
+
 - Create student profile UI components
 - Implement profile update functionality
 - Add photo upload capability
@@ -300,11 +330,13 @@ The following Architecture Decision Records (ADRs) guide the implementation acro
 - Write profile management tests
 
 #### Story 3: Guardian Management
+
 **As a** registrar,  
 **I want** to manage student guardian information,  
 **So that** parents/guardians can be contacted.
 
 **Acceptance Criteria:**
+
 - Multiple guardians can be assigned per student
 - Guardian contact information is maintained
 - Guardian relationships are properly categorized
@@ -312,6 +344,7 @@ The following Architecture Decision Records (ADRs) guide the implementation acro
 - Guardian access can be granted
 
 **Technical Tasks:**
+
 - Implement guardian management
 - Create guardian relationship types
 - Add emergency contact functionality
@@ -331,11 +364,13 @@ The following Architecture Decision Records (ADRs) guide the implementation acro
 ### User Stories
 
 #### Story 1: Course and Section Management
+
 **As a** registrar,  
 **I want** to manage courses and sections,  
 **So that** students can be properly enrolled.
 
 **Acceptance Criteria:**
+
 - Courses can be created with appropriate metadata
 - Sections can be created with capacity limits
 - Course schedules can be defined
@@ -343,6 +378,7 @@ The following Architecture Decision Records (ADRs) guide the implementation acro
 - Section assignments are tracked
 
 **Technical Tasks:**
+
 - Implement enrollment management domain module (ADR-002)
 - Create course management service
 - Implement section management
@@ -353,11 +389,13 @@ The following Architecture Decision Records (ADRs) guide the implementation acro
 - Write course management tests
 
 #### Story 2: Student Enrollment
+
 **As a** registrar,  
 **I want** to enroll students in courses,  
 **So that** they can attend classes.
 
 **Acceptance Criteria:**
+
 - Students can be enrolled in multiple courses
 - Section capacity limits are enforced
 - Schedule conflicts are detected and prevented
@@ -365,6 +403,7 @@ The following Architecture Decision Records (ADRs) guide the implementation acro
 - Enrollment can be approved or rejected
 
 **Technical Tasks:**
+
 - Implement enrollment service
 - Create capacity management
 - Add schedule conflict detection
@@ -375,11 +414,13 @@ The following Architecture Decision Records (ADRs) guide the implementation acro
 - Write enrollment tests
 
 #### Story 3: Enrollment Reporting
+
 **As a** administrator,  
 **I want** to view enrollment statistics,  
 **So that** I can make informed decisions.
 
 **Acceptance Criteria:**
+
 - Enrollment reports can be generated by various criteria
 - Class rosters can be printed
 - Enrollment trends can be visualized
@@ -387,6 +428,7 @@ The following Architecture Decision Records (ADRs) guide the implementation acro
 - Reports can be exported
 
 **Technical Tasks:**
+
 - Create enrollment reporting service
 - Implement class roster generation
 - Add trend analysis
@@ -407,11 +449,13 @@ The following Architecture Decision Records (ADRs) guide the implementation acro
 ### User Stories
 
 #### Story 1: Manual Attendance Tracking
+
 **As a** teacher,  
 **I want** to record student attendance manually,  
 **So that** attendance records are maintained.
 
 **Acceptance Criteria:**
+
 - Attendance can be recorded for individual students
 - Bulk attendance can be recorded for entire classes
 - Attendance status options (Present, Absent, Late, Excused)
@@ -419,6 +463,7 @@ The following Architecture Decision Records (ADRs) guide the implementation acro
 - Historical attendance can be viewed
 
 **Technical Tasks:**
+
 - Implement attendance management domain module (ADR-002)
 - Create manual attendance service
 - Implement bulk attendance recording
@@ -429,11 +474,13 @@ The following Architecture Decision Records (ADRs) guide the implementation acro
 - Write attendance tests
 
 #### Story 2: RFID-Based Attendance
+
 **As a** student,  
 **I want** to check in/out using my RFID card,  
 **So that** my attendance is automatically recorded.
 
 **Acceptance Criteria:**
+
 - RFID cards can be assigned to students
 - RFID readers can automatically record attendance
 - Check-in/check-out times are captured
@@ -441,6 +488,7 @@ The following Architecture Decision Records (ADRs) guide the implementation acro
 - RFID hardware integration works
 
 **Technical Tasks:**
+
 - Implement RFID attendance service
 - Create RFID card management
 - Implement RFID reader integration
@@ -451,11 +499,13 @@ The following Architecture Decision Records (ADRs) guide the implementation acro
 - Write RFID attendance tests
 
 #### Story 3: Attendance Reporting
+
 **As a** administrator,  
 **I want** to generate attendance reports,  
 **So that** I can monitor student attendance patterns.
 
 **Acceptance Criteria:**
+
 - Daily attendance reports can be generated
 - Attendance summaries can be viewed by class
 - Chronic absenteeism can be identified
@@ -463,6 +513,7 @@ The following Architecture Decision Records (ADRs) guide the implementation acro
 - Reports can be exported
 
 **Technical Tasks:**
+
 - Create attendance reporting service
 - Implement daily attendance reports
 - Add attendance analytics
@@ -483,11 +534,13 @@ The following Architecture Decision Records (ADRs) guide the implementation acro
 ### User Stories
 
 #### Story 1: Grade Component Management
+
 **As a** teacher,  
 **I want** to define grade components,  
 **So that** grades are calculated according to DepEd/CHED standards.
 
 **Acceptance Criteria:**
+
 - Grade components can be defined (Written Work, Performance Task, etc.)
 - Component weights can be set according to standards
 - K-12 grading components follow DepEd guidelines (30/50/20 split)
@@ -495,6 +548,7 @@ The following Architecture Decision Records (ADRs) guide the implementation acro
 - Grade components can be customized per course
 
 **Technical Tasks:**
+
 - Implement grading management domain module (ADR-002)
 - Create grade component service
 - Implement DepEd grading standards
@@ -505,11 +559,13 @@ The following Architecture Decision Records (ADRs) guide the implementation acro
 - Write grading tests
 
 #### Story 2: Grade Recording
+
 **As a** teacher,  
 **I want** to record student grades,  
 **So that** academic performance is tracked.
 
 **Acceptance Criteria:**
+
 - Individual grades can be recorded for each component
 - Grades can be imported from external sources
 - Grade validation ensures data integrity
@@ -517,6 +573,7 @@ The following Architecture Decision Records (ADRs) guide the implementation acro
 - Grade histories are maintained
 
 **Technical Tasks:**
+
 - Implement grade recording service
 - Create grade validation
 - Add grade calculation logic
@@ -526,11 +583,13 @@ The following Architecture Decision Records (ADRs) guide the implementation acro
 - Write grade recording tests
 
 #### Story 3: Report Card Generation
+
 **As a** student/parent,  
 **I want** to view my report card,  
 **So that** I can track academic progress.
 
 **Acceptance Criteria:**
+
 - Report cards follow DepEd/CHED formats
 - Quarterly/Semester grades are displayed
 - General averages are calculated correctly
@@ -538,6 +597,7 @@ The following Architecture Decision Records (ADRs) guide the implementation acro
 - Historical report cards are accessible
 
 **Technical Tasks:**
+
 - Create report card generation service
 - Implement DepEd report card format
 - Add CHED transcript format
@@ -558,11 +618,13 @@ The following Architecture Decision Records (ADRs) guide the implementation acro
 ### User Stories
 
 #### Story 1: Cross-Module Reporting
+
 **As a** administrator,  
 **I want** to generate comprehensive reports,  
 **So that** I can make data-driven decisions.
 
 **Acceptance Criteria:**
+
 - Reports can combine data from multiple modules
 - Report filters are flexible and powerful
 - Reports can be scheduled for automatic generation
@@ -570,6 +632,7 @@ The following Architecture Decision Records (ADRs) guide the implementation acro
 - Reports can be exported in multiple formats
 
 **Technical Tasks:**
+
 - Implement reporting management domain module (ADR-002)
 - Create cross-module data aggregation
 - Implement report scheduling
@@ -581,11 +644,13 @@ The following Architecture Decision Records (ADRs) guide the implementation acro
 - Write reporting tests
 
 #### Story 2: Dashboard Analytics
+
 **As a** administrator,  
 **I want** to view analytics on a dashboard,  
 **So that** I can quickly understand system status.
 
 **Acceptance Criteria:**
+
 - Key metrics are displayed on the dashboard
 - Charts and visualizations are clear and informative
 - Real-time data updates are supported
@@ -593,6 +658,7 @@ The following Architecture Decision Records (ADRs) guide the implementation acro
 - Historical data trends are visible
 
 **Technical Tasks:**
+
 - Create analytics dashboard
 - Implement data visualization
 - Add real-time data updates
@@ -602,11 +668,13 @@ The following Architecture Decision Records (ADRs) guide the implementation acro
 - Write dashboard tests
 
 #### Story 3: Compliance Reporting
+
 **As a** school administrator,  
 **I want** to generate compliance reports,  
 **So that** we meet DepEd/CHED requirements.
 
 **Acceptance Criteria:**
+
 - DepEd compliance reports are accurate and complete
 - CHED reporting requirements are met
 - Reports follow government formats
@@ -614,6 +682,7 @@ The following Architecture Decision Records (ADRs) guide the implementation acro
 - Compliance status is tracked
 
 **Technical Tasks:**
+
 - Implement DepEd compliance reporting
 - Add CHED compliance support
 - Create government format templates
@@ -634,11 +703,13 @@ The following Architecture Decision Records (ADRs) guide the implementation acro
 ### User Stories
 
 #### Story 1: End-to-End Testing
+
 **As a** quality assurance engineer,  
 **I want** comprehensive E2E tests,  
 **So that** the system works correctly across all modules.
 
 **Acceptance Criteria:**
+
 - All critical user journeys are tested
 - Cross-module functionality works correctly
 - Performance meets requirements
@@ -646,6 +717,7 @@ The following Architecture Decision Records (ADRs) guide the implementation acro
 - Accessibility standards are met
 
 **Technical Tasks:**
+
 - Create comprehensive E2E test suite with Playwright (ADR-016)
 - Implement performance testing
 - Add security testing
@@ -655,11 +727,13 @@ The following Architecture Decision Records (ADRs) guide the implementation acro
 - Write integration tests
 
 #### Story 2: Deployment Preparation
+
 **As a** DevOps engineer,  
 **I want** production-ready deployment configurations,  
 **So that** the system can be deployed reliably.
 
 **Acceptance Criteria:**
+
 - Production environment is configured
 - Database migrations are tested
 - Backup and recovery procedures are documented
@@ -667,6 +741,7 @@ The following Architecture Decision Records (ADRs) guide the implementation acro
 - Deployment procedures are automated
 
 **Technical Tasks:**
+
 - Configure production environment (ADR-022)
 - Set up database migration procedures
 - Implement backup and recovery
@@ -679,11 +754,13 @@ The following Architecture Decision Records (ADRs) guide the implementation acro
 - Write deployment documentation
 
 #### Story 3: User Documentation
+
 **As a** user,  
 **I want** comprehensive documentation,  
 **So that** I can use the system effectively.
 
 **Acceptance Criteria:**
+
 - User manuals are complete and accurate
 - Video tutorials are available
 - FAQ section covers common issues
@@ -691,6 +768,7 @@ The following Architecture Decision Records (ADRs) guide the implementation acro
 - Troubleshooting guides are helpful
 
 **Technical Tasks:**
+
 - Create user manuals
 - Produce video tutorials
 - Write FAQ documentation

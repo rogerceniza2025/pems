@@ -80,8 +80,8 @@ Add the following dependencies to `package.json`:
 ### Vitest Configuration (vitest.config.ts)
 
 ```typescript
-import { defineConfig } from 'vitest/config';
-import { resolve } from 'path';
+import { defineConfig } from 'vitest/config'
+import { resolve } from 'path'
 
 export default defineConfig({
   test: {
@@ -97,42 +97,38 @@ export default defineConfig({
         '**/*.config.*',
         '**/*.stories.*',
         'dist/',
-        'coverage/'
+        'coverage/',
       ],
       thresholds: {
         global: {
           branches: 80,
           functions: 80,
           lines: 80,
-          statements: 80
-        }
-      }
+          statements: 80,
+        },
+      },
     },
     include: [
       'src/**/*.{test,spec}.{js,ts,jsx,tsx}',
       'tests/unit/**/*.{test,spec}.{js,ts,jsx,tsx}',
-      'tests/integration/**/*.{test,spec}.{js,ts,jsx,tsx}'
+      'tests/integration/**/*.{test,spec}.{js,ts,jsx,tsx}',
     ],
-    exclude: [
-      'node_modules/',
-      'dist/',
-      'tests/e2e/'
-    ]
+    exclude: ['node_modules/', 'dist/', 'tests/e2e/'],
   },
   resolve: {
     alias: {
       '@': resolve(__dirname, './src'),
-      '@tests': resolve(__dirname, './tests')
-    }
-  }
-});
+      '@tests': resolve(__dirname, './tests'),
+    },
+  },
+})
 ```
 
 ### Vitest Unit Test Configuration (vitest.unit.config.ts)
 
 ```typescript
-import { defineConfig } from 'vitest/config';
-import { resolve } from 'path';
+import { defineConfig } from 'vitest/config'
+import { resolve } from 'path'
 
 export default defineConfig({
   test: {
@@ -150,24 +146,24 @@ export default defineConfig({
         '**/*.config.*',
         '**/*.stories.*',
         'dist/',
-        'coverage/'
-      ]
-    }
+        'coverage/',
+      ],
+    },
   },
   resolve: {
     alias: {
       '@': resolve(__dirname, './src'),
-      '@tests': resolve(__dirname, './tests')
-    }
-  }
-});
+      '@tests': resolve(__dirname, './tests'),
+    },
+  },
+})
 ```
 
 ### Vitest Integration Test Configuration (vitest.integration.config.ts)
 
 ```typescript
-import { defineConfig } from 'vitest/config';
-import { resolve } from 'path';
+import { defineConfig } from 'vitest/config'
+import { resolve } from 'path'
 
 export default defineConfig({
   test: {
@@ -187,24 +183,24 @@ export default defineConfig({
         '**/*.config.*',
         '**/*.stories.*',
         'dist/',
-        'coverage/'
-      ]
-    }
+        'coverage/',
+      ],
+    },
   },
   resolve: {
     alias: {
       '@': resolve(__dirname, './src'),
-      '@tests': resolve(__dirname, './tests')
-    }
-  }
-});
+      '@tests': resolve(__dirname, './tests'),
+    },
+  },
+})
 ```
 
 ### Playwright Configuration (playwright.config.ts)
 
 ```typescript
-import { defineConfig, devices } from '@playwright/test';
-import { resolve } from 'path';
+import { defineConfig, devices } from '@playwright/test'
+import { resolve } from 'path'
 
 export default defineConfig({
   testDir: './tests/e2e',
@@ -215,7 +211,7 @@ export default defineConfig({
   reporter: [
     ['html', { outputFolder: 'playwright-report' }],
     ['json', { outputFile: 'test-results.json' }],
-    ['junit', { outputFile: 'test-results.xml' }]
+    ['junit', { outputFile: 'test-results.xml' }],
   ],
   use: {
     baseURL: 'http://localhost:3000',
@@ -223,7 +219,7 @@ export default defineConfig({
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
     actionTimeout: 10000,
-    navigationTimeout: 30000
+    navigationTimeout: 30000,
   },
   projects: [
     {
@@ -253,7 +249,7 @@ export default defineConfig({
     reuseExistingServer: !process.env.CI,
     timeout: 120 * 1000,
   },
-});
+})
 ```
 
 ## Test Setup Files
@@ -261,8 +257,8 @@ export default defineConfig({
 ### Vitest Setup (tests/setup/vitest.setup.ts)
 
 ```typescript
-import '@testing-library/jest-dom';
-import { vi } from 'vitest';
+import '@testing-library/jest-dom'
+import { vi } from 'vitest'
 
 // Global test setup
 global.console = {
@@ -271,92 +267,94 @@ global.console = {
   // log: vi.fn(),
   // warn: vi.fn(),
   // error: vi.fn(),
-};
+}
 
 // Mock environment variables
-process.env.NODE_ENV = 'test';
-process.env.DATABASE_URL = 'postgresql://test:test@localhost:5432/pems_test';
+process.env.NODE_ENV = 'test'
+process.env.DATABASE_URL = 'postgresql://test:test@localhost:5432/pems_test'
 
 // Mock fetch if needed
-global.fetch = vi.fn();
+global.fetch = vi.fn()
 
 // Setup global test utilities
-import { setupTestDatabase } from '@tests/helpers/database';
-import { createTestFactories } from '@tests/helpers/factories';
+import { setupTestDatabase } from '@tests/helpers/database'
+import { createTestFactories } from '@tests/helpers/factories'
 
 beforeAll(async () => {
-  await setupTestDatabase();
-  createTestFactories();
-});
+  await setupTestDatabase()
+  createTestFactories()
+})
 
 afterAll(async () => {
   // Cleanup test database
-  await setupTestDatabase().cleanup();
-});
+  await setupTestDatabase().cleanup()
+})
 ```
 
 ### Vitest Unit Setup (tests/setup/vitest.unit.setup.ts)
 
 ```typescript
-import { vi } from 'vitest';
+import { vi } from 'vitest'
 
 // Mock all external dependencies for unit tests
-vi.mock('axios');
-vi.mock('@prisma/client');
-vi.mock('better-auth');
+vi.mock('axios')
+vi.mock('@prisma/client')
+vi.mock('better-auth')
 
 // Mock file system operations
 vi.mock('fs', () => ({
   readFileSync: vi.fn(),
   writeFileSync: vi.fn(),
   existsSync: vi.fn(() => true),
-}));
+}))
 
 // Mock environment
-process.env.NODE_ENV = 'test';
-process.env.JWT_SECRET = 'test-jwt-secret';
-process.env.ENCRYPTION_KEY = 'test-encryption-key';
+process.env.NODE_ENV = 'test'
+process.env.JWT_SECRET = 'test-jwt-secret'
+process.env.ENCRYPTION_KEY = 'test-encryption-key'
 ```
 
 ### Vitest Integration Setup (tests/setup/vitest.integration.setup.ts)
 
 ```typescript
-import { PrismaClient } from '@prisma/client';
-import { execSync } from 'child_process';
+import { PrismaClient } from '@prisma/client'
+import { execSync } from 'child_process'
 
 // Setup test database
 const prisma = new PrismaClient({
   datasources: {
     db: {
-      url: process.env.TEST_DATABASE_URL || 'postgresql://test:test@localhost:5432/pems_test'
-    }
-  }
-});
+      url:
+        process.env.TEST_DATABASE_URL ||
+        'postgresql://test:test@localhost:5432/pems_test',
+    },
+  },
+})
 
 beforeAll(async () => {
   // Reset database
   execSync('npx prisma migrate reset --force --skip-seed', {
-    env: { ...process.env, DATABASE_URL: process.env.TEST_DATABASE_URL }
-  });
-  
+    env: { ...process.env, DATABASE_URL: process.env.TEST_DATABASE_URL },
+  })
+
   // Run migrations
   execSync('npx prisma migrate deploy', {
-    env: { ...process.env, DATABASE_URL: process.env.TEST_DATABASE_URL }
-  });
-});
+    env: { ...process.env, DATABASE_URL: process.env.TEST_DATABASE_URL },
+  })
+})
 
 afterAll(async () => {
-  await prisma.$disconnect();
-});
+  await prisma.$disconnect()
+})
 
 beforeEach(async () => {
   // Clean up test data between tests
-  await prisma.user.deleteMany();
-  await prisma.tenant.deleteMany();
-  await prisma.student.deleteMany();
-});
+  await prisma.user.deleteMany()
+  await prisma.tenant.deleteMany()
+  await prisma.student.deleteMany()
+})
 
-export { prisma };
+export { prisma }
 ```
 
 ## Test Directory Structure
@@ -458,62 +456,66 @@ tests/
 ### Database Helper (tests/helpers/database.ts)
 
 ```typescript
-import { PrismaClient } from '@prisma/client';
-import { execSync } from 'child_process';
+import { PrismaClient } from '@prisma/client'
+import { execSync } from 'child_process'
 
-let prisma: PrismaClient;
+let prisma: PrismaClient
 
 export async function setupTestDatabase() {
-  const testDbUrl = process.env.TEST_DATABASE_URL || 'postgresql://test:test@localhost:5432/pems_test';
-  
+  const testDbUrl =
+    process.env.TEST_DATABASE_URL ||
+    'postgresql://test:test@localhost:5432/pems_test'
+
   prisma = new PrismaClient({
     datasources: {
-      db: { url: testDbUrl }
-    }
-  });
+      db: { url: testDbUrl },
+    },
+  })
 
   // Reset database
   try {
     execSync('npx prisma migrate reset --force --skip-seed', {
       env: { ...process.env, DATABASE_URL: testDbUrl },
-      stdio: 'pipe'
-    });
-    
+      stdio: 'pipe',
+    })
+
     execSync('npx prisma migrate deploy', {
       env: { ...process.env, DATABASE_URL: testDbUrl },
-      stdio: 'pipe'
-    });
+      stdio: 'pipe',
+    })
   } catch (error) {
-    console.error('Database setup failed:', error);
-    throw error;
+    console.error('Database setup failed:', error)
+    throw error
   }
 
   return {
     prisma,
     cleanup: async () => {
-      await prisma.$disconnect();
-    }
-  };
+      await prisma.$disconnect()
+    },
+  }
 }
 
 export function getTestPrisma() {
   if (!prisma) {
-    throw new Error('Test database not initialized. Call setupTestDatabase() first.');
+    throw new Error(
+      'Test database not initialized. Call setupTestDatabase() first.',
+    )
   }
-  return prisma;
+  return prisma
 }
 ```
 
 ### Test Factories (tests/helpers/factories.ts)
 
 ```typescript
-import { PrismaClient, Tenant, User, Student } from '@prisma/client';
-import { v7 as uuidv7 } from 'uuid';
+import { PrismaClient, Tenant, User, Student } from '@prisma/client'
+import { v7 as uuidv7 } from 'uuid'
 
-let prisma: PrismaClient;
+let prisma: PrismaClient
 
 export function createTestFactories(prismaClient?: PrismaClient) {
-  prisma = prismaClient || require('./database').getTestPrisma();
+  prisma = prismaClient || require('./database').getTestPrisma()
 }
 
 export const TenantFactory = {
@@ -527,13 +529,13 @@ export const TenantFactory = {
         address: '123 Test Street',
         phone: '+639123456789',
         email: 'test@school.edu.ph',
-        ...overrides
-      }
-    });
+        ...overrides,
+      },
+    })
   },
 
   createMany: async (count: number, overrides: Partial<Tenant> = {}) => {
-    const tenants = [];
+    const tenants = []
     for (let i = 0; i < count; i++) {
       tenants.push({
         id: uuidv7(),
@@ -543,17 +545,17 @@ export const TenantFactory = {
         address: `${i} Test Street`,
         phone: `+63912345678${i}`,
         email: `test${i}@school.edu.ph`,
-        ...overrides
-      });
+        ...overrides,
+      })
     }
-    return prisma.tenant.createMany({ data: tenants });
-  }
-};
+    return prisma.tenant.createMany({ data: tenants })
+  },
+}
 
 export const UserFactory = {
   create: async (overrides: Partial<User> = {}) => {
-    const tenant = await TenantFactory.create();
-    
+    const tenant = await TenantFactory.create()
+
     return prisma.user.create({
       data: {
         id: uuidv7(),
@@ -563,16 +565,16 @@ export const UserFactory = {
         lastName: 'User',
         role: 'ADMIN',
         isActive: true,
-        ...overrides
-      }
-    });
-  }
-};
+        ...overrides,
+      },
+    })
+  },
+}
 
 export const StudentFactory = {
   create: async (overrides: Partial<Student> = {}) => {
-    const tenant = await TenantFactory.create();
-    
+    const tenant = await TenantFactory.create()
+
     return prisma.student.create({
       data: {
         id: uuidv7(),
@@ -582,24 +584,24 @@ export const StudentFactory = {
         lastName: 'Student',
         birthDate: new Date('2000-01-01'),
         gender: 'MALE',
-        ...overrides
-      }
-    });
-  }
-};
+        ...overrides,
+      },
+    })
+  },
+}
 ```
 
 ### Auth Helper (tests/helpers/auth.ts)
 
 ```typescript
-import jwt from 'jsonwebtoken';
-import { User } from '@prisma/client';
+import jwt from 'jsonwebtoken'
+import { User } from '@prisma/client'
 
 export interface TestUser {
-  id: string;
-  tenantId: string;
-  email: string;
-  role: string;
+  id: string
+  tenantId: string
+  email: string
+  role: string
 }
 
 export function createTestToken(user: TestUser): string {
@@ -608,20 +610,20 @@ export function createTestToken(user: TestUser): string {
       sub: user.id,
       tenantId: user.tenantId,
       email: user.email,
-      role: user.role
+      role: user.role,
     },
     process.env.JWT_SECRET || 'test-jwt-secret',
-    { expiresIn: '1h' }
-  );
+    { expiresIn: '1h' },
+  )
 }
 
 export function createTestHeaders(user: TestUser) {
-  const token = createTestToken(user);
+  const token = createTestToken(user)
   return {
-    'Authorization': `Bearer ${token}`,
+    Authorization: `Bearer ${token}`,
     'Content-Type': 'application/json',
-    'X-Tenant-ID': user.tenantId
-  };
+    'X-Tenant-ID': user.tenantId,
+  }
 }
 ```
 
@@ -634,14 +636,14 @@ name: Tests
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [main, develop]
   pull_request:
-    branches: [ main, develop ]
+    branches: [main, develop]
 
 jobs:
   unit-tests:
     runs-on: ubuntu-latest
-    
+
     services:
       postgres:
         image: postgres:18
@@ -658,36 +660,36 @@ jobs:
           - 5432:5432
 
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-        cache: 'npm'
-    
-    - name: Install dependencies
-      run: npm ci
-    
-    - name: Setup test database
-      run: |
-        npx prisma migrate deploy
-        npx prisma db seed
-      env:
-        DATABASE_URL: postgresql://test:test@localhost:5432/pems_test
-    
-    - name: Run unit tests
-      run: npm run test:unit -- --coverage
-    
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v3
-      with:
-        file: ./coverage/lcov.info
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Setup test database
+        run: |
+          npx prisma migrate deploy
+          npx prisma db seed
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/pems_test
+
+      - name: Run unit tests
+        run: npm run test:unit -- --coverage
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./coverage/lcov.info
 
   integration-tests:
     runs-on: ubuntu-latest
     needs: unit-tests
-    
+
     services:
       postgres:
         image: postgres:18
@@ -704,69 +706,71 @@ jobs:
           - 5432:5432
 
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-        cache: 'npm'
-    
-    - name: Install dependencies
-      run: npm ci
-    
-    - name: Setup test database
-      run: |
-        npx prisma migrate deploy
-        npx prisma db seed
-      env:
-        DATABASE_URL: postgresql://test:test@localhost:5432/pems_test
-    
-    - name: Run integration tests
-      run: npm run test:integration
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Setup test database
+        run: |
+          npx prisma migrate deploy
+          npx prisma db seed
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/pems_test
+
+      - name: Run integration tests
+        run: npm run test:integration
 
   e2e-tests:
     runs-on: ubuntu-latest
     needs: [unit-tests, integration-tests]
-    
+
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-        cache: 'npm'
-    
-    - name: Install dependencies
-      run: npm ci
-    
-    - name: Install Playwright browsers
-      run: npx playwright install --with-deps
-    
-    - name: Build application
-      run: npm run build
-    
-    - name: Run E2E tests
-      run: npm run test:e2e
-    
-    - name: Upload test results
-      uses: actions/upload-artifact@v3
-      if: always()
-      with:
-        name: playwright-report
-        path: playwright-report/
-        retention-days: 30
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+
+      - name: Build application
+        run: npm run build
+
+      - name: Run E2E tests
+        run: npm run test:e2e
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
 ```
 
 ## Installation Steps
 
 1. **Install dependencies**:
+
    ```bash
    npm install
    ```
 
 2. **Setup test database**:
+
    ```bash
    createdb pems_test
    npx prisma migrate deploy
@@ -774,22 +778,23 @@ jobs:
    ```
 
 3. **Run tests**:
+
    ```bash
    # Unit tests
    npm run test:unit
-   
+
    # Integration tests
    npm run test:integration
-   
+
    # E2E tests
    npm run test:e2e
-   
+
    # All tests
    npm test
-   
+
    # Watch mode
    npm run test:watch
-   
+
    # Coverage
    npm run test:coverage
    ```

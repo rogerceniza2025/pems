@@ -1,0 +1,20 @@
+{
+  "name": "@pems/shared-validation",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "scripts": {
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "lint:fix": "eslint . --ext ts,tsx --fix",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@pems/shared-types": "workspace:*",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@pems/config-typescript": "workspace:*",
+    "@types/node": "^22.10.5",
+    "typescript": "^5.9.3"
+  }
+}

@@ -1,0 +1,595 @@
+/* Modern CSS Features for Tailwind CSS 4 */
+/* Container Queries, Cascade Layers, and Advanced CSS Features */
+
+/* Define container queries for responsive components */
+@layer utilities {
+  /* Container query setup */
+  .container-query {
+    container-type: inline-size;
+  }
+
+  .container-query-block {
+    container-type: size;
+  }
+
+  /* Container query units - responsive typography and spacing */
+  @container (min-width: 20rem) {
+    .responsive-text-sm {
+      font-size: var(--text-sm);
+    }
+    .responsive-text-md {
+      font-size: var(--text-base);
+    }
+    .responsive-text-lg {
+      font-size: var(--text-lg);
+    }
+    .responsive-text-xl {
+      font-size: var(--text-xl);
+    }
+    .responsive-spacing-sm {
+      padding: var(--spacing-2);
+    }
+    .responsive-spacing-md {
+      padding: var(--spacing-4);
+    }
+    .responsive-spacing-lg {
+      padding: var(--spacing-6);
+    }
+  }
+
+  @container (min-width: 30rem) {
+    .responsive-text-sm {
+      font-size: var(--text-base);
+    }
+    .responsive-text-md {
+      font-size: var(--text-lg);
+    }
+    .responsive-text-lg {
+      font-size: var(--text-xl);
+    }
+    .responsive-text-xl {
+      font-size: var(--text-2xl);
+    }
+    .responsive-spacing-sm {
+      padding: var(--spacing-3);
+    }
+    .responsive-spacing-md {
+      padding: var(--spacing-5);
+    }
+    .responsive-spacing-lg {
+      padding: var(--spacing-8);
+    }
+  }
+
+  @container (min-width: 40rem) {
+    .responsive-text-sm {
+      font-size: var(--text-lg);
+    }
+    .responsive-text-md {
+      font-size: var(--text-xl);
+    }
+    .responsive-text-lg {
+      font-size: var(--text-2xl);
+    }
+    .responsive-text-xl {
+      font-size: var(--text-3xl);
+    }
+    .responsive-spacing-sm {
+      padding: var(--spacing-4);
+    }
+    .responsive-spacing-md {
+      padding: var(--spacing-6);
+    }
+    .responsive-spacing-lg {
+      padding: var(--spacing-10);
+    }
+  }
+
+  @container (min-width: 50rem) {
+    .responsive-text-sm {
+      font-size: var(--text-xl);
+    }
+    .responsive-text-md {
+      font-size: var(--text-2xl);
+    }
+    .responsive-text-lg {
+      font-size: var(--text-3xl);
+    }
+    .responsive-text-xl {
+      font-size: var(--text-4xl);
+    }
+    .responsive-spacing-sm {
+      padding: var(--spacing-5);
+    }
+    .responsive-spacing-md {
+      padding: var(--spacing-8);
+    }
+    .responsive-spacing-lg {
+      padding: var(--spacing-12);
+    }
+  }
+}
+
+/* Cascade layers for better CSS organization */
+@layer base {
+  /* Base layer for fundamental styles */
+  @layer reset {
+    /* CSS Reset improvements */
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+    }
+  }
+
+  @layer typography {
+    /* Modern typography features */
+    body {
+      text-wrap: pretty;
+      line-height: var(--leading-normal);
+      field-sizing: content;
+    }
+
+    /* Variable fonts support */
+    .font-variable {
+      font-variation-settings:
+        'wght' var(--font-weight, 400),
+        'slnt' var(--font-slant, 0);
+    }
+  }
+}
+
+@layer components {
+  /* Component-specific modern features */
+  .modern-card {
+    container-type: inline-size;
+    background: oklch(var(--color-card));
+    border: 1px solid oklch(var(--color-border));
+    border-radius: var(--radius);
+    transition: all 0.3s var(--ease-fluid);
+    contain: layout style paint;
+    content-visibility: auto;
+    contain-intrinsic-size: 0 500px;
+  }
+
+  @container (min-width: 24rem) {
+    .modern-card {
+      padding: var(--spacing-6);
+    }
+  }
+
+  .modern-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-md);
+    font-weight: var(--font-weight-medium);
+    transition: all 0.2s var(--ease-fluid);
+    container-type: inline-size;
+    position: relative;
+    isolation: isolate;
+    field-sizing: content;
+  }
+
+  /* Modern focus states */
+  .modern-button:focus-visible {
+    outline: 2px solid oklch(var(--color-ring));
+    outline-offset: 2px;
+  }
+
+  /* Modern entry animations with @starting-style */
+  .modern-dialog {
+    @starting-style {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+
+    opacity: 1;
+    transform: scale(1);
+    transition:
+      opacity 0.2s var(--ease-fluid),
+      transform 0.2s var(--ease-fluid);
+  }
+
+  .modern-dropdown {
+    @starting-style {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+
+    opacity: 1;
+    transform: translateY(0);
+    transition:
+      opacity 0.2s var(--ease-fluid),
+      transform 0.2s var(--ease-fluid);
+  }
+}
+
+@layer utilities {
+  /* Modern CSS utilities */
+  .contain-layout {
+    contain: layout;
+  }
+
+  .contain-style {
+    contain: style;
+  }
+
+  .contain-paint {
+    contain: paint;
+  }
+
+  .contain-size {
+    contain: size;
+  }
+
+  .contain-strict {
+    contain: strict;
+  }
+
+  /* Content visibility utilities */
+  .content-visibility-auto {
+    content-visibility: auto;
+    contain-intrinsic-size: 0 500px;
+  }
+
+  .content-visibility-hidden {
+    content-visibility: hidden;
+    contain-intrinsic-size: 0 500px;
+  }
+
+  .content-visibility-visible {
+    content-visibility: visible;
+  }
+
+  /* Field sizing utilities */
+  .field-sizing-content {
+    field-sizing: content;
+  }
+
+  .field-sizing-fixed {
+    field-sizing: fixed;
+  }
+
+  /* CSS Grid with subgrid support */
+  .grid-subgrid {
+    display: grid;
+    grid-template-columns: subgrid;
+  }
+
+  /* Modern position sticky */
+  .sticky-top {
+    position: sticky;
+    top: 0;
+    z-index: var(--z-sticky);
+  }
+
+  /* Modern backdrop filters */
+  .backdrop-blur-modern {
+    backdrop-filter: blur(var(--blur-md)) saturate(180%);
+    -webkit-backdrop-filter: blur(var(--blur-md)) saturate(180%);
+  }
+
+  /* Modern scroll-driven animations */
+  @keyframes scroll-grow {
+    from {
+      transform: scaleX(0);
+      transform-origin: left;
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
+
+  .scroll-indicator {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 4px;
+    background: oklch(var(--color-primary));
+    z-index: var(--z-tooltip);
+    animation: scroll-grow linear;
+    animation-timeline: scroll(root);
+  }
+
+  /* CSS custom property improvements */
+  .dynamic-color {
+    color: oklch(from var(--dynamic-hue) h s l);
+  }
+
+  .dynamic-spacing {
+    margin: calc(var(--spacing-base) * var(--spacing-multiplier, 1));
+  }
+
+  /* Modern color functions */
+  .color-mix {
+    background: color-mix(
+      in oklch,
+      oklch(var(--color-primary)) 50%,
+      oklch(var(--color-secondary))
+    );
+  }
+
+  /* Modern clamp usage */
+  .responsive-clamp {
+    font-size: clamp(var(--text-base), 2.5vw, var(--text-xl));
+    width: clamp(20rem, 80%, 40rem);
+  }
+
+  /* Modern aspect ratio */
+  .aspect-video {
+    aspect-ratio: 16/9;
+  }
+
+  .aspect-square {
+    aspect-ratio: 1;
+  }
+
+  .aspect-golden {
+    aspect-ratio: 1.618;
+  }
+
+  /* Modern text decorations */
+  .text-decoration-modern {
+    text-decoration-line: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 4px;
+    text-decoration-color: oklch(var(--color-primary) / 0.3);
+  }
+
+  /* Modern overflow handling */
+  .overflow-ellipsis {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .overflow-line-clamp {
+    display: -webkit-box;
+    -webkit-line-clamp: var(--lines, 3);
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Modern blend modes */
+  .blend-multiply {
+    mix-blend-mode: multiply;
+  }
+
+  .blend-screen {
+    mix-blend-mode: screen;
+  }
+
+  .blend-overlay {
+    mix-blend-mode: overlay;
+  }
+
+  .blend-darken {
+    mix-blend-mode: darken;
+  }
+
+  .blend-lighten {
+    mix-blend-mode: lighten;
+  }
+
+  .blend-color-dodge {
+    mix-blend-mode: color-dodge;
+  }
+
+  .blend-color-burn {
+    mix-blend-mode: color-burn;
+  }
+
+  .blend-hard-light {
+    mix-blend-mode: hard-light;
+  }
+
+  .blend-soft-light {
+    mix-blend-mode: soft-light;
+  }
+
+  .blend-difference {
+    mix-blend-mode: difference;
+  }
+
+  .blend-exclusion {
+    mix-blend-mode: exclusion;
+  }
+
+  /* Modern filter utilities */
+  .filter-grayscale {
+    filter: grayscale(100%);
+  }
+
+  .filter-sepia {
+    filter: sepia(100%);
+  }
+
+  .filter-saturate {
+    filter: saturate(200%);
+  }
+
+  .filter-hue-rotate {
+    filter: hue-rotate(90deg);
+  }
+
+  .filter-invert {
+    filter: invert(100%);
+  }
+
+  .filter-brightness {
+    filter: brightness(150%);
+  }
+
+  .filter-contrast {
+    filter: contrast(200%);
+  }
+
+  .filter-blur {
+    filter: blur(var(--blur-md));
+  }
+}
+
+/* Modern CSS features for dark mode */
+@layer theme {
+  @media (prefers-color-scheme: dark) {
+    .auto-dark {
+      color-scheme: dark;
+    }
+  }
+
+  @media (prefers-color-scheme: light) {
+    .auto-light {
+      color-scheme: light;
+    }
+  }
+}
+
+/* Modern accessibility features */
+@layer accessibility {
+  @media (prefers-reduced-motion: reduce) {
+    .motion-safe {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  @media (prefers-contrast: high) {
+    .high-contrast {
+      border-width: 2px !important;
+      filter: contrast(1.2);
+    }
+  }
+
+  @media (forced-colors: active) {
+    .forced-colors {
+      forced-color-adjust: none;
+    }
+  }
+}
+
+/* Modern layout utilities */
+@layer layout {
+  .logical-margins {
+    margin-inline: auto;
+    margin-block: 0;
+  }
+
+  .logical-padding {
+    padding-inline: var(--spacing-md);
+    padding-block: var(--spacing-sm);
+  }
+
+  /* Modern gap utilities */
+  .gap-logical {
+    gap: var(--spacing-md) var(--spacing-lg);
+  }
+
+  /* Modern flex utilities */
+  .flex-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .flex-between {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  /* Modern grid utilities */
+  .grid-auto {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--spacing-md);
+  }
+
+  .grid-fill {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr));
+    gap: var(--spacing-md);
+  }
+}
+
+/* Performance optimizations */
+@layer performance {
+  /* Content-visibility for better performance */
+  .content-visibility-auto {
+    content-visibility: auto;
+    contain-intrinsic-size: 0 500px;
+  }
+
+  .content-visibility-hidden {
+    content-visibility: hidden;
+    contain-intrinsic-size: 0 500px;
+  }
+
+  /* Modern will-change usage */
+  .will-change-transform {
+    will-change: transform;
+  }
+
+  .will-change-opacity {
+    will-change: opacity;
+  }
+
+  /* Composite layer creation */
+  .composite-layer {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+  }
+}
+
+/* Modern input styling */
+@layer forms {
+  .modern-input {
+    background: oklch(var(--color-background));
+    border: 1px solid oklch(var(--color-border));
+    border-radius: var(--radius-md);
+    padding: var(--spacing-sm) var(--spacing-md);
+    transition: all 0.2s var(--ease-fluid);
+    color: oklch(var(--color-foreground));
+    field-sizing: content;
+  }
+
+  .modern-input:focus {
+    outline: 2px solid oklch(var(--color-ring));
+    outline-offset: 2px;
+    border-color: oklch(var(--color-ring));
+  }
+
+  .modern-input::placeholder {
+    color: oklch(var(--color-muted-foreground));
+  }
+
+  /* Modern checkbox styling */
+  .modern-checkbox {
+    appearance: none;
+    width: 1.25rem;
+    height: 1.25rem;
+    border: 2px solid oklch(var(--color-border));
+    border-radius: var(--radius-sm);
+    background: oklch(var(--color-background));
+    position: relative;
+    cursor: pointer;
+    transition: all 0.2s var(--ease-fluid);
+  }
+
+  .modern-checkbox:checked {
+    background: oklch(var(--color-primary));
+    border-color: oklch(var(--color-primary));
+  }
+
+  .modern-checkbox:checked::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: oklch(var(--color-primary-foreground));
+    font-weight: var(--font-weight-bold);
+  }
+}

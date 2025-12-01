@@ -11,11 +11,13 @@ This script will populate your Jira backlog with all user stories from the sprin
 ## Setup
 
 1. Install dependencies:
+
 ```bash
 npm install axios dotenv
 ```
 
 2. Verify your `.env` file contains the required Jira credentials:
+
 ```env
 JIRA_URL=https://your-domain.atlassian.net
 JIRA_EMAIL=your-email@example.com
@@ -26,25 +28,33 @@ JIRA_PROJECT_KEY=YOUR_PROJECT_KEY
 ## Usage
 
 ### Dry Run (Recommended First)
+
 Run in dry-run mode to preview what will be created without actually creating issues:
+
 ```bash
 node scripts/populate-jira-backlog.js --dry-run
 ```
 
 ### Populate All Stories
+
 Create all stories from all sprints:
+
 ```bash
 node scripts/populate-jira-backlog.js
 ```
 
 ### Populate Specific Sprint
+
 Create stories from a specific sprint only:
+
 ```bash
 node scripts/populate-jira-backlog.js --sprint 1
 ```
 
 ### View Help
+
 Display all available options:
+
 ```bash
 node scripts/populate-jira-backlog.js --help
 ```
@@ -52,6 +62,7 @@ node scripts/populate-jira-backlog.js --help
 ## Output
 
 The script will:
+
 - Create Jira issues of type "Task" for each user story
 - Add sprint labels (e.g., "sprint-0", "sprint-1") to each issue
 - Include the user story, acceptance criteria, and technical tasks in the issue description
@@ -77,6 +88,7 @@ The script will:
 ### Getting Help
 
 If you encounter issues:
+
 1. Check the console output for error messages
 2. Verify your `.env` configuration
 3. Ensure you have proper permissions in Jira

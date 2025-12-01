@@ -1,0 +1,24 @@
+{
+  "extends": "./base.json",
+  "env": {
+    "browser": true
+  },
+  "globals": {
+    "JSX": true
+  },
+  "parserOptions": {
+    "ecmaFeatures": {
+      "jsx": true
+    }
+  },
+  "rules": {
+    "solid/reactivity": "error",
+    "solid/components-return-once": "error",
+    "solid/no-destructure": "error",
+    "solid/no-innerhtml": "error",
+    "solid/no-unknown-namespaces": "error",
+    "solid/prefer-for": "error",
+    "solid/prefer-show": "error"
+  },
+  "plugins": ["solid"]
+}

@@ -108,134 +108,138 @@ tests/
 #### Unit Test Template
 
 ```typescript
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { Component } from '@/path/to/component';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
+import { Component } from '@/path/to/component'
 
 describe('Component', () => {
-  let component: Component;
+  let component: Component
 
   beforeEach(() => {
     // Setup before each test
-    component = new Component();
+    component = new Component()
     // Mock dependencies
     vi.mock('@/dependency', () => ({
       // Mock implementation
-    }));
-  });
+    }))
+  })
 
   afterEach(() => {
     // Cleanup after each test
-    vi.clearAllMocks();
-  });
+    vi.clearAllMocks()
+  })
 
   describe('Specific Feature', () => {
     it('should do X when Y', () => {
       // Arrange
-      const input = 'test input';
-      
+      const input = 'test input'
+
       // Act
-      const result = component.doSomething(input);
-      
+      const result = component.doSomething(input)
+
       // Assert
-      expect(result).toBe('expected output');
-    });
+      expect(result).toBe('expected output')
+    })
 
     it('should handle edge case Z', () => {
       // Test edge cases
-      const edgeInput = 'edge case input';
-      
+      const edgeInput = 'edge case input'
+
       expect(() => {
-        component.doSomething(edgeInput);
-      }).toThrow('Expected error message');
-    });
-  });
-});
+        component.doSomething(edgeInput)
+      }).toThrow('Expected error message')
+    })
+  })
+})
 ```
 
 #### Integration Test Template
 
 ```typescript
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { Service } from '@/path/to/service';
-import { Repository } from '@/infrastructure/database/Repository';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest'
+import { Service } from '@/path/to/service'
+import { Repository } from '@/infrastructure/database/Repository'
 
 describe('Service Integration', () => {
-  let service: Service;
-  let repository: Repository;
+  let service: Service
+  let repository: Repository
 
   beforeEach(async () => {
     // Setup test database
-    repository = new Repository(testDatabase);
-    service = new Service(repository);
-    
+    repository = new Repository(testDatabase)
+    service = new Service(repository)
+
     // Clean up test data
-    await repository.clear();
-  });
+    await repository.clear()
+  })
 
   afterEach(async () => {
     // Cleanup test data
-    await repository.clear();
-    await repository.disconnect();
-  });
+    await repository.clear()
+    await repository.disconnect()
+  })
 
   it('should integrate with database correctly', async () => {
     // Create test data
     const testData = await repository.create({
       name: 'Test Data',
-      value: 'test value'
-    });
+      value: 'test value',
+    })
 
     // Test service integration
-    const result = await service.processData(testData.id);
+    const result = await service.processData(testData.id)
 
-    expect(result).toBeDefined();
-    expect(result.processedValue).toBe('expected value');
-    
+    expect(result).toBeDefined()
+    expect(result.processedValue).toBe('expected value')
+
     // Verify database state
-    const dbData = await repository.findById(testData.id);
-    expect(dbData.processed).toBe(true);
-  });
-});
+    const dbData = await repository.findById(testData.id)
+    expect(dbData.processed).toBe(true)
+  })
+})
 ```
 
 #### E2E Test Template
 
 ```typescript
-import { test, expect } from '@playwright/test';
+import { test, expect } from '@playwright/test'
 
 test.describe('User Workflow', () => {
   test.beforeEach(async ({ page }) => {
     // Setup before each test
-    await page.goto('http://localhost:3000/login');
-  });
+    await page.goto('http://localhost:3000/login')
+  })
 
   test('should complete user journey successfully', async ({ page }) => {
     // Login
-    await page.fill('[data-testid="email"]', 'user@example.com');
-    await page.fill('[data-testid="password"]', 'password123');
-    await page.click('[data-testid="login-button"]');
-    
+    await page.fill('[data-testid="email"]', 'user@example.com')
+    await page.fill('[data-testid="password"]', 'password123')
+    await page.click('[data-testid="login-button"]')
+
     // Navigate through workflow
-    await page.click('[data-testid="menu-item"]');
-    await page.fill('[data-testid="form-field"]', 'test value');
-    await page.click('[data-testid="submit-button"]');
-    
+    await page.click('[data-testid="menu-item"]')
+    await page.fill('[data-testid="form-field"]', 'test value')
+    await page.click('[data-testid="submit-button"]')
+
     // Verify results
-    await expect(page.locator('[data-testid="success-message"]')).toBeVisible();
-    await expect(page.locator('[data-testid="result-value"]')).toContainText('expected result');
-  });
+    await expect(page.locator('[data-testid="success-message"]')).toBeVisible()
+    await expect(page.locator('[data-testid="result-value"]')).toContainText(
+      'expected result',
+    )
+  })
 
   test('should handle errors gracefully', async ({ page }) => {
     // Trigger error condition
-    await page.fill('[data-testid="email"]', 'invalid@example.com');
-    await page.fill('[data-testid="password"]', 'wrong-password');
-    await page.click('[data-testid="login-button"]');
-    
+    await page.fill('[data-testid="email"]', 'invalid@example.com')
+    await page.fill('[data-testid="password"]', 'wrong-password')
+    await page.click('[data-testid="login-button"]')
+
     // Verify error handling
-    await expect(page.locator('[data-testid="error-message"]')).toBeVisible();
-    await expect(page.locator('[data-testid="error-message"]')).toContainText('Invalid credentials');
-  });
-});
+    await expect(page.locator('[data-testid="error-message"]')).toBeVisible()
+    await expect(page.locator('[data-testid="error-message"]')).toContainText(
+      'Invalid credentials',
+    )
+  })
+})
 ```
 
 ## Test Data Management
@@ -246,8 +250,8 @@ Use factory pattern for creating test data:
 
 ```typescript
 // tests/helpers/factories.ts
-import { v7 as uuidv7 } from 'uuid';
-import { User, Tenant, Student } from '@prisma/client';
+import { v7 as uuidv7 } from 'uuid'
+import { User, Tenant, Student } from '@prisma/client'
 
 export class UserFactory {
   static create(overrides: Partial<User> = {}): User {
@@ -262,25 +266,25 @@ export class UserFactory {
       passwordHash: 'hashed-password',
       createdAt: new Date(),
       updatedAt: new Date(),
-      ...overrides
-    };
+      ...overrides,
+    }
   }
 
   static createMany(count: number, overrides: Partial<User> = {}): User[] {
-    return Array.from({ length: count }, (_, index) => 
+    return Array.from({ length: count }, (_, index) =>
       UserFactory.create({
         ...overrides,
         email: `test${index}@example.com`,
-        firstName: `Test${index}`
-      })
-    );
+        firstName: `Test${index}`,
+      }),
+    )
   }
 
   static withRole(role: string): UserFactory {
     return {
-      create: (overrides: Partial<User> = {}) => 
-        UserFactory.create({ ...overrides, role })
-    };
+      create: (overrides: Partial<User> = {}) =>
+        UserFactory.create({ ...overrides, role }),
+    }
   }
 }
 ```
@@ -332,22 +336,20 @@ Use fixtures for consistent test data:
 vi.mock('@/infrastructure/api/Client', () => ({
   getUser: vi.fn(),
   createUser: vi.fn(),
-  updateUser: vi.fn()
-}));
+  updateUser: vi.fn(),
+}))
 
 // Mocking with implementation
 vi.mock('@/infrastructure/database/Repository', () => ({
-  findById: vi.fn((id: string) => 
-    Promise.resolve({ id, name: `User ${id}` })
+  findById: vi.fn((id: string) => Promise.resolve({ id, name: `User ${id}` })),
+  save: vi.fn((user: User) =>
+    Promise.resolve({ ...user, id: user.id || 'new-id' }),
   ),
-  save: vi.fn((user: User) => 
-    Promise.resolve({ ...user, id: user.id || 'new-id' })
-  )
-}));
+}))
 
 // Mocking with return values
-const mockApi = vi.mocked('@/infrastructure/api/Client');
-mockApi.getUser.mockResolvedValue({ id: '123', name: 'Test User' });
+const mockApi = vi.mocked('@/infrastructure/api/Client')
+mockApi.getUser.mockResolvedValue({ id: '123', name: 'Test User' })
 ```
 
 ## Assertion Standards
@@ -356,69 +358,71 @@ mockApi.getUser.mockResolvedValue({ id: '123', name: 'Test User' });
 
 ```typescript
 // Basic assertions
-expect(result).toBeDefined();
-expect(result).toBeNull();
-expect(result).toBeTruthy();
-expect(result).toBeFalsy();
+expect(result).toBeDefined()
+expect(result).toBeNull()
+expect(result).toBeTruthy()
+expect(result).toBeFalsy()
 
 // Value assertions
-expect(result).toBe(expectedValue);
-expect(result).toEqual(expectedObject);
-expect(result).toMatchObject(expectedStructure);
-expect(result).toMatch(expectedPattern);
+expect(result).toBe(expectedValue)
+expect(result).toEqual(expectedObject)
+expect(result).toMatchObject(expectedStructure)
+expect(result).toMatch(expectedPattern)
 
 // Array assertions
-expect(array).toHaveLength(expectedLength);
-expect(array).toContain(expectedItem);
-expect(array).toEqual(expect.arrayContaining([expectedItem]));
+expect(array).toHaveLength(expectedLength)
+expect(array).toContain(expectedItem)
+expect(array).toEqual(expect.arrayContaining([expectedItem]))
 
 // String assertions
-expect(string).toContain(expectedSubstring);
-expect(string).toMatch(expectedRegex);
-expect(string).toStartWith(expectedPrefix);
+expect(string).toContain(expectedSubstring)
+expect(string).toMatch(expectedRegex)
+expect(string).toStartWith(expectedPrefix)
 
 // Error assertions
-expect(() => riskyOperation()).toThrow();
-expect(() => riskyOperation()).toThrow('Expected error message');
-expect(() => riskyOperation()).toThrow(Error);
+expect(() => riskyOperation()).toThrow()
+expect(() => riskyOperation()).toThrow('Expected error message')
+expect(() => riskyOperation()).toThrow(Error)
 ```
 
 ### Custom Matchers
 
 ```typescript
 // tests/helpers/custom-matchers.ts
-import { expect } from 'vitest';
+import { expect } from 'vitest'
 
 expect.extend({
   toBeValidEmail(received: string) {
-    const isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(received);
+    const isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(received)
     return {
       message: () => `expected ${received} to be a valid email`,
-      pass: isValid
-    };
+      pass: isValid,
+    }
   },
 
   toBeValidUUID(received: string) {
-    const isValid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(received);
+    const isValid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+      received,
+    )
     return {
       message: () => `expected ${received} to be a valid UUID`,
-      pass: isValid
-    };
+      pass: isValid,
+    }
   },
 
   toBeWithinRange(received: number, min: number, max: number) {
-    const isInRange = received >= min && received <= max;
+    const isInRange = received >= min && received <= max
     return {
       message: () => `expected ${received} to be within range ${min}-${max}`,
-      pass: isInRange
-    };
-  }
-});
+      pass: isInRange,
+    }
+  },
+})
 
 // Usage in tests
-expect(user.email).toBeValidEmail();
-expect(user.id).toBeValidUUID();
-expect(user.age).toBeWithinRange(18, 65);
+expect(user.email).toBeValidEmail()
+expect(user.id).toBeValidUUID()
+expect(user.age).toBeWithinRange(18, 65)
 ```
 
 ## Test Coverage Requirements
@@ -445,32 +449,32 @@ export default defineConfig({
         '**/*.config.*',
         '**/*.stories.*',
         'dist/',
-        'coverage/'
+        'coverage/',
       ],
       thresholds: {
         global: {
           branches: 80,
           functions: 80,
           lines: 80,
-          statements: 80
+          statements: 80,
         },
         // Per-module thresholds
         './src/domain/tenant/**': {
           branches: 95,
           functions: 95,
           lines: 95,
-          statements: 95
+          statements: 95,
         },
         './src/domain/user/**': {
           branches: 90,
           functions: 90,
           lines: 90,
-          statements: 90
-        }
-      }
-    }
-  }
-});
+          statements: 90,
+        },
+      },
+    },
+  },
+})
 ```
 
 ## Performance Testing Standards
@@ -487,31 +491,31 @@ export default defineConfig({
 ```typescript
 describe('Performance Tests', () => {
   it('should complete operation within time limit', async () => {
-    const startTime = performance.now();
-    
-    await service.complexOperation();
-    
-    const endTime = performance.now();
-    const duration = endTime - startTime;
-    
-    expect(duration).toBeLessThan(500); // Should complete within 500ms
-  });
+    const startTime = performance.now()
+
+    await service.complexOperation()
+
+    const endTime = performance.now()
+    const duration = endTime - startTime
+
+    expect(duration).toBeLessThan(500) // Should complete within 500ms
+  })
 
   it('should handle large datasets efficiently', async () => {
     const largeDataset = Array.from({ length: 10000 }, (_, i) => ({
       id: i,
       name: `Item ${i}`,
-      value: Math.random()
-    }));
+      value: Math.random(),
+    }))
 
-    const startTime = performance.now();
-    const result = await service.processLargeDataset(largeDataset);
-    const endTime = performance.now();
-    
-    expect(endTime - startTime).toBeLessThan(2000); // Should complete within 2s
-    expect(result).toHaveLength(10000);
-  });
-});
+    const startTime = performance.now()
+    const result = await service.processLargeDataset(largeDataset)
+    const endTime = performance.now()
+
+    expect(endTime - startTime).toBeLessThan(2000) // Should complete within 2s
+    expect(result).toHaveLength(10000)
+  })
+})
 ```
 
 ## Security Testing Standards
@@ -530,44 +534,44 @@ describe('Performance Tests', () => {
 describe('Security Tests', () => {
   describe('Input Validation', () => {
     it('should reject SQL injection attempts', async () => {
-      const maliciousInput = "'; DROP TABLE users; --";
-      
-      await expect(service.processInput(maliciousInput)).rejects.toThrow();
-    });
+      const maliciousInput = "'; DROP TABLE users; --"
+
+      await expect(service.processInput(maliciousInput)).rejects.toThrow()
+    })
 
     it('should sanitize HTML inputs', async () => {
-      const xssInput = '<script>alert("xss")</script>';
-      
-      const result = await service.processInput(xssInput);
-      expect(result).not.toContain('<script>');
-      expect(result).toContain('<script>');
-    });
-  });
+      const xssInput = '<script>alert("xss")</script>'
+
+      const result = await service.processInput(xssInput)
+      expect(result).not.toContain('<script>')
+      expect(result).toContain('<script>')
+    })
+  })
 
   describe('Authentication Security', () => {
     it('should prevent brute force attacks', async () => {
-      const user = await userService.findByEmail('user@example.com');
-      
+      const user = await userService.findByEmail('user@example.com')
+
       // Simulate multiple failed attempts
       for (let i = 0; i < 10; i++) {
-        await authService.login('user@example.com', `wrong${i}`);
+        await authService.login('user@example.com', `wrong${i}`)
       }
-      
+
       // Verify account is locked
-      const lockedUser = await userService.findByEmail('user@example.com');
-      expect(lockedUser.isLocked).toBe(true);
-    });
+      const lockedUser = await userService.findByEmail('user@example.com')
+      expect(lockedUser.isLocked).toBe(true)
+    })
 
     it('should prevent session hijacking', async () => {
-      const token = authService.generateToken(user);
-      
+      const token = authService.generateToken(user)
+
       // Verify token has proper claims and expiration
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      expect(decoded.exp).toBeLessThanOrEqual(Date.now() / 1000 + 3600); // 1 hour
-      expect(decoded.iat).toBeGreaterThan(Date.now() / 1000 - 300); // Issued within last 5 minutes
-    });
-  });
-});
+      const decoded = jwt.verify(token, process.env.JWT_SECRET)
+      expect(decoded.exp).toBeLessThanOrEqual(Date.now() / 1000 + 3600) // 1 hour
+      expect(decoded.iat).toBeGreaterThan(Date.now() / 1000 - 300) // Issued within last 5 minutes
+    })
+  })
+})
 ```
 
 ## Accessibility Testing Standards
@@ -585,41 +589,50 @@ describe('Security Tests', () => {
 ```typescript
 test.describe('Accessibility Tests', () => {
   test('should support keyboard navigation', async ({ page }) => {
-    await page.goto('http://localhost:3000/dashboard');
-    
+    await page.goto('http://localhost:3000/dashboard')
+
     // Test tab navigation
-    await page.keyboard.press('Tab');
-    await expect(page.locator(':focus')).toBeVisible();
-    
+    await page.keyboard.press('Tab')
+    await expect(page.locator(':focus')).toBeVisible()
+
     // Test Enter key activation
-    await page.keyboard.press('Enter');
-    await expect(page.locator('[data-testid="active-element"]')).toBeVisible();
-  });
+    await page.keyboard.press('Enter')
+    await expect(page.locator('[data-testid="active-element"]')).toBeVisible()
+  })
 
   test('should have proper ARIA labels', async ({ page }) => {
-    await page.goto('http://localhost:3000/login');
-    
+    await page.goto('http://localhost:3000/login')
+
     // Check for proper labels
-    await expect(page.locator('[data-testid="email"]')).toHaveAttribute('aria-label', 'Email address');
-    await expect(page.locator('[data-testid="password"]')).toHaveAttribute('aria-label', 'Password');
-    await expect(page.locator('[data-testid="login-button"]')).toHaveAttribute('aria-label', 'Sign in to your account');
-  });
+    await expect(page.locator('[data-testid="email"]')).toHaveAttribute(
+      'aria-label',
+      'Email address',
+    )
+    await expect(page.locator('[data-testid="password"]')).toHaveAttribute(
+      'aria-label',
+      'Password',
+    )
+    await expect(page.locator('[data-testid="login-button"]')).toHaveAttribute(
+      'aria-label',
+      'Sign in to your account',
+    )
+  })
 
   test('should maintain focus management', async ({ page }) => {
-    await page.goto('http://localhost:3000/dashboard');
-    
+    await page.goto('http://localhost:3000/dashboard')
+
     // Check initial focus
-    await expect(page.locator('body')).toBeFocused();
-    
+    await expect(page.locator('body')).toBeFocused()
+
     // Test focus trap in modals
-    await page.click('[data-testid="open-modal"]');
-    await expect(page.locator('[data-testid="modal-input"]')).toBeFocused();
-    
+    await page.click('[data-testid="open-modal"]')
+    await expect(page.locator('[data-testid="modal-input"]')).toBeFocused()
+
     // Test focus restoration
-    await page.keyboard.press('Escape');
-    await expect(page.locator('[data-testid="modal-trigger"]')).toBeFocused();
-  });
-});
+    await page.keyboard.press('Escape')
+    await expect(page.locator('[data-testid="modal-trigger"]')).toBeFocused()
+  })
+})
 ```
 
 ## Test Data Privacy
@@ -638,15 +651,15 @@ test.describe('Accessibility Tests', () => {
 const testUser = UserFactory.create({
   email: 'test123@example.com',
   firstName: 'Test',
-  lastName: 'User'
-});
+  lastName: 'User',
+})
 
 // Bad: Using real data
 const realUser = {
   email: 'john.doe@realschool.edu.ph',
   firstName: 'John',
-  lastName: 'Doe'
-};
+  lastName: 'Doe',
+}
 ```
 
 ## Continuous Integration Testing
@@ -667,9 +680,9 @@ name: Tests
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [main, develop]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   unit-tests:
@@ -743,10 +756,11 @@ jobs:
 
 ### Test Documentation Template
 
-```markdown
+````markdown
 # Module Tests
 
 ## Overview
+
 This directory contains tests for [module name] module.
 
 ## Running Tests
@@ -767,6 +781,7 @@ npm run test:e2e -- --grep "[module name]"
 # Run with coverage
 npm run test:coverage -- --grep "[module name]"
 ```
+````
 
 ## Test Structure
 
@@ -792,6 +807,7 @@ Tests use factory-generated data to ensure consistency and avoid using real user
 - Check test logs for detailed error messages
 - Run tests with `--verbose` flag for additional output
 - Review test documentation for specific module requirements
+
 ```
 
 ## Code Review Standards
@@ -852,3 +868,4 @@ A feature is considered complete when:
 Following these testing guidelines ensures that the PEMS system maintains high quality standards, provides comprehensive coverage, and delivers a reliable educational management system that meets the needs of Philippine educational institutions.
 
 Regular reviews and updates to these guidelines will help the team maintain consistency and improve testing practices over time.
+```

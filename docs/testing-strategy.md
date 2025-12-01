@@ -7,12 +7,15 @@ This document outlines the comprehensive testing strategy for the Philippine Edu
 ## Testing Philosophy
 
 ### TDD-First Approach
+
 Following ADR-011, we implement a strict TDD workflow:
+
 1. **RED**: Write failing tests that define the desired behavior
 2. **GREEN**: Implement minimal code to make tests pass
 3. **REFACTOR**: Optimize while maintaining test coverage
 
 ### Testing Pyramid
+
 ```
     E2E Tests (Playwright)
         ↓
@@ -24,6 +27,7 @@ Following ADR-011, we implement a strict TDD workflow:
 ## Testing Tools & Frameworks
 
 ### Core Testing Stack
+
 - **Unit/Integration Tests**: Vitest (ADR-015)
 - **E2E Tests**: Playwright (ADR-016)
 - **Mocking**: Vitest built-in mocking
@@ -32,6 +36,7 @@ Following ADR-011, we implement a strict TDD workflow:
 - **Test Data**: Factory pattern with fixtures
 
 ### Supporting Tools
+
 - **Database Testing**: Test containers with PostgreSQL
 - **API Testing**: Supertest for HTTP assertions
 - **Authentication Testing**: Mock BetterAuth
@@ -40,6 +45,7 @@ Following ADR-011, we implement a strict TDD workflow:
 ## Test Structure
 
 ### Directory Organization
+
 ```
 tests/
 ├── unit/                    # Unit tests for individual components/functions
@@ -69,9 +75,11 @@ tests/
 ## Test Categories by Sprint
 
 ### Sprint 0: Foundation & Infrastructure
+
 **Focus**: Testing infrastructure setup and tooling
 
 #### Story 1: Development Environment Setup
+
 - **Unit Tests**:
   - Package installation verification
   - Configuration file validation
@@ -85,6 +93,7 @@ tests/
   - Complete development environment workflow
 
 #### Story 2: CI/CD Pipeline Foundation
+
 - **Unit Tests**:
   - GitHub Actions workflow validation
   - Build script tests
@@ -97,9 +106,11 @@ tests/
   - Complete CI/CD workflow simulation
 
 ### Sprint 1: Core Tenant Management & Authentication
+
 **Focus**: Multi-tenancy and authentication security
 
 #### Story 1: Multi-Tenant Architecture
+
 - **Unit Tests**:
   - Tenant creation and validation
   - Tenant isolation logic
@@ -115,6 +126,7 @@ tests/
   - Tenant switching scenarios
 
 #### Story 2: User Authentication System
+
 - **Unit Tests**:
   - User registration validation
   - Password hashing/verification
@@ -130,6 +142,7 @@ tests/
   - MFA setup and usage
 
 #### Story 3: Permission-Based Navigation
+
 - **Unit Tests**:
   - Permission validation logic
   - Menu filtering algorithms
@@ -144,9 +157,11 @@ tests/
   - Menu customization per tenant
 
 ### Sprint 2: Cashiering Module (Priority Module)
+
 **Focus**: Payment processing and receipt generation
 
 #### Story 1: Payment Processing
+
 - **Unit Tests**:
   - Payment method validation
   - Transaction recording logic
@@ -163,6 +178,7 @@ tests/
   - Error handling and recovery
 
 #### Story 2: Official Receipt Generation
+
 - **Unit Tests**:
   - Receipt template rendering
   - Philippine tax compliance validation
@@ -178,6 +194,7 @@ tests/
   - Receipt voiding processes
 
 #### Story 3: Cashier Session Management
+
 - **Unit Tests**:
   - Session creation/termination
   - Balance calculation logic
@@ -192,9 +209,11 @@ tests/
   - Discrepancy handling
 
 ### Sprint 3: Student Management Module
+
 **Focus**: Student registration and profile management
 
 #### Story 1: Student Registration
+
 - **Unit Tests**:
   - Student information validation
   - LRN validation logic (DepEd)
@@ -210,6 +229,7 @@ tests/
   - Validation error handling
 
 #### Story 2: Student Profile Management
+
 - **Unit Tests**:
   - Profile update validation
   - Photo upload processing
@@ -224,6 +244,7 @@ tests/
   - Information update processes
 
 #### Story 3: Guardian Management
+
 - **Unit Tests**:
   - Guardian relationship validation
   - Contact information management
@@ -237,9 +258,11 @@ tests/
   - Access grant processes
 
 ### Sprint 4: Enrollment Management Module
+
 **Focus**: Course management and student enrollment
 
 #### Story 1: Course and Section Management
+
 - **Unit Tests**:
   - Course creation validation
   - Section capacity management
@@ -255,6 +278,7 @@ tests/
   - Schedule configuration
 
 #### Story 2: Student Enrollment
+
 - **Unit Tests**:
   - Enrollment validation logic
   - Capacity checking algorithms
@@ -270,6 +294,7 @@ tests/
   - Error handling processes
 
 #### Story 3: Enrollment Reporting
+
 - **Unit Tests**:
   - Report generation logic
   - Data aggregation algorithms
@@ -284,9 +309,11 @@ tests/
   - Export functionality
 
 ### Sprint 5: Attendance Management Module
+
 **Focus**: Attendance tracking with RFID support
 
 #### Story 1: Manual Attendance Tracking
+
 - **Unit Tests**:
   - Attendance recording logic
   - Status validation
@@ -301,6 +328,7 @@ tests/
   - Historical data viewing
 
 #### Story 2: RFID-Based Attendance
+
 - **Unit Tests**:
   - RFID validation logic
   - Check-in/out algorithms
@@ -315,6 +343,7 @@ tests/
   - Error recovery processes
 
 #### Story 3: Attendance Reporting
+
 - **Unit Tests**:
   - Report calculation logic
   - Trend analysis algorithms
@@ -329,9 +358,11 @@ tests/
   - Alert scenarios
 
 ### Sprint 6: Grading Management Module
+
 **Focus**: Grade recording and report card generation
 
 #### Story 1: Grade Component Management
+
 - **Unit Tests**:
   - Component validation logic
   - Weight calculation algorithms
@@ -346,6 +377,7 @@ tests/
   - Calculation verification
 
 #### Story 2: Grade Recording
+
 - **Unit Tests**:
   - Grade validation logic
   - Import processing
@@ -360,6 +392,7 @@ tests/
   - Calculation verification
 
 #### Story 3: Report Card Generation
+
 - **Unit Tests**:
   - Report formatting logic
   - Template rendering
@@ -374,9 +407,11 @@ tests/
   - Export scenarios
 
 ### Sprint 7: Reporting & Analytics
+
 **Focus**: Cross-module reporting and dashboard analytics
 
 #### Story 1: Cross-Module Reporting
+
 - **Unit Tests**:
   - Data aggregation logic
   - Filter processing
@@ -391,6 +426,7 @@ tests/
   - Export processes
 
 #### Story 2: Dashboard Analytics
+
 - **Unit Tests**:
   - Metric calculation logic
   - Data visualization
@@ -405,6 +441,7 @@ tests/
   - Customization processes
 
 #### Story 3: Compliance Reporting
+
 - **Unit Tests**:
   - Compliance validation logic
   - Format generation
@@ -419,9 +456,11 @@ tests/
   - Status monitoring
 
 ### Sprint 8: Integration Testing & Deployment Prep
+
 **Focus**: Comprehensive testing and deployment readiness
 
 #### Story 1: End-to-End Testing
+
 - **Unit Tests**:
   - Test utility functions
   - Mock data generators
@@ -436,6 +475,7 @@ tests/
   - Accessibility validation
 
 #### Story 2: Deployment Preparation
+
 - **Unit Tests**:
   - Configuration validation
   - Migration testing
@@ -450,6 +490,7 @@ tests/
   - Recovery processes
 
 #### Story 3: User Documentation
+
 - **Unit Tests**:
   - Documentation validation
   - Link checking
@@ -466,28 +507,33 @@ tests/
 ## Testing Best Practices
 
 ### Test Naming Conventions
+
 - **Unit Tests**: `describe('Component/Function', () => { it('should do X when Y', () => {}); })`
 - **Integration Tests**: `describe('Integration: Feature', () => { it('should integrate X with Y', () => {}); })`
 - **E2E Tests**: `describe('E2E: User Workflow', () => { it('should complete X workflow', () => {}); })`
 
 ### Test Data Management
+
 - Use factory pattern for test data generation
 - Implement proper test isolation and cleanup
 - Use deterministic data for reproducible tests
 - Separate test data from production data
 
 ### Mock Strategy
+
 - Mock external dependencies (APIs, databases)
 - Use realistic mock data that matches production
 - Implement proper mock verification
 - Avoid over-mocking internal logic
 
 ### Coverage Requirements
+
 - **Unit Tests**: 90%+ line coverage for business logic
 - **Integration Tests**: 80%+ coverage for critical paths
 - **E2E Tests**: 100% coverage for critical user journeys
 
 ### Performance Testing
+
 - Load testing for critical endpoints
 - Performance regression testing
 - Database query optimization validation
@@ -496,17 +542,20 @@ tests/
 ## Test Execution Strategy
 
 ### Continuous Integration
+
 - Run unit tests on every commit
 - Run integration tests on pull requests
 - Run E2E tests on main branch updates
 - Generate coverage reports for all test runs
 
 ### Test Environments
+
 - **Unit Tests**: In-memory with mocked dependencies
 - **Integration Tests**: Isolated test database with real services
 - **E2E Tests**: Staging environment with production-like setup
 
 ### Test Data Management
+
 - Use database transactions for test isolation
 - Implement proper cleanup procedures
 - Use seed data for consistent test states
@@ -515,6 +564,7 @@ tests/
 ## Quality Gates
 
 ### Definition of Done
+
 - All tests passing (unit, integration, E2E)
 - Code coverage requirements met
 - Performance benchmarks satisfied
@@ -522,6 +572,7 @@ tests/
 - Documentation updated
 
 ### Release Criteria
+
 - No critical test failures
 - Coverage targets achieved
 - Performance requirements met
@@ -531,12 +582,14 @@ tests/
 ## Monitoring and Maintenance
 
 ### Test Health Monitoring
+
 - Track test execution times
 - Monitor flaky test identification
 - Analyze test failure patterns
 - Maintain test suite performance
 
 ### Continuous Improvement
+
 - Regular test suite reviews
 - Test refactoring and optimization
 - Update testing tools and practices
