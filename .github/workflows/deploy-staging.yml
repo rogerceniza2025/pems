@@ -1,0 +1,251 @@
+name: Deploy to Staging
+
+on:
+  push:
+    branches: [main]
+
+env:
+  NODE_VERSION: '20'
+  PNPM_VERSION: '8'
+  RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+  RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
+
+jobs:
+  # Full test suite
+  full-test-suite:
+    name: Full Test Suite
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_PASSWORD: test
+          POSTGRES_USER: test
+          POSTGRES_DB: pems_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v3
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Cache Turbo
+        uses: actions/cache@v3
+        with:
+          path: |
+            .turbo
+            node_modules/.cache
+          key: turbo-${{ runner.os }}-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('**/turbo.json') }}
+          restore-keys: |
+            turbo-${{ runner.os }}-${{ hashFiles('**/pnpm-lock.yaml') }}-
+            turbo-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Setup test database
+        run: |
+          pnpm db:generate
+          pnpm db:migrate
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/pems_test
+          REDIS_URL: redis://localhost:6379
+
+      - name: Run all tests
+        run: pnpm test
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/pems_test
+          REDIS_URL: redis://localhost:6379
+          NODE_ENV: test
+
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps
+
+      - name: Run E2E tests
+        run: pnpm test:e2e
+
+      - name: Upload E2E test results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: e2e-test-results
+          path: |
+            playwright-report
+            test-results
+          retention-days: 7
+
+      - name: Generate coverage report
+        run: pnpm test:coverage
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./coverage/lcov.info
+          flags: alltests
+          name: codecov-umbrella
+
+  # Build and deploy
+  deploy-staging:
+    name: Deploy to Staging
+    needs: full-test-suite
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v3
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Cache Turbo
+        uses: actions/cache@v3
+        with:
+          path: |
+            .turbo
+            node_modules/.cache
+          key: turbo-${{ runner.os }}-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('**/turbo.json') }}
+          restore-keys: |
+            turbo-${{ runner.os }}-${{ hashFiles('**/pnpm-lock.yaml') }}-
+            turbo-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Railway CLI
+        run: npm install -g @railway/cli
+
+      - name: Build applications
+        run: pnpm build
+
+      - name: Deploy to Railway
+        run: |
+          railway login --token ${{ env.RAILWAY_TOKEN }}
+          railway up --service api
+          railway up --service web
+          railway up --service admin
+        env:
+          DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+          REDIS_URL: ${{ secrets.STAGING_REDIS_URL }}
+          JWT_SECRET: ${{ secrets.STAGING_JWT_SECRET }}
+          BETTER_AUTH_SECRET: ${{ secrets.STAGING_BETTER_AUTH_SECRET }}
+
+      - name: Wait for deployment
+        run: sleep 60
+
+      - name: Run health checks
+        run: |
+          # Check API health
+          if ! curl -f ${{ secrets.STAGING_API_URL }}/api/health; then
+            echo "API health check failed"
+            exit 1
+          fi
+
+          # Check web app
+          if ! curl -f ${{ secrets.STAGING_WEB_URL }}; then
+            echo "Web app health check failed"
+            exit 1
+          fi
+
+          # Check admin panel
+          if ! curl -f ${{ secrets.STAGING_ADMIN_URL }}; then
+            echo "Admin panel health check failed"
+            exit 1
+          fi
+
+      - name: Notify deployment status
+        run: |
+          echo "Deployment completed with status: ${{ job.status }}"
+
+  # Rollback on failure
+  rollback-on-failure:
+    name: Rollback on Failure
+    needs: deploy-staging
+    runs-on: ubuntu-latest
+    if: failure()
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.before }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install Railway CLI
+        run: npm install -g @railway/cli
+
+      - name: Rollback deployment
+        run: |
+          railway login --token ${{ env.RAILWAY_TOKEN }}
+          railway rollback
+        env:
+          DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+          REDIS_URL: ${{ secrets.STAGING_REDIS_URL }}
+
+      - name: Notify rollback
+        run: |
+          echo "Deployment rolled back due to health check failure"
