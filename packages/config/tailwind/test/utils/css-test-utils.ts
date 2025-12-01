@@ -4,7 +4,14 @@
  */
 
 import { render } from 'solid-js/web';
-import { JSX } from 'solid-js/jsx-runtime';
+
+// Make SolidJS JSX available globally
+declare global {
+  var h: any;
+  var Fragment: any;
+}
+
+// Use Vitest's expect functions
 import { expect } from 'vitest';
 
 /**
@@ -156,7 +163,7 @@ export function expectReducedMotionSupport(element: HTMLElement) {
 /**
  * Helper to render a component for testing
  */
-export function renderComponent(component: JSX.Element): HTMLElement {
+export function renderComponent(component: any): HTMLElement {
   const container = document.createElement('div');
   document.body.appendChild(container);
 

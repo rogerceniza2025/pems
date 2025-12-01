@@ -3,17 +3,20 @@
  * Tests the styling, theme application, and accessibility of the Button component
  */
 
-import { Button } from '../src/Button';
 import {
-  renderComponent,
   cleanup,
-  expectClasses,
-  expectCSSVariable,
-  expectColorContrast,
-  expectFocusable,
   expectAriaAttribute,
+  expectClasses,
+  expectColorContrast,
+  expectCSSVariable,
+  expectFocusable,
   PerformanceTestUtils,
+  renderComponent,
 } from '@pems/config-tailwind/test/utils/css-test-utils';
+import { Button } from '../src/components/ui/button';
+
+// Import SolidJS JSX runtime
+import 'solid-js/jsx-runtime';
 
 describe('Button Component Styling', () => {
   beforeEach(() => {
@@ -44,8 +47,8 @@ describe('Button Component Styling', () => {
       expect(button.tagName).toBe('BUTTON');
     });
 
-    it('should apply primary variant styles correctly', () => {
-      const button = renderComponent(<Button variant="primary">Primary</Button>);
+    it('should apply default variant styles correctly', () => {
+      const button = renderComponent(<Button variant="default">Default</Button>);
 
       expectClasses(button, ['bg-primary', 'text-primary-foreground']);
       expectCSSVariable(button, '--background', '0 0% 100%');
@@ -85,9 +88,9 @@ describe('Button Component Styling', () => {
     });
 
     it('should apply medium size styles', () => {
-      const button = renderComponent(<Button size="md">Medium</Button>);
+      const button = renderComponent(<Button size="default">Medium</Button>);
 
-      expectClasses(button, ['h-9', 'px-4', 'py-2']);
+      expectClasses(button, ['h-10', 'px-4', 'py-2']);
     });
 
     it('should apply large size styles', () => {
@@ -96,16 +99,16 @@ describe('Button Component Styling', () => {
       expectClasses(button, ['h-10', 'px-8']);
     });
 
-    it('should apply extra large size styles', () => {
-      const button = renderComponent(<Button size="xl">Extra Large</Button>);
+    it('should apply large size styles', () => {
+      const button = renderComponent(<Button size="lg">Large</Button>);
 
-      expectClasses(button, ['h-11', 'px-10']);
+      expectClasses(button, ['h-11', 'px-8']);
     });
   });
 
   describe('Theme Application', () => {
     it('should use design tokens for colors', () => {
-      const button = renderComponent(<Button variant="primary">Themed</Button>);
+      const button = renderComponent(<Button variant="default">Themed</Button>);
 
       // Check if CSS custom properties are applied
       const computedStyle = getComputedStyle(button);
@@ -114,7 +117,7 @@ describe('Button Component Styling', () => {
     });
 
     it('should switch themes correctly', () => {
-      const button = renderComponent(<Button variant="primary">Theme Test</Button>);
+      const button = renderComponent(<Button variant="default">Theme Test</Button>);
 
       // Test light theme
       document.documentElement.classList.remove('dark');
@@ -130,7 +133,7 @@ describe('Button Component Styling', () => {
 
     it('should maintain consistent spacing across variants', () => {
       const buttons = [
-        renderComponent(<Button variant="primary">Primary</Button>),
+        renderComponent(<Button variant="default">Default</Button>),
         renderComponent(<Button variant="secondary">Secondary</Button>),
         renderComponent(<Button variant="destructive">Destructive</Button>),
       ];
@@ -167,7 +170,7 @@ describe('Button Component Styling', () => {
     });
 
     it('should maintain sufficient color contrast', () => {
-      const button = renderComponent(<Button variant="primary">High Contrast</Button>);
+      const button = renderComponent(<Button variant="default">High Contrast</Button>);
 
       const computedStyle = getComputedStyle(button);
       const foregroundColor = computedStyle.color;
@@ -212,15 +215,15 @@ describe('Button Component Styling', () => {
       expect(button.hasAttribute('disabled')).toBe(true);
     });
 
-    it('should show loading state correctly', () => {
-      const button = renderComponent(<Button loading>Loading</Button>);
+    it('should show disabled state correctly', () => {
+      const button = renderComponent(<Button disabled>Disabled</Button>);
 
-      expectClasses(button, ['cursor-wait']);
-      expect(button.getAttribute('aria-busy')).toBe('true');
+      expectClasses(button, ['disabled:opacity-50', 'disabled:pointer-events-none']);
+      expect(button.hasAttribute('disabled')).toBe(true);
     });
 
     it('should handle hover states', () => {
-      const button = renderComponent(<Button variant="primary">Hover</Button>);
+      const button = renderComponent(<Button variant="default">Hover</Button>);
 
       // Simulate hover
       button.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
@@ -298,7 +301,7 @@ describe('Button Component Styling', () => {
     it('should follow consistent spacing scale', () => {
       const buttons = [
         renderComponent(<Button size="sm">Small</Button>),
-        renderComponent(<Button size="md">Medium</Button>),
+        renderComponent(<Button size="default">Medium</Button>),
         renderComponent(<Button size="lg">Large</Button>),
       ];
 
@@ -314,7 +317,7 @@ describe('Button Component Styling', () => {
 
   describe('CSS Custom Properties Integration', () => {
     it('should properly consume CSS custom properties', () => {
-      const button = renderComponent(<Button variant="primary">CSS Vars</Button>);
+      const button = renderComponent(<Button variant="default">CSS Vars</Button>);
 
       // Test if CSS variables are being used
       const computedStyle = getComputedStyle(button);
