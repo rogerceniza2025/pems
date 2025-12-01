@@ -1,0 +1,20 @@
+{
+  "name": "@pems/config-prettier",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./base.json": "./base.json"
+  },
+  "files": [
+    "base.json"
+  ],
+  "scripts": {
+    "lint": "echo 'No TypeScript files to lint in config package'",
+    "lint:fix": "echo 'No TypeScript files to lint in config package'",
+    "type-check": "echo 'No TypeScript files to type-check in config package'"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.5",
+    "typescript": "^5.9.3"
+  }
+}

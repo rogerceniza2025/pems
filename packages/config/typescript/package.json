@@ -1,0 +1,25 @@
+{
+  "name": "@pems/config-typescript",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "exports": {
+    "./base.json": "./base.json",
+    "./node.json": "./node.json",
+    "./solid.json": "./solid.json"
+  },
+  "files": [
+    "base.json",
+    "node.json",
+    "solid.json"
+  ],
+  "scripts": {
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "lint:fix": "eslint . --ext ts,tsx --fix",
+    "type-check": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.5",
+    "typescript": "^5.9.3"
+  }
+}

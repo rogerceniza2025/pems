@@ -1,0 +1,13 @@
+{
+  "extends": "@pems/config-typescript/solid.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "~/*": ["./src/*"],
+      "@pems/*": ["../../packages/*"],
+      "@modules/*": ["../../modules/*"]
+    }
+  },
+  "include": ["src/**/*", "**/*.ts", "**/*.tsx"],
+  "exclude": ["node_modules", "dist", "build"]
+}

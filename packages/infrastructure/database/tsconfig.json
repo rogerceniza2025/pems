@@ -1,0 +1,12 @@
+{
+  "extends": "@pems/config-typescript/node.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "baseUrl": ".",
+    "paths": {
+      "@pems/*": ["../../packages/*"]
+    }
+  },
+  "include": ["src/**/*", "prisma/**/*", "prisma.config.ts"],
+  "exclude": ["node_modules", "dist"]
+}

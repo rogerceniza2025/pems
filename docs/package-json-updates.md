@@ -107,7 +107,7 @@ This document provides the complete package.json updates required to implement t
 ```json
 {
   "@playwright/test": "^1.40.0",
-  "@testing-library/jest-dom": "^6.1.5", 
+  "@testing-library/jest-dom": "^6.1.5",
   "@testing-library/solid": "^0.8.0",
   "@types/node": "^20.10.0",
   "@types/supertest": "^2.0.16",
@@ -138,7 +138,7 @@ This document provides the complete package.json updates required to implement t
 ```json
 {
   "test:unit": "vitest run --config vitest.unit.config.ts",
-  "test:integration": "vitest run --config vitest.integration.config.ts", 
+  "test:integration": "vitest run --config vitest.integration.config.ts",
   "test:e2e": "playwright test",
   "test:watch": "vitest --watch",
   "test:ui": "vitest --ui",
@@ -342,7 +342,7 @@ The new testing dependencies add approximately 15-20MB to node_modules and provi
 
 - **@playwright/test**: Browser automation (5MB)
 - **@vitest/coverage-v8**: Coverage reporting (2MB)
-- **@testing-library/*****: Component testing (3MB)
+- **@testing-library/\*\*\***: Component testing (3MB)
 - **jsdom**: DOM testing (1MB)
 - **supertest**: API testing (1MB)
 - **better-auth**: Authentication testing (2MB)

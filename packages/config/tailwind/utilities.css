@@ -1,0 +1,558 @@
+/* Tailwind CSS 4 Custom Utilities with Performance Optimizations */
+
+/* Animation utilities with modern CSS features */
+@layer utilities {
+  /* Hover animations with performance optimizations */
+  .hover-lift {
+    transition: transform var(--duration-200) var(--ease-fluid);
+    will-change: transform;
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-0.25rem);
+  }
+
+  .hover-scale {
+    transition: transform var(--duration-200) var(--ease-fluid);
+    will-change: transform;
+  }
+
+  .hover-scale:hover {
+    transform: scale(1.05);
+  }
+
+  .hover-glow {
+    transition: box-shadow var(--duration-200) var(--ease-fluid);
+    will-change: box-shadow;
+  }
+
+  .hover-glow:hover {
+    box-shadow: var(--shadow-lg);
+  }
+
+  /* Focus animations with accessibility */
+  .focus-ring:focus {
+    outline: none;
+    box-shadow:
+      0 0 0 2px oklch(var(--color-ring)),
+      0 0 0 4px transparent;
+  }
+
+  /* Loading animations with reduced motion support */
+  .animate-pulse-slow {
+    animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  .animate-bounce-slow {
+    animation: bounce 2s infinite;
+  }
+
+  .animate-spin-slow {
+    animation: spin 3s linear infinite;
+  }
+
+  /* Entry animations */
+  @keyframes fadeInScale {
+    from {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  .animate-fade-in-scale {
+    animation: fadeInScale var(--duration-300) var(--ease-fluid);
+  }
+}
+
+/* Glassmorphism utilities with modern backdrop filters */
+@layer utilities {
+  .glass {
+    background-color: oklch(var(--color-background) / 0.2);
+    backdrop-filter: blur(var(--blur-lg));
+    border: 1px solid oklch(var(--color-border) / 0.2);
+    contain: layout style paint;
+  }
+
+  .glass-dark {
+    background-color: oklch(var(--color-foreground) / 0.2);
+    backdrop-filter: blur(var(--blur-lg));
+    border: 1px solid oklch(var(--color-border) / 0.1);
+    contain: layout style paint;
+  }
+
+  .glass-modern {
+    background: color-mix(
+      in oklch,
+      oklch(var(--color-background) / 0.2),
+      oklch(var(--color-primary) / 0.1)
+    );
+    backdrop-filter: blur(var(--blur-md)) saturate(180%);
+    border: 1px solid oklch(var(--color-border) / 0.3);
+    contain: layout style paint;
+  }
+}
+
+/* Gradient utilities with modern color functions */
+@layer utilities {
+  .gradient-radial {
+    background: radial-gradient(circle at center, var(--tw-gradient-stops));
+  }
+
+  .gradient-conic {
+    background: conic-gradient(from 180deg at 50%, var(--tw-gradient-stops));
+  }
+
+  .gradient-text {
+    background: linear-gradient(
+      to right,
+      oklch(var(--color-primary)),
+      oklch(var(--color-accent))
+    );
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    contain: layout style paint;
+  }
+
+  .gradient-mesh {
+    background:
+      radial-gradient(
+        at 40% 20%,
+        oklch(var(--color-primary) / 0.4) 0px,
+        transparent 50%
+      ),
+      radial-gradient(
+        at 80% 0%,
+        oklch(var(--color-secondary) / 0.4) 0px,
+        transparent 50%
+      ),
+      radial-gradient(
+        at 40% 80%,
+        oklch(var(--color-accent) / 0.4) 0px,
+        transparent 50%
+      );
+    contain: layout style paint;
+  }
+}
+
+/* Spacing utilities with modern CSS */
+@layer utilities {
+  .safe-top {
+    padding-top: env(safe-area-inset-top);
+    contain: layout style paint;
+  }
+
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+    contain: layout style paint;
+  }
+
+  .safe-left {
+    padding-left: env(safe-area-inset-left);
+    contain: layout style paint;
+  }
+
+  .safe-right {
+    padding-right: env(safe-area-inset-right);
+    contain: layout style paint;
+  }
+
+  .safe-all {
+    padding: env(safe-area-inset-top) env(safe-area-inset-right)
+      env(safe-area-inset-bottom) env(safe-area-inset-left);
+    contain: layout style paint;
+  }
+
+  /* Logical spacing */
+  .space-logical {
+    --space-logical-reverse: 0;
+    margin-inline: calc(var(--spacing-logical) * var(--space-logical-reverse));
+    margin-block: calc(
+      var(--spacing-logical) * calc(1 - var(--space-logical-reverse))
+    );
+  }
+}
+
+/* Typography utilities with modern features */
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+    contain: layout style paint;
+  }
+
+  .text-pretty {
+    text-wrap: pretty;
+    contain: layout style paint;
+  }
+
+  .font-variable {
+    font-variation-settings:
+      'wght' var(--font-weight, 400),
+      'slnt' var(--font-slant, 0);
+    contain: layout style paint;
+  }
+
+  .text-gradient-modern {
+    background: linear-gradient(
+      to right,
+      oklch(var(--color-primary)),
+      oklch(var(--color-secondary))
+    );
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    contain: layout style paint;
+  }
+
+  /* Responsive typography with container queries */
+  .text-responsive {
+    font-size: clamp(var(--text-sm), 2.5vw, var(--text-xl));
+    line-height: var(--leading-relaxed);
+    contain: layout style paint;
+  }
+}
+
+/* Interactive utilities with performance optimizations */
+@layer utilities {
+  .interactive {
+    cursor: pointer;
+    user-select: none;
+    transition: all var(--duration-200) var(--ease-fluid);
+    will-change: transform;
+    contain: layout style paint;
+  }
+
+  .no-tap-highlight {
+    -webkit-tap-highlight-color: transparent;
+    contain: layout style paint;
+  }
+
+  .interactive-card {
+    transition: all var(--duration-300) var(--ease-fluid);
+    cursor: pointer;
+    will-change: transform, box-shadow;
+    contain: layout style paint;
+  }
+
+  .interactive-card:hover {
+    transform: translateY(-0.25rem);
+    box-shadow: var(--shadow-xl);
+  }
+}
+
+/* Screen reader only utilities with modern CSS */
+@layer utilities {
+  .sr-only {
+    position: absolute;
+    height: 1px;
+    width: 1px;
+    overflow: hidden;
+    white-space: nowrap;
+    border: 0;
+    padding: 0;
+    clip-path: inset(50%);
+    -webkit-clip-path: inset(50%);
+    contain: layout style paint;
+  }
+
+  .not-sr-only {
+    position: static;
+    height: auto;
+    width: auto;
+    overflow: visible;
+    white-space: normal;
+    padding: 0;
+    clip-path: none;
+    contain: layout style paint;
+  }
+}
+
+/* Visually hidden but accessible */
+@layer utilities {
+  .visually-hidden {
+    position: absolute;
+    height: 1px;
+    width: 1px;
+    overflow: hidden;
+    white-space: nowrap;
+    border: 0;
+    padding: 0;
+    clip-path: inset(50%);
+    -webkit-clip-path: inset(50%);
+    contain: layout style paint;
+  }
+}
+
+/* Reduced motion utilities */
+@layer utilities {
+  @media (prefers-reduced-motion: reduce) {
+    .motion-reduce {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+/* High contrast mode utilities */
+@layer utilities {
+  @media (prefers-contrast: high) {
+    .high-contrast-border {
+      border-width: 2px !important;
+      filter: contrast(1.2);
+    }
+  }
+}
+
+/* Scrollbar utilities with modern CSS */
+@layer utilities {
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: oklch(var(--color-muted)) transparent;
+    contain: layout style paint;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: oklch(var(--color-muted));
+    border-radius: 3px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: oklch(var(--color-muted-foreground));
+  }
+}
+
+/* Performance optimization utilities */
+@layer utilities {
+  .content-visibility-auto {
+    content-visibility: auto;
+    contain-intrinsic-size: 0 500px;
+  }
+
+  .content-visibility-hidden {
+    content-visibility: hidden;
+    contain-intrinsic-size: 0 500px;
+  }
+
+  .content-visibility-visible {
+    content-visibility: visible;
+  }
+
+  .contain-strict {
+    contain: strict;
+  }
+
+  .contain-layout {
+    contain: layout;
+  }
+
+  .contain-style {
+    contain: style;
+  }
+
+  .contain-paint {
+    contain: paint;
+  }
+
+  .will-change-transform {
+    will-change: transform;
+  }
+
+  .will-change-opacity {
+    will-change: opacity;
+  }
+
+  .composite-layer {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+  }
+}
+
+/* Modern layout utilities */
+@layer utilities {
+  .grid-subgrid {
+    display: grid;
+    grid-template-columns: subgrid;
+    contain: layout style paint;
+  }
+
+  .flex-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    contain: layout style paint;
+  }
+
+  .flex-between {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    contain: layout style paint;
+  }
+
+  .grid-auto {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--spacing-md);
+    contain: layout style paint;
+  }
+
+  .grid-fill {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr));
+    gap: var(--spacing-md);
+    contain: layout style paint;
+  }
+}
+
+/* Modern form utilities */
+@layer utilities {
+  .field-sizing-content {
+    field-sizing: content;
+  }
+
+  .field-sizing-fixed {
+    field-sizing: fixed;
+  }
+
+  .form-modern {
+    background: oklch(var(--color-background));
+    border: 1px solid oklch(var(--color-border));
+    border-radius: var(--radius-md);
+    padding: var(--spacing-sm) var(--spacing-md);
+    transition: all var(--duration-200) var(--ease-fluid);
+    color: oklch(var(--color-foreground));
+    field-sizing: content;
+    contain: layout style paint;
+  }
+
+  .form-modern:focus {
+    outline: 2px solid oklch(var(--color-ring));
+    outline-offset: 2px;
+    border-color: oklch(var(--color-ring));
+  }
+}
+
+/* Modern color utilities with OKLCH */
+@layer utilities {
+  .color-mix-primary {
+    background: color-mix(
+      in oklch,
+      oklch(var(--color-primary)) 50%,
+      oklch(var(--color-background))
+    );
+  }
+
+  .color-mix-secondary {
+    background: color-mix(
+      in oklch,
+      oklch(var(--color-secondary)) 50%,
+      oklch(var(--color-background))
+    );
+  }
+
+  .color-mix-accent {
+    background: color-mix(
+      in oklch,
+      oklch(var(--color-accent)) 50%,
+      oklch(var(--color-background))
+    );
+  }
+
+  .color-mix-success {
+    background: color-mix(
+      in oklch,
+      oklch(var(--color-success)) 10%,
+      oklch(var(--color-background))
+    );
+  }
+
+  .color-mix-warning {
+    background: color-mix(
+      in oklch,
+      oklch(var(--color-warning)) 10%,
+      oklch(var(--color-background))
+    );
+  }
+
+  .color-mix-error {
+    background: color-mix(
+      in oklch,
+      oklch(var(--color-error)) 10%,
+      oklch(var(--color-background))
+    );
+  }
+}
+
+/* Modern animation utilities */
+@keyframes slideInFromTop {
+  from {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInFromBottom {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInFromLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-slide-in-top {
+  animation: slideInFromTop var(--duration-300) var(--ease-fluid);
+}
+
+.animate-slide-in-bottom {
+  animation: slideInFromBottom var(--duration-300) var(--ease-fluid);
+}
+
+.animate-slide-in-left {
+  animation: slideInFromLeft var(--duration-300) var(--ease-fluid);
+}
+
+.animate-slide-in-right {
+  animation: slideInFromRight var(--duration-300) var(--ease-fluid);
+}

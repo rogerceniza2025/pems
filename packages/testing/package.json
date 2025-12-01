@@ -1,0 +1,22 @@
+{
+  "name": "@pems/testing",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "scripts": {
+    "lint": "echo 'No TypeScript files to lint in testing package'",
+    "lint:fix": "echo 'No TypeScript files to lint in testing package'",
+    "type-check": "echo 'No TypeScript files to type-check in testing package'"
+  },
+  "dependencies": {
+    "@pems/shared-types": "workspace:*",
+    "@pems/shared-utils": "workspace:*",
+    "@pems/database": "workspace:*",
+    "vitest": "^2.1.8",
+    "playwright": "^1.50.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.5",
+    "typescript": "^5.9.3"
+  }
+}

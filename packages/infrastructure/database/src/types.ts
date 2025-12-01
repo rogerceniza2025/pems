@@ -1,0 +1,28 @@
+export type {
+  User,
+  Role,
+  UserRole,
+  Tenant,
+  TenantSetting,
+  UserProfile,
+  UserAuthProvider,
+  Permission,
+  RolePermission,
+  NavigationItem,
+  RFIDTag,
+  RFIDAssignment,
+  RFIDDevice,
+  RFIDScan,
+  Account,
+  Transaction,
+  CashTill,
+  TillSession,
+  Receipt,
+  Student,
+  Course,
+  CourseSection,
+  Enrollment,
+  PrismaClient,
+} from '@prisma/client'
+
+export { Prisma } from '@prisma/client'

@@ -1,0 +1,75 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "globalDependencies": ["**/.env.*local"],
+  "pipeline": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": [".next/**", "!.next/cache/**", "dist/**", "**/*.css"],
+      "inputs": ["src/**", "public/**", "package.json", "tsconfig.json", "tailwind.config.*", "vite.config.*"]
+    },
+    "build:css": {
+      "dependsOn": ["^build"],
+      "outputs": ["**/*.css", "**/*.css.map"],
+      "inputs": ["**/*.css", "**/*.scss", "**/*.less", "tailwind.config.*", "postcss.config.*"]
+    },
+    "lint": {
+      "outputs": [],
+      "inputs": ["src/**/*.{js,ts,jsx,tsx}", "eslint.config.*"]
+    },
+    "lint:fix": {
+      "outputs": [],
+      "inputs": ["src/**/*.{js,ts,jsx,tsx}", "eslint.config.*"]
+    },
+    "lint:styles": {
+      "outputs": [],
+      "inputs": ["**/*.css", "**/*.{js,ts,jsx,tsx}", "stylelint.config.*"]
+    },
+    "type-check": {
+      "dependsOn": ["^build"],
+      "outputs": [],
+      "inputs": ["src/**/*.{js,ts,jsx,tsx}", "tsconfig.json"]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true,
+      "inputs": ["src/**", "public/**", "package.json", "tsconfig.json", "tailwind.config.*", "vite.config.*"]
+    },
+    "clean": {
+      "cache": false,
+      "outputs": ["dist/**", ".next/**", "node_modules/.cache/**"]
+    },
+    "test": {
+      "dependsOn": ["^build"],
+      "outputs": ["coverage/**"],
+      "inputs": ["src/**/*.{js,ts,jsx,tsx}", "test/**/*.{js,ts,jsx,tsx}", "vitest.config.*"]
+    },
+    "test:e2e": {
+      "dependsOn": ["build"],
+      "outputs": [],
+      "inputs": ["**/*.{js,ts,jsx,tsx}", "playwright.config.*"]
+    },
+    "test:visual": {
+      "dependsOn": ["build"],
+      "outputs": ["**/.storybook/coverage/**", "**/__screenshots__/**"],
+      "inputs": ["**/*.css", "**/*.{js,ts,jsx,tsx}", ".storybook/**/*"]
+    },
+    "db:generate": {
+      "outputs": ["**/prisma/migrations/**", "**/prisma/client/**"],
+      "inputs": ["prisma/schema.prisma"]
+    },
+    "db:migrate": {
+      "outputs": ["**/prisma/migrations/**"],
+      "inputs": ["prisma/schema.prisma"]
+    },
+    "db:push": {
+      "outputs": [],
+      "inputs": ["prisma/schema.prisma"]
+    },
+    "db:seed": {
+      "dependsOn": ["db:migrate"],
+      "outputs": [],
+      "inputs": ["prisma/seed.*", "prisma/schema.prisma"]
+    }
+  },
+  "globalEnv": ["NODE_ENV", "CI"]
+}

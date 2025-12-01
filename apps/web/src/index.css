@@ -1,0 +1,217 @@
+@import 'tailwindcss/preflight';
+@tailwind utilities;
+
+/* Import UI package styles (includes design tokens) */
+@import '@pems/ui/styles';
+
+@layer base {
+  * {
+    border-color: oklch(var(--color-border));
+  }
+  body {
+    background-color: oklch(var(--color-background));
+    color: oklch(var(--color-foreground));
+    font-family: var(--font-family-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    field-sizing: content;
+    text-wrap: pretty;
+  }
+}
+
+/* Web app specific custom styles */
+@layer components {
+  /* Hero section styles */
+  .hero-gradient {
+    background: linear-gradient(
+      to bottom right,
+      oklch(0.98 0.02 264),
+      oklch(1 0 0),
+      oklch(0.99 0.01 60)
+    );
+  }
+
+  .dark .hero-gradient {
+    background: linear-gradient(
+      to bottom right,
+      oklch(0.09 0.01 264),
+      oklch(0.17 0.012 264),
+      oklch(0.37 0.093 197 / 0.2)
+    );
+  }
+
+  /* Feature card styles */
+  .feature-card {
+    border-radius: var(--radius-lg);
+    border: 1px solid oklch(var(--color-border));
+    background-color: oklch(var(--color-card));
+    color: oklch(var(--color-card-foreground));
+    box-shadow: var(--shadow-sm);
+    padding: var(--spacing-6);
+    transition: all var(--duration-200) var(--ease-fluid);
+    contain: layout style paint;
+  }
+
+  .feature-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+
+  /* Navigation styles - removed custom classes to avoid conflicts */
+
+  /* CTA button styles */
+  .cta-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    font-weight: var(--font-weight-medium);
+    background-color: oklch(var(--color-primary));
+    color: oklch(var(--color-primary-foreground));
+    padding: var(--spacing-3) var(--spacing-8);
+    font-size: var(--text-lg);
+    transition:
+      transform var(--duration-200) var(--ease-fluid),
+      background-color var(--duration-200) var(--ease-fluid);
+    field-sizing: content;
+    contain: layout style paint;
+  }
+
+  .cta-button:hover {
+    transform: scale(1.05);
+    background-color: oklch(var(--color-primary) / 0.9);
+  }
+
+  .cta-button:focus-visible {
+    outline: none;
+    box-shadow:
+      0 0 0 2px oklch(var(--color-ring)),
+      0 0 0 4px transparent;
+  }
+
+  .cta-button:disabled {
+    pointer-events: none;
+    opacity: 0.5;
+  }
+
+  /* Testimonial card */
+  .testimonial-card {
+    background-color: oklch(var(--color-card));
+    color: oklch(var(--color-card-foreground));
+    padding: var(--spacing-6);
+    border-left: 4px solid oklch(var(--color-primary));
+    border-radius: var(--radius-lg);
+    border: 1px solid oklch(var(--color-border));
+    contain: layout style paint;
+  }
+
+  /* Pricing card */
+  .pricing-card {
+    background-color: oklch(var(--color-card));
+    color: oklch(var(--color-card-foreground));
+    padding: var(--spacing-8);
+    position: relative;
+    border-radius: var(--radius-lg);
+    border: 1px solid oklch(var(--color-border));
+    contain: layout style paint;
+  }
+
+  .pricing-card-popular {
+    background-color: oklch(var(--color-card));
+    color: oklch(var(--color-card-foreground));
+    padding: var(--spacing-8);
+    position: relative;
+    border-radius: var(--radius-lg);
+    border: 2px solid oklch(var(--color-primary));
+    box-shadow: var(--shadow-lg);
+    contain: layout style paint;
+  }
+
+  .pricing-badge {
+    position: absolute;
+    top: -0.75rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: oklch(var(--color-primary));
+    color: oklch(var(--color-primary-foreground));
+    padding: var(--spacing-1) var(--spacing-3);
+    border-radius: var(--radius-full);
+    font-size: var(--text-sm);
+    font-weight: var(--font-weight-medium);
+    contain: layout style paint;
+  }
+}
+
+/* Web app specific utilities */
+@layer utilities {
+  /* Text gradients */
+  .text-gradient {
+    background: linear-gradient(to right, hsl(var(--primary)), rgb(147 51 234));
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+  }
+
+  /* Glass morphism for web */
+  .glass-web {
+    background-color: rgb(255 255 255 / 0.2);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgb(255 255 255 / 0.2);
+  }
+
+  .dark .glass-web {
+    background-color: rgb(0 0 0 / 0.2);
+    border: 1px solid rgb(255 255 255 / 0.1);
+  }
+
+  /* Scroll animations */
+  .scroll-reveal {
+    opacity: 0;
+    transform: translateY(20px);
+    transition:
+      opacity 0.6s ease-out,
+      transform 0.6s ease-out;
+  }
+
+  .scroll-reveal.revealed {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Interactive hover states */
+  .interactive-card {
+    transition: all 0.3s;
+    cursor: pointer;
+  }
+
+  .interactive-card:hover {
+    box-shadow:
+      0 20px 25px -5px rgb(0 0 0 / 0.1),
+      0 8px 10px -6px rgb(0 0 0 / 0.1);
+    transform: translateY(-0.25rem);
+  }
+}
+
+/* Responsive typography using container queries */
+@media (min-width: 640px) {
+  .responsive-text {
+    font-size: 1.125rem;
+    line-height: 1.75rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .responsive-text {
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .responsive-text {
+    font-size: 1.5rem;
+    line-height: 2rem;
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "extends": "@pems/config-typescript/node.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@pems/*": ["../../packages/*"]
+    }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}
