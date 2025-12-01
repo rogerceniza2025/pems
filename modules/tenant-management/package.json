@@ -1,0 +1,26 @@
+{
+  "name": "@pems/tenant-management",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "scripts": {
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "lint:fix": "eslint . --ext ts,tsx --fix",
+    "type-check": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@pems/database": "workspace:*",
+    "@pems/shared-types": "workspace:*",
+    "@pems/shared-utils": "workspace:*",
+    "@pems/middleware": "workspace:*",
+    "hono": "^4.6.16",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@pems/config-typescript": "workspace:*",
+    "@types/node": "^22.10.5",
+    "typescript": "^5.9.3",
+    "vitest": "^2.1.8"
+  }
+}

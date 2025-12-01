@@ -10,7 +10,9 @@
       "Bash(pnpm run:*)",
       "Bash(pnpm type-check:*)",
       "Bash(pnpm lint)",
-      "Bash(pnpm lint:styles:*)"
+      "Bash(pnpm lint:styles:*)",
+      "Bash(cat:*)",
+      "Bash(pnpm db:migrate --name add-rls-policies)"
     ],
     "deny": [],
     "ask": []
