@@ -58,11 +58,17 @@ const CustomComponentsDemo: Component = () => {
 
   // Form handlers for demo purposes
   const handleLogin = async (email: string, password: string) => {
+    // eslint-disable-next-line no-console
     console.log('Login attempted:', { email, password })
     alert(`Login attempt with email: ${email}`)
   }
 
-  const handleRegister = async (data: any) => {
+  const handleRegister = async (data: {
+    email: string
+    password: string
+    [key: string]: string
+  }) => {
+    // eslint-disable-next-line no-console
     console.log('Register attempted:', data)
     alert(`Registration attempt with email: ${data.email}`)
   }

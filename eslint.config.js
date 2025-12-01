@@ -17,8 +17,9 @@ export default [
       '**/build/**',
       '**/*.d.ts',
       '**/*.js.map',
-      '**/*.d.ts.map'
-    ]
+      '**/*.d.ts.map',
+      '.storybook/**/*',
+    ],
   },
   {
     files: ['**/*.{ts,tsx}'],
