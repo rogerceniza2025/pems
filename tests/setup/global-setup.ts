@@ -1,27 +1,64 @@
-// Global test setup
-console.log('Setting up test environment...')
+import '@testing-library/jest-dom'
+import { vi } from 'vitest'
 
-// Add any global test utilities here
-export const testUtils = {
-  createMockUser: (overrides = {}) => ({
-    id: 'test-user-id',
-    email: 'test@example.com',
-    firstName: 'Test',
-    lastName: 'User',
-    isActive: true,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    ...overrides,
-  }),
-
-  createMockSchool: (overrides = {}) => ({
-    id: 'test-school-id',
-    name: 'Test School',
-    code: 'TEST-001',
-    type: 'K12',
-    isActive: true,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    ...overrides,
-  }),
+// Global test configuration
+global.console = {
+  ...console,
+  // Uncomment to ignore specific console logs during tests
+  // log: vi.fn(),
+  // warn: vi.fn(),
+  // error: vi.fn(),
 }
+
+// Mock environment variables
+process.env.NODE_ENV = 'test'
+process.env.TZ = 'Asia/Manila'
+
+// Mock fetch if needed
+global.fetch = vi.fn()
+
+// Mock Web APIs
+Object.defineProperty(window, 'matchMedia', {
+  writable: true,
+  value: vi.fn().mockImplementation(query => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: vi.fn(), // deprecated
+    removeListener: vi.fn(), // deprecated
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    dispatchEvent: vi.fn(),
+  })),
+})
+
+// Mock ResizeObserver
+global.ResizeObserver = vi.fn().mockImplementation(() => ({
+  observe: vi.fn(),
+  unobserve: vi.fn(),
+  disconnect: vi.fn(),
+}))
+
+// Mock IntersectionObserver
+global.IntersectionObserver = vi.fn().mockImplementation(() => ({
+  observe: vi.fn(),
+  unobserve: vi.fn(),
+  disconnect: vi.fn(),
+}))
+
+// Setup global test utilities
+import { setupTestDatabase } from '@tests/helpers/database'
+import { createTestFactories } from '@tests/helpers/factories'
+
+beforeAll(async () => {
+  await setupTestDatabase()
+  createTestFactories()
+})
+
+afterAll(async () => {
+  // Cleanup test database
+  await setupTestDatabase().cleanup()
+})
+
+// Global test timeout
+vi.setConfig({ testTimeout: 10000 })

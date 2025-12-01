@@ -1,0 +1,22 @@
+{
+  "build": {
+    "builder": "NIXPACKS",
+    "buildCommand": "pnpm build",
+    "buildEnv": {
+      "NODE_ENV": "production",
+      "TURBO_TOKEN": "$TURBO_TOKEN",
+      "TURBO_TEAM": "$TURBO_TEAM"
+    }
+  },
+  "deploy": {
+    "startCommand": "pnpm start",
+    "healthcheckPath": "/",
+    "healthcheckTimeout": 300,
+    "port": 3002,
+    "env": {
+      "NODE_ENV": "production",
+      "PORT": "3002",
+      "HOST": "0.0.0.0"
+    }
+  }
+}
