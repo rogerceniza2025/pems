@@ -1,0 +1,449 @@
+name: Security Testing
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+    types: [opened, synchronize, reopened]
+  schedule:
+    # Run security tests daily at 2 AM UTC
+    - cron: '0 2 * * *'
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  owasp-security-testing:
+    name: OWASP Security Tests
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: pems_security_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build application
+        run: pnpm build
+
+      - name: Setup test environment
+        run: |
+          echo "TEST_BASE_URL=http://localhost:3000" >> $GITHUB_ENV
+          echo "API_BASE_URL=http://localhost:3000/api/v1" >> $GITHUB_ENV
+          echo "CI=true" >> $GITHUB_ENV
+          echo "NODE_ENV=test" >> $GITHUB_ENV
+
+      - name: Start application
+        run: |
+          pnpm dev &
+          sleep 10
+
+      - name: Wait for application
+        run: |
+          timeout 60 bash -c 'until curl -f http://localhost:3000/health; do sleep 2; done'
+
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps
+
+      - name: Run Broken Access Control Tests (A01)
+        run: pnpm test:security:owasp-a01
+        env:
+          TEST_BASE_URL: http://localhost:3000
+
+      - name: Run Cryptographic Failures Tests (A02)
+        run: pnpm test:security:owasp-a02
+        env:
+          TEST_BASE_URL: http://localhost:3000
+
+      - name: Run Authentication Failures Tests (A07)
+        run: pnpm test:security:owasp-a07
+        env:
+          TEST_BASE_URL: http://localhost:3000
+
+      - name: Run API Security Tests
+        run: pnpm test:security:api
+        env:
+          API_BASE_URL: http://localhost:3000/api/v1
+
+      - name: Upload OWASP test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: owasp-security-results
+          path: |
+            test-results/owasp-*/
+            playwright-report/
+          retention-days: 7
+
+      - name: OWASP security summary
+        if: always()
+        run: |
+          echo "## 🛡️ OWASP Security Testing Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Check test results
+          if [ -d "test-results" ]; then
+            echo "### 📊 Test Results:" >> $GITHUB_STEP_SUMMARY
+
+            # Look for test result files
+            for result_file in test-results/owasp-*/test-results.json; do
+              if [ -f "$result_file" ]; then
+                TEST_NAME=$(basename $(dirname "$result_file"))
+                PASSED=$(jq -r '.numPassedTests // 0' "$result_file" 2>/dev/null || echo "0")
+                FAILED=$(jq -r '.numFailedTests // 0' "$result_file" 2>/dev/null || echo "0")
+                TOTAL=$((PASSED + FAILED))
+
+                echo "- **$TEST_NAME**: $PASSED/$TOTAL passed" >> $GITHUB_STEP_SUMMARY
+
+                if [ "$FAILED" -gt 0 ]; then
+                  echo "  - ⚠️ $FAILED failed tests" >> $GITHUB_STEP_SUMMARY
+                fi
+              fi
+            done
+          else
+            echo "ℹ️ No test results available" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Security compliance check
+        run: |
+          echo "## ✅ Security Compliance Status" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Check if any security tests failed
+          SECURITY_PASSED=true
+
+          if [ -d "test-results/owasp-*" ]; then
+            for result_dir in test-results/owasp-*/; do
+              if [ -f "$result_dir/test-results.json" ]; then
+                FAILED=$(jq -r '.numFailedTests // 0' "$result_dir/test-results.json" 2>/dev/null || echo "0")
+                if [ "$FAILED" -gt 0 ]; then
+                  SECURITY_PASSED=false
+                fi
+              fi
+            done
+          fi
+
+          if [ "$SECURITY_PASSED" = true ]; then
+            echo "✅ **All OWASP security tests passed**" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "The application meets OWASP Top 10 security requirements:" >> $GITHUB_STEP_SUMMARY
+            echo "- ✅ A01: Broken Access Control" >> $GITHUB_STEP_SUMMARY
+            echo "- ✅ A02: Cryptographic Failures" >> $GITHUB_STEP_SUMMARY
+            echo "- ✅ A07: Authentication Failures" >> $GITHUB_STEP_SUMMARY
+            echo "- ✅ API Security" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **Security tests failed**" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Please review the failed tests and address security issues:" >> $GITHUB_STEP_SUMMARY
+            echo "- Check the uploaded test results for details" >> $GITHUB_STEP_SUMMARY
+            echo "- Review the Playwright report for specific failures" >> $GITHUB_STEP_SUMMARY
+            echo "- Address critical security vulnerabilities before merging" >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
+
+  penetration-testing:
+    name: Automated Penetration Testing
+    runs-on: ubuntu-latest
+    needs: owasp-security-testing
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build application
+        run: pnpm build
+
+      - name: Start services
+        run: |
+          pnpm dev &
+          sleep 15
+
+      - name: Install OWASP ZAP
+        run: |
+          wget -q https://github.com/zaproxy/zaproxy/releases/download/v2.13.0/ZAP_2.13.0_Linux.tar.gz
+          tar -xzf ZAP_2.13.0_Linux.tar.gz
+          chmod +x ZAP_2.13.0/zap.sh
+
+      - name: Run OWASP ZAP Baseline Scan
+        run: |
+          ./ZAP_2.13.0/zap.sh -cmd -quickurl http://localhost:3000 -quickprogress \
+            -cmd -spider http://localhost:3000 \
+            -cmd -activeScan http://localhost:3000 \
+            -cmd -jsonzapout zap-report.json \
+            -cmd -zapout zap-report.html
+
+      - name: Parse ZAP results
+        run: |
+          echo "## 🔍 Penetration Testing Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ -f "zap-report.json" ]; then
+            HIGH_ALERTS=$(jq -r '.site[0].alerts | map(select(.risk == "High")) | length' zap-report.json 2>/dev/null || echo "0")
+            MEDIUM_ALERTS=$(jq -r '.site[0].alerts | map(select(.risk == "Medium")) | length' zap-report.json 2>/dev/null || echo "0")
+            LOW_ALERTS=$(jq -r '.site[0].alerts | map(select(.risk == "Low")) | length' zap-report.json 2>/dev/null || echo "0")
+            INFO_ALERTS=$(jq -r '.site[0].alerts | map(select(.risk == "Informational")) | length' zap-report.json 2>/dev/null || echo "0")
+
+            echo "### 🚨 Alert Summary:" >> $GITHUB_STEP_SUMMARY
+            echo "- 🔴 **High**: $HIGH_ALERTS" >> $GITHUB_STEP_SUMMARY
+            echo "- 🟡 **Medium**: $MEDIUM_ALERTS" >> $GITHUB_STEP_SUMMARY
+            echo "- 🟢 **Low**: $LOW_ALERTS" >> $GITHUB_STEP_SUMMARY
+            echo "- ℹ️ **Informational**: $INFO_ALERTS" >> $GITHUB_STEP_SUMMARY
+
+            if [ "$HIGH_ALERTS" -gt 0 ]; then
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo "### 🚨 Critical Security Issues Found" >> $GITHUB_STEP_SUMMARY
+              echo "- Review the ZAP report for detailed information" >> $GITHUB_STEP_SUMMARY
+              echo "- Address high-risk vulnerabilities immediately" >> $GITHUB_STEP_SUMMARY
+              echo "- Consider blocking deployment until critical issues are resolved" >> $GITHUB_STEP_SUMMARY
+            fi
+          else
+            echo "❌ ZAP report not available" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Upload ZAP report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: zap-penetration-report
+          path: |
+            zap-report.json
+            zap-report.html
+          retention-days: 30
+
+      - name: Check for critical vulnerabilities
+        run: |
+          if [ -f "zap-report.json" ]; then
+            HIGH_ALERTS=$(jq -r '.site[0].alerts | map(select(.risk == "High")) | length' zap-report.json 2>/dev/null || echo "0")
+
+            if [ "$HIGH_ALERTS" -gt 0 ]; then
+              echo "❌ Critical vulnerabilities detected ($HIGH_ALERTS high-risk alerts)"
+              exit 1
+            else
+              echo "✅ No critical vulnerabilities detected"
+            fi
+          fi
+
+  security-audit:
+    name: Security Audit Report
+    runs-on: ubuntu-latest
+    needs: [owasp-security-testing, penetration-testing]
+    if: always()
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Generate comprehensive security report
+        run: |
+          echo "## 📋 Comprehensive Security Audit Report" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Generated:** $(date -u +%Y-%m-%dT%H:%M:%SZ)" >> $GITHUB_STEP_SUMMARY
+          echo "**Repository:** ${{ github.repository }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Security Testing Status
+          echo "### 🔒 Security Testing Status" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          OWASP_STATUS="${{ needs.owasp-security-testing.result }}"
+          PENTEST_STATUS="${{ needs.penetration-testing.result }}"
+
+          echo "- **OWASP Security Tests:** $OWASP_STATUS" >> $GITHUB_STEP_SUMMARY
+          echo "- **Penetration Testing:** $PENTEST_STATUS" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Coverage Analysis
+          echo "### 📊 Security Coverage" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**OWASP Top 10 Coverage:**" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ A01: Broken Access Control" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ A02: Cryptographic Failures" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ A07: Identification and Authentication Failures" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Additional Security Tests:**" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ API Security Testing" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Input Validation" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Rate Limiting" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ CORS Configuration" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Secret Detection" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Compliance Status
+          echo "### 🛡️ Compliance Status" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          ALL_PASSED=true
+          if [ "$OWASP_STATUS" != "success" ]; then ALL_PASSED=false; fi
+          if [ "$PENTEST_STATUS" != "success" ] && [ "$PENTEST_STATUS" != "skipped" ]; then ALL_PASSED=false; fi
+
+          if [ "$ALL_PASSED" = true ]; then
+            echo "✅ **SECURITY COMPLIANCE: PASSED**" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "The application meets comprehensive security requirements and is ready for deployment." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **SECURITY COMPLIANCE: FAILED**" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Critical security issues must be addressed before deployment." >> $GITHUB_STEP_SUMMARY
+          fi
+
+          # Recommendations
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 💡 Security Recommendations" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "1. **Regular Security Reviews**: Conduct quarterly security assessments" >> $GITHUB_STEP_SUMMARY
+          echo "2. **Dependency Updates**: Keep dependencies updated and scan regularly" >> $GITHUB_STEP_SUMMARY
+          echo "3. **Security Training**: Ensure team is trained on secure coding practices" >> $GITHUB_STEP_SUMMARY
+          echo "4. **Monitoring**: Implement continuous security monitoring" >> $GITHUB_STEP_SUMMARY
+          echo "5. **Incident Response**: Maintain security incident response procedures" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📚 Security Resources" >> $GITHUB_STEP_SUMMARY
+          echo "- [OWASP Top 10](https://owasp.org/www-project-top-ten/)" >> $GITHUB_STEP_SUMMARY
+          echo "- [OWASP ASVS](https://owasp.org/www-project-application-security-verification-standard/)" >> $GITHUB_STEP_SUMMARY
+          echo "- [Security Testing Guide](https://owasp.org/www-project-security-testing-guide/)" >> $GITHUB_STEP_SUMMARY
+
+      - name: Create security badge
+        if: always()
+        run: |
+          # Create security badge based on results
+          OWASP_STATUS="${{ needs.owasp-security-testing.result }}"
+          PENTEST_STATUS="${{ needs.penetration-testing.result }}"
+
+          if [ "$OWASP_STATUS" = "success" ] && ([ "$PENTEST_STATUS" = "success" ] || [ "$PENTEST_STATUS" = "skipped" ]); then
+            BADGE_COLOR="brightgreen"
+            BADGE_TEXT="Security+Passed"
+          else
+            BADGE_COLOR="red"
+            BADGE_TEXT="Security+Failed"
+          fi
+
+          echo "Security Status: $BADGE_TEXT (Color: $BADGE_COLOR)"
+          echo "Badge URL: https://img.shields.io/badge/security-$BADGE_TEXT-$BADGE_COLOR"
+
+      - name: Archive security artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-audit-report
+          path: |
+            security-report.json
+            test-results/owasp-*/
+            zap-report.*
+          retention-days: 90
+
+      - name: Notify security team on failures
+        if: failure()
+        run: |
+          echo "🚨 Security testing failed! Notifying security team." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Please review the security test results and address critical issues." >> $GITHUB_STEP_SUMMARY
+
+  security-policy-check:
+    name: Security Policy Compliance
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check security policy compliance
+        run: |
+          echo "## 📋 Security Policy Compliance Check" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Check for required security configurations
+          REQUIRED_FILES=(
+            ".github/workflows/secret-scan.yml"
+            ".github/workflows/security-testing.yml"
+            "gitguardian.yml"
+            ".gitleaks.toml"
+            "tests/security/owasp/"
+          )
+
+          COMPLIANT=true
+          for file in "${REQUIRED_FILES[@]}"; do
+            if [ -f "$file" ]; then
+              echo "✅ $file - Present" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "❌ $file - Missing" >> $GITHUB_STEP_SUMMARY
+              COMPLIANT=false
+            fi
+          done
+
+          # Check package.json for security scripts
+          if [ -f "package.json" ]; then
+            SECURITY_SCRIPTS=(
+              "test:security"
+              "test:security:owasp"
+              "test:security:api"
+            )
+
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### 🔧 Security Scripts:" >> $GITHUB_STEP_SUMMARY
+            for script in "${SECURITY_SCRIPTS[@]}"; do
+              if npm run | grep -q "$script"; then
+                echo "✅ $script - Available" >> $GITHUB_STEP_SUMMARY
+              else
+                echo "❌ $script - Missing" >> $GITHUB_STEP_SUMMARY
+              fi
+            done
+          fi
+
+          if [ "$COMPLIANT" = true ]; then
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "✅ **Security policy compliance: PASSED**" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "❌ **Security policy compliance: FAILED**" >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi

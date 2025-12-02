@@ -19,8 +19,8 @@ model Tenant {
   tenant_settings  TenantSetting[]
   navigation_items NavigationItem[]
   roles            Role[]
-  accounts         Account[]
   receipts         Receipt[]
+  accounts         FinancialAccount[]
   rfid_tags        RFIDTag[]
   rfid_devices     RFIDDevice[]
   rfid_scans       RFIDScan[]
@@ -43,25 +43,95 @@ model TenantSetting {
   @@unique([tenant_id, key])
 }
 
+// BetterAuth User model with multi-tenant extensions
 model User {
-  id         String   @id @default(dbgenerated("uuidv7()")) @db.Uuid
-  tenant_id  String   @db.Uuid
-  email      String
-  phone      String?
-  is_active  Boolean  @default(true)
+  id            String    @id @default(dbgenerated("uuidv7()")) @db.Uuid
+  tenant_id     String    @db.Uuid
+  email         String
+  emailVerified DateTime? @default(now())
+  name          String?
+  image         String?
+  phone         String?
+  is_active     Boolean   @default(true)
   is_system_admin Boolean @default(false)
-  metadata   Json?    @default("{}")
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  metadata      Json?     @default("{}")
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
-  tenant         Tenant @relation(fields: [tenant_id], references: [id])
-  profiles       UserProfile[]
+  // BetterAuth relations
+  accounts      Account[]
+  sessions      Session[]
+  twoFactor     TwoFactor?
+
+  // Existing relations
+  tenant        Tenant @relation(fields: [tenant_id], references: [id])
+  profiles      UserProfile[]
   auth_providers UserAuthProvider[]
-  user_roles     UserRole[]
-  rfid_scans     RFIDScan[]
+  user_roles    UserRole[]
+  rfid_scans    RFIDScan[]
 
   @@index([tenant_id])
   @@unique([tenant_id, email])
+  @@map("better_auth_users")
+}
+
+// BetterAuth Account model for OAuth and authentication providers
+model Account {
+  id                String  @id @default(dbgenerated("uuidv7()")) @db.Uuid
+  userId            String  @db.Uuid
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("better_auth_accounts")
+}
+
+// BetterAuth Session model for session management
+model Session {
+  id           String   @id @default(dbgenerated("uuidv7()")) @db.Uuid
+  sessionToken String   @unique @db.Text
+  userId       String   @db.Uuid
+  expires      DateTime
+  ipAddress    String?
+  userAgent    String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("better_auth_sessions")
+}
+
+// BetterAuth VerificationToken model for email verification and password reset
+model VerificationToken {
+  identifier String
+  token      String   @unique @db.Text
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("better_auth_verification_tokens")
+}
+
+// BetterAuth 2FA model for multi-factor authentication
+model TwoFactor {
+  id          String   @id @default(dbgenerated("uuidv7()")) @db.Uuid
+  userId      String   @unique @db.Uuid
+  secret      String   @unique @db.Text
+  backupCodes String[] @default([])
+  enabled     Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("better_auth_two_factor")
 }
 
 model UserProfile {
@@ -211,7 +281,7 @@ model RFIDScan {
   @@index([tenant_id, scanned_at])
 }
 
-model Account {
+model FinancialAccount {
   id        String @id @default(dbgenerated("uuidv7()")) @db.Uuid
   tenant_id String @db.Uuid
   code      String
@@ -223,6 +293,7 @@ model Account {
   tenant Tenant @relation(fields: [tenant_id], references: [id])
   transactions Transaction[]
   @@unique([tenant_id, code])
+  @@map("accounts")
 }
 
 model Transaction {
@@ -238,7 +309,7 @@ model Transaction {
   metadata   Json? @default("{}")
 
   tenant Tenant @relation(fields: [tenant_id], references: [id])
-  account Account @relation(fields: [account_id], references: [id])
+  account FinancialAccount @relation(fields: [account_id], references: [id])
   @@index([tenant_id, recorded_at])
 }
 

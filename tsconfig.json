@@ -31,7 +31,10 @@
     "noUncheckedSideEffectImports": true,
     "baseUrl": ".",
     "paths": {
-      "~/*": ["./src/*"]
+      "~/*": ["./src/*"],
+      "@tests/*": ["./tests/*"],
+      "@modules/*": ["./modules/*"],
+      "@packages/*": ["./packages/*"]
     }
   }
 }

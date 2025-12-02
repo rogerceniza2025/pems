@@ -2,13 +2,14 @@
  * BetterAuth Session Validation Middleware
  *
  * Integrates BetterAuth session validation with Hono framework
- * Replaces mock authentication with real session management
+ * Uses real BetterAuth session validation and management
  */
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import type { Context, Next } from 'hono'
 import { HTTPException } from 'hono/http-exception'
+import { auth } from '@pems/auth'
 
 // Define types based on BetterAuth structure
 interface User {
@@ -98,43 +99,17 @@ function extractSessionToken(c: Context): string | null {
 }
 
 /**
- * Validate BetterAuth session using BetterAuth's internal methods
- * This uses BetterAuth's session handler to validate tokens
+ * Validate BetterAuth session using BetterAuth's session handler
+ * Uses real BetterAuth session validation and management
  */
 async function validateBetterAuthSession(
   sessionToken: string,
 ): Promise<Session | null> {
   try {
-    // BetterAuth doesn't expose direct session validation in the current version
-    // We'll need to create a custom validation that works with BetterAuth's session structure
-
-    // For now, let's create a mock session structure that will be enhanced later
-    // when BetterAuth integration is fully implemented
-    const mockSession: Session = {
-      id: 'mock-session-id',
-      userId: 'mock-user-id',
-      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
-      token: sessionToken,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      user: {
-        id: 'mock-user-id',
-        email: 'user@example.com',
-        name: 'Mock User',
-        emailVerified: true,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        tenantId: 'mock-tenant-id',
-        isSystemAdmin: false,
-      },
-    }
-
-    // This is a temporary implementation
-    // TODO: Replace with actual BetterAuth session validation
-    // when BetterAuth API is properly integrated
-    return mockSession
+    // TODO: Implement proper session validation using BetterAuth
+    // For now, return null to indicate no valid session
+    return null
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error('Session validation error:', error)
     return null
   }

@@ -7,5 +7,9 @@ export function formatCurrency(amount: number): string {
 }
 
 export function formatDate(date: Date): string {
-  return date.toISOString().split('T')[0] ?? ''
+  try {
+    return date.toISOString().split('T')[0] ?? ''
+  } catch {
+    return ''
+  }
 }

@@ -34,7 +34,7 @@ describe('Tenant Isolation Integration Tests', () => {
             'postgresql://postgres:postgres@localhost:5432/pems_test',
         },
       },
-    })
+    } as any)
 
     tenantRepository = new TenantRepository(prisma)
     tenantService = new TenantService(tenantRepository)
@@ -162,14 +162,14 @@ describe('Tenant Isolation Integration Tests', () => {
       // Should only see Tenant A's students
       const students = await prisma.student.findMany()
       expect(students).toHaveLength(1)
-      expect(students[0].tenant_id).toBe(tenantAId)
-      expect(students[0].first_name).toBe('John')
+      expect(students[0]?.tenant_id).toBe(tenantAId)
+      expect(students[0]?.first_name).toBe('John')
 
       // Should only see Tenant A's accounts
       const accounts = await prisma.account.findMany()
       expect(accounts).toHaveLength(1)
-      expect(accounts[0].tenant_id).toBe(tenantAId)
-      expect(accounts[0].code).toBe('ACC-A-001')
+      expect(accounts[0]?.tenant_id).toBe(tenantAId)
+      expect(accounts[0]?.code).toBe('ACC-A-001')
     })
 
     test('should prevent cross-tenant data access', async () => {
@@ -219,6 +219,7 @@ describe('Tenant Isolation Integration Tests', () => {
         name: 'New Test Tenant',
         slug: 'new-test-tenant',
         timezone: 'Asia/Manila',
+        metadata: {},
       }
 
       // Create tenant without tenant context (system operation)
@@ -235,6 +236,7 @@ describe('Tenant Isolation Integration Tests', () => {
         name: 'Duplicate Tenant',
         slug: 'tenant-a-test', // Same as existing tenant
         timezone: 'Asia/Manila',
+        metadata: {},
       }
 
       await expect(
@@ -264,7 +266,7 @@ describe('Tenant Isolation Integration Tests', () => {
         `) as Array<{ rls_enabled: boolean }>
 
         expect(result).toHaveLength(1)
-        expect(result[0].rls_enabled).toBe(true)
+        expect(result[0]?.rls_enabled).toBe(true)
       }
     })
 
@@ -299,7 +301,7 @@ describe('Tenant Isolation Integration Tests', () => {
 
       // Should only return the current tenant's ID
       expect(enumerationAttempt).toHaveLength(1)
-      expect(enumerationAttempt[0].tenant_id).toBe(tenantAId)
+      expect(enumerationAttempt[0]?.tenant_id).toBe(tenantAId)
     })
 
     test('should prevent foreign key exposure from other tenants', async () => {
@@ -324,7 +326,7 @@ describe('Tenant Isolation Integration Tests', () => {
       })
 
       expect(transactions).toHaveLength(1)
-      expect(transactions[0].account?.tenant_id).toBe(tenantAId)
+      expect(transactions[0]?.account?.tenant_id).toBe(tenantAId)
     })
   })
 
@@ -344,8 +346,8 @@ describe('Tenant Isolation Integration Tests', () => {
         SELECT current_setting('app.is_system_admin', true) as is_admin
       `) as Array<{ is_admin: string }>
 
-      expect(tenantIdResult[0].tenant_id).toBe(tenantAId)
-      expect(isAdminResult[0].is_admin).toBe('false')
+      expect(tenantIdResult[0]?.tenant_id).toBe(tenantAId)
+      expect(isAdminResult[0]?.is_admin).toBe('false')
     })
 
     test('should reset context properly', async () => {
@@ -362,7 +364,7 @@ describe('Tenant Isolation Integration Tests', () => {
         SELECT current_setting('app.current_tenant_id', true) as tenant_id
       `) as Array<{ tenant_id: string }>
 
-      expect(tenantIdResult[0].tenant_id).toBe('')
+      expect(tenantIdResult[0]?.tenant_id).toBe('')
     })
   })
 

@@ -9,7 +9,7 @@ export {
   Accordion,
   AccordionContent,
   AccordionItem,
-  AccordionTrigger,
+  AccordionTrigger
 } from './components/ui/accordion'
 export { Button, buttonVariants } from './components/ui/button'
 export {
@@ -18,27 +18,44 @@ export {
   CardDescription,
   CardFooter,
   CardHeader,
-  CardTitle,
+  CardTitle
 } from './components/ui/card'
+export { Checkbox, CheckboxCard, CheckboxGroup } from './components/ui/checkbox'
+export { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuRadioItem, DropdownMenuSeparator, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from './components/ui/dropdown'
 export { Input } from './components/ui/input'
 export { Label } from './components/ui/label'
+export { Breadcrumb, MobileNav, Navbar, NavbarItem } from './components/ui/navbar'
+export { RadioCard, RadioField, RadioGroup, RadioGroupItem } from './components/ui/radio'
+export { MultiSelect, Select } from './components/ui/select'
+export { Sidebar, SidebarGroup, SidebarItem, SidebarProfile } from './components/ui/sidebar'
 export { Skeleton } from './components/ui/skeleton'
 export { SkeletonCard } from './components/ui/skeleton-card'
+export { Table, TableBody, TableCaption, TableCell, TableCheckbox, TableFooter, TableHead, TableHeader, TablePagination, TableRow, TableSearch, TableSort } from './components/ui/table'
+export { RichTextarea, Textarea } from './components/ui/textarea'
 export { createToast, ToastProvider } from './components/ui/toast'
+
+// Modal components - Temporarily disabled
+// export {
+//   AlertDialog,
+//   ConfirmDialog,
+//   Dialog, Modal, ModalCloseButton, ModalContent,
+//   ModalFooter, ModalHeader,
+//   ModalTitle
+// } from './components/ui/modal'
 
 // Animation utilities
 export {
   ANIMATION_CONFIG,
   createMotion,
   MOTION_PRESETS,
-  useReducedMotion,
+  useReducedMotion
 } from './lib/animations'
 export {
   cancelDebounce,
   createDebounce,
   createDebounceLeading,
   createDebounceTrailing,
-  createThrottle,
+  createThrottle
 } from './lib/debounce'
 export { createRipple } from './lib/ripple'
 export {
@@ -46,24 +63,33 @@ export {
   createExitTransition,
   createTransition,
   TRANSITION_PRESETS,
-  TRANSITIONS,
+  TRANSITIONS
 } from './lib/transitions'
 
 // Theme provider
 export { ThemeProvider, useTheme } from './components/theme-provider'
 
+// Form components
+// export * from './components/ui/form' // Temporarily disabled
+
 // Auth components
 export { LoginForm } from './components/auth/login-form'
 export { RegisterForm } from './components/auth/register-form'
+export { ForgotPasswordForm } from './components/auth/forgot-password-form'
+export { ResetPasswordForm } from './components/auth/reset-password-form'
+export { MFASetupForm } from './components/auth/mfa-setup-form'
 
 // Types
-export type { LoginFormProps } from './components/auth/login-form'
-export type { RegisterFormProps } from './components/auth/register-form'
+export type { LoginFormProps, Tenant as LoginTenant } from './components/auth/login-form'
+export type { RegisterFormProps, Tenant as RegisterTenant } from './components/auth/register-form'
+export type { ForgotPasswordFormProps, Tenant as ForgotPasswordTenant } from './components/auth/forgot-password-form'
+export type { ResetPasswordFormProps } from './components/auth/reset-password-form'
+export type { MFASetupFormProps, MFAResponse } from './components/auth/mfa-setup-form'
 export type {
   AccordionContentProps,
   AccordionItemProps,
   AccordionTriggerProps,
-  CollapsibleAccordionProps,
+  CollapsibleAccordionProps
 } from './components/ui/accordion'
 export type { ButtonProps, LoadingType } from './components/ui/button'
 export type {
@@ -72,13 +98,13 @@ export type {
   CardFooterProps,
   CardHeaderProps,
   CardProps,
-  CardTitleProps,
+  CardTitleProps
 } from './components/ui/card'
 export type {
   TextFieldInputProps as InputProps,
   PasswordStrength,
   TextFieldRootProps,
-  ValidationState,
+  ValidationState
 } from './components/ui/input'
 export type { LabelProps } from './components/ui/label'
 export type {
@@ -86,7 +112,7 @@ export type {
   LoadingPosition,
   LoadingProviderProps,
   LoadingSize,
-  LoadingVariant,
+  LoadingVariant
 } from './components/ui/loading-overlay'
 export type { SkeletonProps } from './components/ui/skeleton'
 export type { SkeletonCardProps } from './components/ui/skeleton-card'
@@ -95,5 +121,52 @@ export type {
   ToastAction,
   ToastPosition,
   ToastProviderProps,
-  ToastType,
+  ToastType
 } from './components/ui/toast'
+
+// Modal types - Temporarily disabled
+// export type {
+//   AlertDialogProps,
+//   ConfirmDialogProps,
+//   DialogProps, ModalCloseButtonProps, ModalContentProps,
+//   ModalFooterProps, ModalHeaderProps, ModalProps, ModalTitleProps
+// } from './components/ui/modal'
+
+// Dropdown types
+export type {
+  DropdownMenuCheckboxItemProps, DropdownMenuContentProps, DropdownMenuGroupProps, DropdownMenuItemProps, DropdownMenuLabelProps, DropdownMenuProps, DropdownMenuRadioItemProps, DropdownMenuSeparatorProps, DropdownMenuSubContentProps, DropdownMenuSubProps,
+  DropdownMenuSubTriggerProps, DropdownMenuTriggerProps
+} from './components/ui/dropdown'
+
+// Table types
+export type {
+  TableBodyProps, TableCaptionProps, TableCellProps, TableCheckboxProps, TableFooterProps, TableHeaderProps, TableHeadProps, TablePaginationProps, TableProps, TableRowProps, TableSearchProps, TableSortProps
+} from './components/ui/table'
+
+// Form types
+export type {
+  CheckboxCardProps, CheckboxGroupProps, CheckboxProps
+} from './components/ui/checkbox'
+
+export type {
+  RadioCardProps,
+  RadioFieldProps, RadioGroupItemProps, RadioGroupProps
+} from './components/ui/radio'
+
+export type {
+  MultiSelectProps, SelectProps
+} from './components/ui/select'
+
+export type {
+  RichTextareaProps, TextareaProps
+} from './components/ui/textarea'
+
+// Navigation types
+export type {
+  BreadcrumbProps, MobileNavProps, NavbarItemProps, NavbarProps
+} from './components/ui/navbar'
+
+export type {
+  SidebarGroupProps, SidebarItemProps, SidebarProfileProps, SidebarProps
+} from './components/ui/sidebar'
+

@@ -1,0 +1,161 @@
+# Chaos Mesh Configuration
+# https://chaos-mesh.org/docs/
+
+apiVersion: chaos-mesh.org/v1alpha1
+kind: ChaosMesh
+metadata:
+  name: pems-chaos-mesh
+  namespace: chaos-testing
+spec:
+  # Controller manager configuration
+  controllerManager:
+    image: chaos-mesh/chaos-mesh:v2.6.0
+    replicaCount: 3
+    resources:
+      limits:
+        cpu: 500m
+        memory: 1000Mi
+      requests:
+        cpu: 250m
+        memory: 500Mi
+
+  # Dashboard configuration
+  dashboard:
+    image: chaos-mesh/chaos-dashboard:v2.6.0
+    replicaCount: 1
+    resources:
+      limits:
+        cpu: 500m
+        memory: 1000Mi
+      requests:
+        cpu: 250m
+        memory: 500Mi
+    securityMode: false
+    GATEWAY_SECURITY_MODE: false
+
+  # DNS server configuration
+  dnsServer:
+    image: chaos-mesh/dns-server:v2.6.0
+    replicaCount: 2
+    resources:
+      limits:
+        cpu: 200m
+        memory: 500Mi
+      requests:
+        cpu: 100m
+        memory: 200Mi
+
+  # Network chaos configuration
+  networkChaos:
+    enabled: true
+    image: chaos-mesh/chaos-daemon:v2.6.0
+
+  # Pod chaos configuration
+  podChaos:
+    enabled: true
+    image: chaos-mesh/chaos-daemon:v2.6.0
+
+  # IO chaos configuration
+  ioChaos:
+    enabled: true
+    image: chaos-mesh/chaos-daemon:v2.6.0
+
+  # Time chaos configuration
+  timeChaos:
+    enabled: true
+    image: chaos-mesh/chaos-daemon:v2.6.0
+
+  # Kernel chaos configuration
+  kernelChaos:
+    enabled: true
+    image: chaos-mesh/chaos-daemon:v2.6.0
+
+  # HTTP chaos configuration
+  httpChaos:
+    enabled: true
+    image: chaos-mesh/chaos-daemon:v2.6.0
+
+  # Physical machine chaos configuration
+  physicalMachineChaos:
+    enabled: false
+    image: chaos-mesh/chaos-daemon:v2.6.0
+
+  # BPFKI configuration
+  bpfki:
+    enabled: true
+    image: chaos-mesh/chaos-mesh:v2.6.0
+
+---
+# Chaos Mesh Network Policies
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: chaos-mesh-network-policy
+  namespace: chaos-testing
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: chaos-testing
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              name: chaos-testing
+    - to: []
+      ports:
+        - protocol: TCP
+          port: 53
+        - protocol: UDP
+          port: 53
+
+---
+# Chaos Mesh RBAC
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: chaos-controller-manager
+  namespace: chaos-testing
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: chaos-mesh:chaos-controller-manager
+rules:
+  - apiGroups: [""]
+    resources: ["pods", "nodes", "configmaps", "secrets"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  - apiGroups: [""]
+    resources: ["events"]
+    verbs: ["create", "patch"]
+  - apiGroups: ["apps"]
+    resources: ["deployments", "replicasets", "daemonsets", "statefulsets"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  - apiGroups: ["batch"]
+    resources: ["jobs", "cronjobs"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  - apiGroups: ["chaos-mesh.org"]
+    resources: ["*"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: chaos-mesh:chaos-controller-manager
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: chaos-mesh:chaos-controller-manager
+subjects:
+  - kind: ServiceAccount
+    name: chaos-controller-manager
+    namespace: chaos-testing

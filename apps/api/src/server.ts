@@ -15,6 +15,8 @@ import {
   TenantRepository,
   TenantService,
 } from '@pems/tenant-management'
+import { authRouter } from './routes/auth'
+import { usersRouter } from './routes/users'
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 
@@ -67,9 +69,10 @@ app.use(
     required: true,
     skipPaths: [
       '/api/health',
-      '/api/auth/login',
-      '/api/auth/register',
+      '/api/auth/sign-in',
+      '/api/auth/sign-up',
       '/api/auth/forgot-password',
+      '/api/auth/reset-password',
     ],
   }),
 )
@@ -83,8 +86,8 @@ app.use(
   authorizationMiddleware({
     skipPaths: [
       '/api/health',
-      '/api/auth/login',
-      '/api/auth/register',
+      '/api/auth/sign-in',
+      '/api/auth/sign-up',
       '/api/auth/forgot-password',
       '/api/auth/reset-password',
     ],
@@ -132,9 +135,11 @@ app.get('/health', async (c) => {
 // API Routes
 app.route('/api', createTenantRoutes(tenantService))
 
-// TODO: Add user management routes when implemented
-// app.route('/api', createUserRoutes(userService))
-// app.route('/api', createAuthRoutes(userService))
+// Authentication routes
+app.route('/api/auth', authRouter)
+
+// User management routes
+app.route('/api/users', usersRouter)
 
 // Note: Error handling and 404 are now handled by the enhanced error handling middleware
 

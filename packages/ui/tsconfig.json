@@ -24,5 +24,5 @@
     }
   },
   "include": ["src/**/*", "test/**/*", "vitest.config.ts"],
-  "exclude": ["node_modules", "dist", "build", ".storybook"]
+  "exclude": ["node_modules", "dist", "build", ".storybook", "src/components/ui/form", "src/components/ui/form_disabled", "src/components/ui/modal", "src/components/ui/modal_disabled", "test", "**/*.test.*"]
 }

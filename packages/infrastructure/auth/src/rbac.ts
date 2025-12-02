@@ -129,14 +129,23 @@ export function hasPermission(
   permission: Permission,
   tenantId?: string,
 ): boolean {
-  if (!user.roles || user.roles.length === 0) {
+  if (!user || !user.roles || !Array.isArray(user.roles) || user.roles.length === 0) {
     return false
   }
 
   // Check roles for specific tenant or all roles if no tenant specified
   const relevantRoles = tenantId
-    ? user.roles.filter((role) => role.tenantId === tenantId)
-    : user.roles
+    ? user.roles.filter((role) =>
+        role &&
+        typeof role === 'object' &&
+        role.tenantId === tenantId &&
+        Array.isArray(role.permissions)
+      )
+    : user.roles.filter((role) =>
+        role &&
+        typeof role === 'object' &&
+        Array.isArray(role.permissions)
+      )
 
   return relevantRoles.some(
     (role) =>
@@ -172,16 +181,27 @@ export function getUserPermissions(
   user: User & { roles: UserRole[] },
   tenantId?: string,
 ): Permission[] {
-  if (!user.roles || user.roles.length === 0) {
+  if (!user || !user.roles || !Array.isArray(user.roles) || user.roles.length === 0) {
     return []
   }
 
   const relevantRoles = tenantId
-    ? user.roles.filter((role) => role.tenantId === tenantId)
-    : user.roles
+    ? user.roles.filter((role) =>
+        role &&
+        typeof role === 'object' &&
+        role.tenantId === tenantId &&
+        Array.isArray(role.permissions)
+      )
+    : user.roles.filter((role) =>
+        role &&
+        typeof role === 'object' &&
+        Array.isArray(role.permissions)
+      )
 
   const allPermissions = relevantRoles
-    .filter((role) => !role.expiresAt || role.expiresAt > new Date())
+    .filter((role) =>
+      (!role.expiresAt || role.expiresAt > new Date())
+    )
     .flatMap((role) => role.permissions)
 
   return [...new Set(allPermissions)] // Remove duplicates
@@ -192,18 +212,29 @@ export function getUserRoles(
   user: User & { roles: UserRole[] },
   tenantId?: string,
 ): UserRole[] {
-  if (!user.roles || user.roles.length === 0) {
+  if (!user || !user.roles || !Array.isArray(user.roles) || user.roles.length === 0) {
     return []
   }
 
   return tenantId
     ? user.roles.filter(
         (role) =>
+          role &&
+          typeof role === 'object' &&
+          role.tenantId &&
+          role.role &&
+          Array.isArray(role.permissions) &&
           role.tenantId === tenantId &&
           (!role.expiresAt || role.expiresAt > new Date()),
       )
     : user.roles.filter(
-        (role) => !role.expiresAt || role.expiresAt > new Date(),
+        (role) =>
+          role &&
+          typeof role === 'object' &&
+          role.tenantId &&
+          role.role &&
+          Array.isArray(role.permissions) &&
+          (!role.expiresAt || role.expiresAt > new Date()),
       )
 }
 

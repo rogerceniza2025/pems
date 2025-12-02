@@ -1,1 +1,22 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+echo "🔍 Running TDD enforcement checks..."
+
+# Run TDD validation first
+echo "📝 Validating test-first development..."
+node scripts/tdd-enforcement.js
+
+# Run coverage validation
+echo "📊 Validating test coverage..."
+node scripts/coverage-validation.js
+
+# Run existing lint-staged
+echo "🔧 Running linting and formatting..."
 npx lint-staged
+
+# Run tests for changed files
+echo "🧪 Running tests for changed files..."
+pnpm test:changed -- --run
+
+echo "✅ All TDD checks passed!"

@@ -1,0 +1,23 @@
+{
+  "mcpServers": {
+    "github.com/upstash/context7-mcp": {
+      "url": "https://mcp.context7.com/mcp",
+      "type": "streamableHttp",
+      "headers": {
+        "Authorization": "ctx7sk-000a4aac-d20b-4306-88d6-ab9d08647235"
+      }
+    },
+    "github.com/modelcontextprotocol/servers/tree/main/src/filesystem": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "C:\\Users\\roger"
+      ]
+    },
+    "github.com/executeautomation/mcp-playwright": {
+      "command": "npx",
+      "args": ["-y", "@executeautomation/playwright-mcp-server"]
+    }
+  }
+}

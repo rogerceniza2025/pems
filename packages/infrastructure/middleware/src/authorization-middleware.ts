@@ -96,7 +96,7 @@ export interface AuthorizationOptions {
 /**
  * Parse permission string into Permission object
  */
-function parsePermission(permission: string): Permission {
+export function parsePermission(permission: string): Permission {
   const [resource, action, scope] = permission.split(':')
 
   return {
@@ -109,7 +109,7 @@ function parsePermission(permission: string): Permission {
 /**
  * Check if user has specific permission
  */
-function hasPermission(
+export function hasPermission(
   userPermissions: string[],
   requiredPermission: string,
 ): boolean {
@@ -153,7 +153,7 @@ function hasPermission(
 /**
  * Check if user has any of the specified permissions
  */
-function hasAnyPermission(
+export function hasAnyPermission(
   userPermissions: string[],
   requiredPermissions: string[],
 ): boolean {
@@ -165,7 +165,7 @@ function hasAnyPermission(
 /**
  * Check if user has all of the specified permissions
  */
-function hasAllPermissions(
+export function hasAllPermissions(
   userPermissions: string[],
   requiredPermissions: string[],
 ): boolean {
@@ -177,7 +177,7 @@ function hasAllPermissions(
 /**
  * Check if user has any of the specified roles
  */
-function hasAnyRole(userRoles: Role[], requiredRoles: string[]): boolean {
+export function hasAnyRole(userRoles: Role[], requiredRoles: string[]): boolean {
   return requiredRoles.some((requiredRole) =>
     userRoles.some((userRole) => userRole.name === requiredRole),
   )

@@ -4,6 +4,7 @@
   "type": "module",
   "main": "./src/index.ts",
   "scripts": {
+    "test": "vitest run",
     "lint": "echo 'No TypeScript files to lint in testing package'",
     "lint:fix": "echo 'No TypeScript files to lint in testing package'",
     "type-check": "echo 'No TypeScript files to type-check in testing package'"
