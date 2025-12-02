@@ -29,28 +29,33 @@ export interface TenantSettingDomainEntity {
 // Validation schemas using Zod (ADR-020)
 export const CreateTenantSchema = z.object({
   name: z.string().min(1, 'Tenant name is required').max(100),
-  slug: z.string()
+  slug: z
+    .string()
     .min(1, 'Tenant slug is required')
     .max(50)
-    .regex(/^[a-z0-9-]+$/, 'Slug must contain only lowercase letters, numbers, and hyphens'),
-  timezone: z.string().optional().default('Asia/Manila'),
-  metadata: z.record(z.unknown()).optional().default({})
+    .regex(
+      /^[a-z0-9-]+$/,
+      'Slug must contain only lowercase letters, numbers, and hyphens',
+    ),
+  timezone: z.string().default('Asia/Manila'),
+  metadata: z.record(z.string(), z.unknown()).default({}),
 })
 
 export const UpdateTenantSchema = z.object({
   name: z.string().min(1).max(100).optional(),
-  slug: z.string()
+  slug: z
+    .string()
     .min(1)
     .max(50)
     .regex(/^[a-z0-9-]+$/)
     .optional(),
   timezone: z.string().optional(),
-  metadata: z.record(z.unknown()).optional()
+  metadata: z.record(z.string(), z.unknown()).optional(),
 })
 
 export const TenantSettingSchema = z.object({
   key: z.string().min(1, 'Setting key is required').max(100),
-  value: z.unknown().optional()
+  value: z.unknown().optional(),
 })
 
 // Domain Events (ADR-014)

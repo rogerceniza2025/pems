@@ -14,7 +14,7 @@
     "type-check": "echo 'No TypeScript files to type-check in config package'"
   },
   "devDependencies": {
-    "@types/node": "^22.10.5",
+    "@types/node": "^24.10.1",
     "typescript": "^5.9.3"
   }
 }

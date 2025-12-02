@@ -13,8 +13,7 @@ declare global {
   var Fragment: any
 }
 
-// Use Vitest's expect functions
-import { expect } from 'vitest'
+// Use Vitest's expect functions (available globally when globals: true)
 
 /**
  * Test utility for CSS class names

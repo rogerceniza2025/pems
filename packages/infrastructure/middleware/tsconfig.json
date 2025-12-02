@@ -1,0 +1,15 @@
+{
+  "extends": "../../config/typescript/base.json",
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "baseUrl": ".",
+    "paths": {
+      "@pems/*": ["../../packages/*"]
+    },
+    "ignoreDeprecations": "5.0"
+  },
+  "include": ["src/**/*", "tests/**/*"],
+  "exclude": ["node_modules", "dist"]
+}

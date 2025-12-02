@@ -2,8 +2,6 @@
  * JSX test to verify SolidJS configuration
  */
 
-import { describe, expect, it } from 'vitest'
-
 describe('JSX Configuration', () => {
   it('should render JSX component', () => {
     const container = document.createElement('div')

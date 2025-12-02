@@ -1,10 +1,22 @@
 import { serve } from '@hono/node-server'
+import { PrismaClient } from '@pems/database'
+import {
+  apiErrorHandling,
+  apiRequestLogging,
+  apiSecurityHeaders,
+  authMiddleware,
+  authorizationMiddleware,
+  createAuthRateLimiter,
+  createGeneralRateLimiter,
+  tenantContextMiddleware,
+} from '@pems/middleware'
+import {
+  createTenantRoutes,
+  TenantRepository,
+  TenantService,
+} from '@pems/tenant-management'
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
-import { logger } from 'hono/logger'
-import { PrismaClient } from '@pems/database'
-import { tenantContextMiddleware } from '@pems/middleware'
-import { TenantRepository, TenantService, createTenantRoutes } from '@pems/tenant-management'
 
 // Initialize database connection
 const prisma = new PrismaClient()
@@ -15,12 +27,72 @@ const tenantService = new TenantService(tenantRepository)
 
 const app = new Hono()
 
-// Global middleware
-app.use('*', cors())
-app.use('*', logger())
+// Enhanced middleware stack (execution order matters)
 
-// Tenant context middleware for all API routes
+// 1. Security headers (first)
+app.use('*', apiSecurityHeaders())
+
+// 2. CORS configuration
+app.use(
+  '*',
+  cors({
+    origin: process.env.CORS_ORIGIN?.split(',') ?? [
+      'http://localhost:3000',
+      'http://localhost:3001',
+    ],
+    credentials: true,
+    allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowHeaders: [
+      'Content-Type',
+      'Authorization',
+      'X-Tenant-ID',
+      'X-Request-ID',
+    ],
+  }),
+)
+
+// 3. Request logging and correlation ID
+app.use('*', apiRequestLogging())
+
+// 4. Rate limiting (before auth to prevent abuse)
+app.use('*', createGeneralRateLimiter())
+
+// 5. Enhanced error handling
+app.use('*', apiErrorHandling())
+
+// 6. Authentication middleware for protected routes
+app.use(
+  '/api/*',
+  authMiddleware({
+    required: true,
+    skipPaths: [
+      '/api/health',
+      '/api/auth/login',
+      '/api/auth/register',
+      '/api/auth/forgot-password',
+    ],
+  }),
+)
+
+// 7. Tenant context middleware for authenticated API routes
 app.use('/api/*', tenantContextMiddleware(prisma))
+
+// 8. Authorization middleware for protected routes
+app.use(
+  '/api/*',
+  authorizationMiddleware({
+    skipPaths: [
+      '/api/health',
+      '/api/auth/login',
+      '/api/auth/register',
+      '/api/auth/forgot-password',
+      '/api/auth/reset-password',
+    ],
+  }),
+)
+
+// 9. Auth-specific rate limiting
+app.use('/api/auth/*', createAuthRateLimiter())
 
 // Basic routes
 app.get('/', (c) => {
@@ -30,8 +102,8 @@ app.get('/', (c) => {
     features: {
       multiTenancy: true,
       rowLevelSecurity: true,
-      uuidv7: true
-    }
+      uuidv7: true,
+    },
   })
 })
 
@@ -42,72 +114,52 @@ app.get('/health', async (c) => {
     return c.json({
       status: 'ok',
       timestamp: new Date().toISOString(),
-      database: 'connected'
+      database: 'connected',
     })
   } catch (error) {
-    return c.json({
-      status: 'degraded',
-      timestamp: new Date().toISOString(),
-      database: 'disconnected',
-      error: error instanceof Error ? error.message : 'Unknown error'
-    }, 503)
+    return c.json(
+      {
+        status: 'degraded',
+        timestamp: new Date().toISOString(),
+        database: 'disconnected',
+        error: error instanceof Error ? error.message : 'Unknown error',
+      },
+      503,
+    )
   }
 })
 
 // API Routes
 app.route('/api', createTenantRoutes(tenantService))
 
-// Error handling middleware
-app.onError((err, c) => {
-  console.error('API Error:', err)
+// TODO: Add user management routes when implemented
+// app.route('/api', createUserRoutes(userService))
+// app.route('/api', createAuthRoutes(userService))
 
-  if (err.name === 'HTTPException') {
-    return c.json({
-      success: false,
-      error: {
-        message: err.message,
-        status: err.status
-      }
-    }, err.status)
-  }
-
-  return c.json({
-    success: false,
-    error: {
-      message: 'Internal server error',
-      status: 500
-    }
-  }, 500)
-})
-
-// 404 handler
-app.notFound((c) => {
-  return c.json({
-    success: false,
-    error: {
-      message: 'Endpoint not found',
-      status: 404
-    }
-  }, 404)
-})
+// Note: Error handling and 404 are now handled by the enhanced error handling middleware
 
 const port = 3002
 
 // Graceful shutdown
 process.on('SIGINT', async () => {
+  // eslint-disable-next-line no-console
   console.log('Shutting down gracefully...')
   await prisma.$disconnect()
   process.exit(0)
 })
 
 process.on('SIGTERM', async () => {
+  // eslint-disable-next-line no-console
   console.log('Shutting down gracefully...')
   await prisma.$disconnect()
   process.exit(0)
 })
 
+// eslint-disable-next-line no-console
 console.log(`🚀 PEMS API Server starting on port ${port}`)
+// eslint-disable-next-line no-console
 console.log(`📊 Health check: http://localhost:${port}/health`)
+// eslint-disable-next-line no-console
 console.log(`🔐 Multi-tenant architecture with RLS enabled`)
 
 serve({

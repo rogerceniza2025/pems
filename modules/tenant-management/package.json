@@ -10,17 +10,18 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@hono/zod-validator": "^0.4.3",
     "@pems/database": "workspace:*",
+    "@pems/middleware": "workspace:*",
     "@pems/shared-types": "workspace:*",
     "@pems/shared-utils": "workspace:*",
-    "@pems/middleware": "workspace:*",
-    "hono": "^4.6.16",
-    "zod": "^3.25.76"
+    "hono": "^4.10.7",
+    "zod": "^4.1.13"
   },
   "devDependencies": {
     "@pems/config-typescript": "workspace:*",
-    "@types/node": "^22.10.5",
+    "@types/node": "^24.10.1",
     "typescript": "^5.9.3",
-    "vitest": "^2.1.8"
+    "vitest": "^4.0.14"
   }
 }
