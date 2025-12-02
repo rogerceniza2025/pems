@@ -21,56 +21,52 @@ describe('CVA Utility', () => {
   it('should handle variant creation patterns', () => {
     const { cva } = require('class-variance-authority')
 
-    const buttonVariants = cva(
-      'inline-flex items-center justify-center',
-      {
-        variants: {
-          variant: {
-            default: 'bg-primary text-primary-foreground',
-            destructive: 'bg-destructive text-destructive-foreground',
-          },
-          size: {
-            default: 'h-10 px-4 py-2',
-            sm: 'h-9 rounded-md px-3',
-          },
+    const buttonVariants = cva('inline-flex items-center justify-center', {
+      variants: {
+        variant: {
+          default: 'bg-primary text-primary-foreground',
+          destructive: 'bg-destructive text-destructive-foreground',
         },
-        defaultVariants: {
-          variant: 'default',
-          size: 'default',
+        size: {
+          default: 'h-10 px-4 py-2',
+          sm: 'h-9 rounded-md px-3',
         },
-      }
-    )
+      },
+      defaultVariants: {
+        variant: 'default',
+        size: 'default',
+      },
+    })
 
     expect(buttonVariants()).toContain('bg-primary')
-    expect(buttonVariants({ variant: 'destructive' })).toContain('bg-destructive')
+    expect(buttonVariants({ variant: 'destructive' })).toContain(
+      'bg-destructive',
+    )
     expect(buttonVariants({ size: 'sm' })).toContain('h-9')
   })
 
   it('should handle compound variants', () => {
     const { cva } = require('class-variance-authority')
 
-    const complexVariants = cva(
-      'base-class',
-      {
-        variants: {
-          variant: {
-            primary: 'text-blue-500',
-            secondary: 'text-gray-500',
-          },
-          size: {
-            sm: 'text-sm',
-            lg: 'text-lg',
-          },
+    const complexVariants = cva('base-class', {
+      variants: {
+        variant: {
+          primary: 'text-blue-500',
+          secondary: 'text-gray-500',
         },
-        compoundVariants: [
-          {
-            variant: 'primary',
-            size: 'lg',
-            class: 'font-bold',
-          },
-        ],
-      }
-    )
+        size: {
+          sm: 'text-sm',
+          lg: 'text-lg',
+        },
+      },
+      compoundVariants: [
+        {
+          variant: 'primary',
+          size: 'lg',
+          class: 'font-bold',
+        },
+      ],
+    })
 
     const result = complexVariants({ variant: 'primary', size: 'lg' })
     expect(result).toContain('font-bold')
@@ -81,18 +77,15 @@ describe('CVA Utility', () => {
   it('should handle responsive design utilities', () => {
     const { cva } = require('class-variance-authority')
 
-    const responsiveVariants = cva(
-      'container',
-      {
-        variants: {
-          responsive: {
-            mobile: 'w-full',
-            tablet: 'w-3/4',
-            desktop: 'w-1/2',
-          },
+    const responsiveVariants = cva('container', {
+      variants: {
+        responsive: {
+          mobile: 'w-full',
+          tablet: 'w-3/4',
+          desktop: 'w-1/2',
         },
-      }
-    )
+      },
+    })
 
     const mobileClass = responsiveVariants({ responsive: 'mobile' })
     const desktopClass = responsiveVariants({ responsive: 'desktop' })

@@ -4,6 +4,7 @@ import { Show, splitProps } from 'solid-js'
 import { cn } from '../../../lib/utils'
 import { useField } from './form-context'
 import type { FormFieldProps } from './form.types'
+import type { FieldValues } from './form.types'
 import { FormDescription } from './form-description'
 import { FormError } from './form-error'
 import { FormLabel } from './form-label'
@@ -11,7 +12,9 @@ import { FormLabel } from './form-label'
 /**
  * Enhanced FormField component that integrates with TanStack Form
  */
-export const FormField = <T extends Record<string, any>>(props: FormFieldProps<T>) => {
+export const FormField = <T extends FieldValues = FieldValues>(
+  props: FormFieldProps,
+) => {
   const [local, others] = splitProps(props, [
     'class',
     'name',
@@ -36,8 +39,8 @@ export const FormField = <T extends Record<string, any>>(props: FormFieldProps<T
     name: field.props.name,
     value: field.value(),
     onValueChange: field.setValue,
-    validationState: local.validationState || field.validationState(),
-    error: local.error || field.error(),
+    validationState: local.validationState ?? field.validationState(),
+    error: local.error ?? field.error(),
     required: local.required,
     disabled: local.disabled,
     'aria-invalid': field.error() ? 'true' : 'false',
@@ -45,7 +48,7 @@ export const FormField = <T extends Record<string, any>>(props: FormFieldProps<T
   }
 
   const isHorizontal = local.layout === 'horizontal'
-  const hasError = fieldProps.error || local.error
+  const hasError = fieldProps.error ?? local.error
   const isValid = fieldProps.validationState === 'success'
   const hasIcon = !!local.icon
 
@@ -74,11 +77,13 @@ export const FormField = <T extends Record<string, any>>(props: FormFieldProps<T
       </Show>
 
       {/* Input/Control Section */}
-      <div class={cn(
-        'relative',
-        isHorizontal && 'md:col-span-2',
-        hasIcon && !isHorizontal && 'pl-8'
-      )}>
+      <div
+        class={cn(
+          'relative',
+          isHorizontal && 'md:col-span-2',
+          hasIcon && !isHorizontal && 'pl-8',
+        )}
+      >
         {/* Icon (left side) */}
         <Show when={hasIcon && !isHorizontal}>
           <div class="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground">
@@ -88,37 +93,39 @@ export const FormField = <T extends Record<string, any>>(props: FormFieldProps<T
 
         {/* Render children with field props */}
         {typeof local.children === 'function'
-          ? local.children({ ...field, props: fieldProps })
-          : local.children
-        }
+          ? (local.children as Function)({ ...field, props: fieldProps })
+          : local.children}
       </div>
 
       {/* Description Section */}
       <Show when={local.description}>
-        <div class={cn(
-          isHorizontal && 'md:col-span-1',
-          !isHorizontal && 'text-sm text-muted-foreground'
-        )}>
+        <div
+          class={cn(
+            isHorizontal && 'md:col-span-1',
+            !isHorizontal && 'text-sm text-muted-foreground',
+          )}
+        >
           <FormDescription>{local.description}</FormDescription>
         </div>
       </Show>
 
       {/* Error Message Section */}
       <Show when={hasError}>
-        <div class={cn(
-          isHorizontal && 'md:col-span-2',
-          !isHorizontal && 'mt-1'
-        )}>
+        <div
+          class={cn(isHorizontal && 'md:col-span-2', !isHorizontal && 'mt-1')}
+        >
           <FormError error={fieldProps.error} />
         </div>
       </Show>
 
       {/* Help Text Section */}
       <Show when={local.helpText && !hasError}>
-        <div class={cn(
-          'text-sm text-muted-foreground',
-          isHorizontal && 'md:col-span-2'
-        )}>
+        <div
+          class={cn(
+            'text-sm text-muted-foreground',
+            isHorizontal && 'md:col-span-2',
+          )}
+        >
           {local.helpText}
         </div>
       </Show>
@@ -179,26 +186,25 @@ export const SimpleFormField = (props: {
       </Show>
 
       {/* Input/Control Section */}
-      <div class={cn(isHorizontal && 'md:col-span-2')}>
-        {local.children}
-      </div>
+      <div class={cn(isHorizontal && 'md:col-span-2')}>{local.children}</div>
 
       {/* Description Section */}
       <Show when={local.description}>
-        <div class={cn(
-          'text-sm text-muted-foreground',
-          isHorizontal && 'md:col-span-1'
-        )}>
+        <div
+          class={cn(
+            'text-sm text-muted-foreground',
+            isHorizontal && 'md:col-span-1',
+          )}
+        >
           {local.description}
         </div>
       </Show>
 
       {/* Error Message Section */}
       <Show when={hasError}>
-        <div class={cn(
-          isHorizontal && 'md:col-span-2',
-          !isHorizontal && 'mt-1'
-        )}>
+        <div
+          class={cn(isHorizontal && 'md:col-span-2', !isHorizontal && 'mt-1')}
+        >
           <FormError error={local.error} />
         </div>
       </Show>
@@ -217,8 +223,10 @@ export const FormFieldGroup = (props: {
   children: JSX.Element
 }) => {
   return (
-    <div class={cn('space-y-4 p-4 border rounded-lg bg-background', props.class)}>
-      <Show when={props.title || props.description}>
+    <div
+      class={cn('space-y-4 p-4 border rounded-lg bg-background', props.class)}
+    >
+      <Show when={props.title ?? props.description}>
         <div class="space-y-1">
           <Show when={props.title}>
             <h3 class="text-base font-medium leading-none">
@@ -235,9 +243,7 @@ export const FormFieldGroup = (props: {
           </Show>
         </div>
       </Show>
-      <div class="space-y-4">
-        {props.children}
-      </div>
+      <div class="space-y-4">{props.children}</div>
     </div>
   )
 }
@@ -267,7 +273,7 @@ export const FormFieldInline = <T extends Record<string, any>>(props: {
   ])
 
   const field = useField<T>(local.name)
-  const hasError = local.error || field.error()
+  const hasError = local.error ?? field.error()
 
   return (
     <div class={cn('flex items-start gap-4', local.class)} {...others}>
@@ -288,7 +294,7 @@ export const FormFieldInline = <T extends Record<string, any>>(props: {
       <div class="flex-1 space-y-1">
         {/* Render children with field props */}
         {typeof local.children === 'function'
-          ? local.children({
+          ? (local.children as Function)({
               ...field,
               props: {
                 id: field.props.id,
@@ -301,21 +307,20 @@ export const FormFieldInline = <T extends Record<string, any>>(props: {
                 disabled: local.disabled,
                 'aria-invalid': field.error() ? 'true' : 'false',
                 'aria-describedby': field.props['aria-describedby'],
-              }
+              },
             })
-          : local.children
-        }
+          : local.children}
 
         {/* Description */}
         <Show when={local.description}>
-          <div class="text-sm text-muted-foreground">
-            {local.description}
-          </div>
+          <div class="text-sm text-muted-foreground">{local.description}</div>
         </Show>
 
         {/* Error Message */}
         <Show when={hasError}>
-          <FormError error={hasError ? (local.error || field.error()) : undefined} />
+          <FormError
+            error={hasError ? (local.error ?? field.error()) : undefined}
+          />
         </Show>
       </div>
     </div>
@@ -345,7 +350,7 @@ export const FormFieldCompact = <T extends Record<string, any>>(props: {
   ])
 
   const field = useField<T>(local.name)
-  const hasError = local.error || field.error()
+  const hasError = local.error ?? field.error()
 
   return (
     <div class={cn('space-y-1', local.class)} {...others}>
@@ -375,14 +380,15 @@ export const FormFieldCompact = <T extends Record<string, any>>(props: {
               required: local.required,
               disabled: local.disabled,
               'aria-invalid': field.error() ? 'true' : 'false',
-            }
+            },
           })
-        : local.children
-      }
+        : local.children}
 
       {/* Error Message */}
       <Show when={hasError}>
-        <FormError error={hasError ? (local.error || field.error()) : undefined} />
+        <FormError
+          error={hasError ? (local.error ?? field.error()) : undefined}
+        />
       </Show>
     </div>
   )

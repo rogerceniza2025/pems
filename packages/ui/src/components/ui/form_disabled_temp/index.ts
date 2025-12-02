@@ -1,5 +1,12 @@
 // Main Form Components
-export { Form, FormField, FormSection, FormProgress, FormErrorSummary, FormConditional } from './form'
+export {
+  Form,
+  FormField,
+  FormSection,
+  FormProgress,
+  FormErrorSummary,
+  FormConditional,
+} from './form'
 export type { FormProps } from './form'
 
 // Form Field Components
@@ -10,7 +17,7 @@ export {
   FormFieldInline,
   FormFieldCompact,
 } from './form-field'
-export type { FormFieldProps } from './form-field'
+export type { FormFieldProps } from './form.types'
 
 // Form Label Components
 export {
@@ -32,7 +39,7 @@ export {
   InlineFormError,
   FormErrorToast,
 } from './form-error'
-export type { FormErrorProps } from './form-error'
+export type { FormErrorProps } from './form.types'
 
 // Form Message Components
 export {
@@ -44,7 +51,7 @@ export {
   FormMessageBanner,
   FormProgressMessage,
 } from './form-message'
-export type { FormMessageProps } from './form-message'
+export type { FormMessageProps } from './form.types'
 
 // Form Control Components
 export {
@@ -56,7 +63,7 @@ export {
   FormControlLoading,
   FormControlHelper,
 } from './form-control'
-export type { FormControlProps } from './form-control'
+export type { FormControlProps } from './form.types'
 
 // Form Submit Components
 export {
@@ -73,7 +80,7 @@ export {
   FormCompleteButton,
   FormContinueButton,
 } from './form-submit'
-export type { FormSubmitProps } from './form-submit'
+export type { FormSubmitProps } from './form.types'
 
 // Form Description Components
 export {
@@ -87,7 +94,7 @@ export {
   FormCharacterCount,
   FormPasswordStrength,
 } from './form-description'
-export type { FormDescriptionProps } from './form-description'
+export type { FormDescriptionProps } from './form.types'
 
 // Form Context and Hooks
 export {
@@ -105,7 +112,7 @@ export {
   useFieldContext,
   FieldProvider,
 } from './form-context'
-export type { FormContextValue } from './form-context'
+export type { FormContextValue } from './form.types'
 
 // Form Types
 export {
@@ -155,11 +162,7 @@ export {
 } from './form.utils'
 
 // Common Schemas
-export {
-  commonSchemas,
-  userFormSchema,
-  contactFormSchema,
-} from './form.types'
+export { commonSchemas, userFormSchema, contactFormSchema } from './form.types'
 
 export type { UserFormData, ContactFormData } from './form.types'
 

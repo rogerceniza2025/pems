@@ -2,7 +2,11 @@ import { createContext, useContext } from 'solid-js'
 import type { Accessor, JSX } from 'solid-js'
 
 import type { ValidationState } from '../input'
-import type { FieldValues, FormContextValue, FormSubmissionState } from './form.types'
+import type {
+  FieldValues,
+  FormContextValue,
+  FormSubmissionState,
+} from './form.types'
 import {
   createFieldErrorSignal,
   createFieldValidationSignal,
@@ -24,7 +28,9 @@ export const FormContext = createContext<FormContextValue>()
 /**
  * Hook to access form context
  */
-export function useForm<T extends FieldValues = FieldValues>(): FormContextValue<T> {
+export function useForm<
+  T extends FieldValues = FieldValues,
+>(): FormContextValue<T> {
   const context = useContext(FormContext)
   if (!context) {
     throw new Error('useForm must be used within a FormProvider')
@@ -35,12 +41,10 @@ export function useForm<T extends FieldValues = FieldValues>(): FormContextValue
 /**
  * Provider component for form context
  */
-export function FormProvider<T extends FieldValues = FieldValues>(
-  props: {
-    form: any // TanStack Form instance
-    children: JSX.Element
-  }
-) {
+export function FormProvider<T extends FieldValues = FieldValues>(props: {
+  form: any // TanStack Form instance
+  children: JSX.Element
+}) {
   const { form } = props
 
   // Create reactive form state signals
@@ -59,7 +63,7 @@ export function FormProvider<T extends FieldValues = FieldValues>(
     isValid: formState.isValid,
     isDirty: formState.isDirty,
     errors: formState.errors,
-    values: (): T => getFormData(form),
+    values: () => getFormData(form) as T,
     setFieldValue: (name: string, value: any) => {
       setFieldValueWithValidation(form, name as keyof T, value, true)
     },
@@ -95,7 +99,7 @@ export function FormProvider<T extends FieldValues = FieldValues>(
  * Hook to get field state
  */
 export function useField<T extends FieldValues = FieldValues>(
-  name: keyof T
+  name: keyof T,
 ): {
   value: Accessor<T[keyof T]>
   error: Accessor<string | undefined>
@@ -120,9 +124,9 @@ export function useField<T extends FieldValues = FieldValues>(
   const [getError, clearError] = createFieldErrorSignal(form, name)
   const [getValidationState] = createFieldValidationSignal(form, name)
 
-  const isDirty = () => form.state.dirtyFields[name as string] || false
-  const isTouched = () => field.state.meta.isTouched || false
-  const isValidating = () => field.state.meta.isValidating || false
+  const isDirty = () => form.state.dirtyFields[name as string] ?? false
+  const isTouched = () => field.state.meta.isTouched ?? false
+  const isValidating = () => field.state.meta.isValidating ?? false
 
   const setValue = (newValue: T[keyof T]) => {
     setFieldValueWithValidation(form, name, newValue, true)
@@ -142,7 +146,7 @@ export function useField<T extends FieldValues = FieldValues>(
     name: String(name),
     'aria-describedby': `${String(name)}-description ${String(name)}-error`,
     'aria-invalid': error() ? 'true' : 'false',
-    'aria-required': field.state.meta.isRequired || false,
+    'aria-required': field.state.meta.isRequired ?? false,
   }
 
   return {
@@ -163,7 +167,7 @@ export function useField<T extends FieldValues = FieldValues>(
 /**
  * Hook to get form submission state
  */
-export function useFormSubmission(): {
+export function useFormSubmission<T extends FieldValues = FieldValues>(): {
   isSubmitting: Accessor<boolean>
   isValid: Accessor<boolean>
   isDirty: Accessor<boolean>
@@ -179,7 +183,7 @@ export function useFormSubmission(): {
     isValid: context.isValid,
     isDirty: context.isDirty,
     errors: context.errors,
-    values: context.values,
+    values: context.values as Accessor<T>,
     submit: context.submitForm,
     reset: context.resetForm,
   }
@@ -204,13 +208,14 @@ export function useFormValidation(): {
   const errorCount = () => {
     const currentErrors = errors()
     return Object.values(currentErrors).reduce(
-      (count, errorArray) => count + (Array.isArray(errorArray) ? errorArray.length : 1),
-      0
+      (count, errorArray) =>
+        count + (Array.isArray(errorArray) ? errorArray.length : 1),
+      0,
     )
   }
 
   const clearErrors = () => {
-    Object.keys(errors()).forEach((field) => {
+    Object.keys(errors()).forEach((_field) => {
       // This will be implemented when we have access to the form instance
       // form.clearFieldError(field as keyof T)
     })
@@ -229,7 +234,7 @@ export function useFormValidation(): {
  */
 export function useFormFieldProps<T extends FieldValues = FieldValues>(
   name: keyof T,
-  baseProps: Record<string, any> = {}
+  baseProps: Record<string, any> = {},
 ): Record<string, any> {
   const field = useField<T>(name)
 
@@ -252,7 +257,7 @@ export function useFormFieldProps<T extends FieldValues = FieldValues>(
  */
 export function useFormLabelProps<T extends FieldValues = FieldValues>(
   name: keyof T,
-  baseProps: Record<string, any> = {}
+  baseProps: Record<string, any> = {},
 ): Record<string, any> {
   const field = useField<T>(name)
 
@@ -269,7 +274,7 @@ export function useFormLabelProps<T extends FieldValues = FieldValues>(
  */
 export function useFormErrorProps<T extends FieldValues = FieldValues>(
   name: keyof T,
-  baseProps: Record<string, any> = {}
+  baseProps: Record<string, any> = {},
 ): Record<string, any> {
   const field = useField<T>(name)
   const error = field.error()
@@ -287,10 +292,8 @@ export function useFormErrorProps<T extends FieldValues = FieldValues>(
  */
 export function useFormDescriptionProps<T extends FieldValues = FieldValues>(
   name: keyof T,
-  baseProps: Record<string, any> = {}
+  baseProps: Record<string, any> = {},
 ): Record<string, any> {
-  const field = useField<T>(name)
-
   return {
     id: `${String(name)}-description`,
     ...baseProps,
@@ -334,9 +337,9 @@ export function FieldProvider(props: {
 }) {
   const contextValue = {
     name: props.name,
-    required: props.required || false,
-    disabled: props.disabled || false,
-    validationState: props.validationState || 'none',
+    required: props.required ?? false,
+    disabled: props.disabled ?? false,
+    validationState: props.validationState ?? 'none',
     error: props.error,
     description: props.description,
   }

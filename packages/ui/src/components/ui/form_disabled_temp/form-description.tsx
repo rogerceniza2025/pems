@@ -13,7 +13,7 @@ export const FormDescription = (props: FormDescriptionProps) => {
   return (
     <p
       class={cn('text-sm text-muted-foreground', local.class)}
-      id={`${others.id || 'field'}-description`}
+      id={`${others.id ?? 'field'}-description`}
       {...others}
     >
       {local.children}
@@ -30,7 +30,12 @@ export const FormHint = (props: {
   icon?: JSX.Element
   children: JSX.Element
 }) => {
-  const [local, others] = splitProps(props, ['class', 'type', 'icon', 'children'])
+  const [local, others] = splitProps(props, [
+    'class',
+    'type',
+    'icon',
+    'children',
+  ])
 
   const typeClasses = {
     info: 'text-blue-600',
@@ -90,7 +95,7 @@ export const FormHint = (props: {
     ),
   }
 
-  const iconType = local.type || 'info'
+  const iconType = local.type ?? 'info'
   const defaultIcon = defaultIcons[iconType]
 
   return (
@@ -103,13 +108,9 @@ export const FormHint = (props: {
       {...others}
     >
       <Show when={local.icon !== false}>
-        <span class="flex-shrink-0 mt-0.5">
-          {local.icon || defaultIcon()}
-        </span>
+        <span class="flex-shrink-0 mt-0.5">{local.icon ?? defaultIcon()}</span>
       </Show>
-      <span class="break-words">
-        {local.children}
-      </span>
+      <span class="break-words">{local.children}</span>
     </div>
   )
 }
@@ -123,7 +124,12 @@ export const FormExample = (props: {
   code?: boolean
   children: JSX.Element
 }) => {
-  const [local, others] = splitProps(props, ['class', 'title', 'code', 'children'])
+  const [local, others] = splitProps(props, [
+    'class',
+    'title',
+    'code',
+    'children',
+  ])
 
   return (
     <div
@@ -136,7 +142,12 @@ export const FormExample = (props: {
       {local.title && (
         <span class="font-medium block mb-1">{local.title}:</span>
       )}
-      <code class={cn('bg-background px-1 py-0.5 rounded', local.code && 'font-mono')}>
+      <code
+        class={cn(
+          'bg-background px-1 py-0.5 rounded',
+          local.code && 'font-mono',
+        )}
+      >
         {local.children}
       </code>
     </div>
@@ -153,14 +164,33 @@ export const FormLink = (props: {
   children: JSX.Element
   external?: boolean
 }) => {
-  const [local, others] = splitProps(props, ['class', 'href', 'onClick', 'children', 'external'])
+  const [local, others] = splitProps(props, [
+    'class',
+    'href',
+    'onClick',
+    'children',
+    'external',
+  ])
 
-  const baseClasses = 'text-xs text-primary hover:text-primary/80 underline-offset-4 hover:underline transition-colors'
+  const baseClasses =
+    'text-xs text-primary hover:text-primary/80 underline-offset-4 hover:underline transition-colors'
 
-  if (local.href) {
-    return (
+  return (
+    <Show
+      when={local.href}
+      fallback={
+        <button
+          type="button"
+          class={cn(baseClasses, local.class)}
+          onClick={local.onClick}
+          {...others}
+        >
+          {local.children}
+        </button>
+      }
+    >
       <a
-        href={local.href}
+        href={local.href!}
         class={cn(baseClasses, local.class)}
         target={local.external ? '_blank' : undefined}
         rel={local.external ? 'noopener noreferrer' : undefined}
@@ -187,18 +217,7 @@ export const FormLink = (props: {
           </span>
         )}
       </a>
-    )
-  }
-
-  return (
-    <button
-      type="button"
-      class={cn(baseClasses, local.class)}
-      onClick={local.onClick}
-      {...others}
-    >
-      {local.children}
-    </button>
+    </Show>
   )
 }
 
@@ -213,10 +232,7 @@ export const FormRichDescription = (props: {
 
   return (
     <div
-      class={cn(
-        'text-sm text-muted-foreground space-y-1',
-        local.class,
-      )}
+      class={cn('text-sm text-muted-foreground space-y-1', local.class)}
       {...others}
     >
       {local.children}
@@ -233,9 +249,14 @@ export const FormDescriptionWithIcon = (props: {
   iconPosition?: 'left' | 'right'
   children: JSX.Element
 }) => {
-  const [local, others] = splitProps(props, ['class', 'icon', 'iconPosition', 'children'])
+  const [local, others] = splitProps(props, [
+    'class',
+    'icon',
+    'iconPosition',
+    'children',
+  ])
 
-  const iconPosition = local.iconPosition || 'left'
+  const iconPosition = local.iconPosition ?? 'left'
 
   return (
     <div
@@ -251,9 +272,7 @@ export const FormDescriptionWithIcon = (props: {
           {local.icon}
         </span>
       </Show>
-      <span class="break-words">
-        {local.children}
-      </span>
+      <span class="break-words">{local.children}</span>
     </div>
   )
 }
@@ -278,7 +297,7 @@ export const FormDescriptionGroup = (props: {
     <div
       class={cn(
         'space-y-2',
-        spacingClasses[local.spacing || 'normal'],
+        spacingClasses[local.spacing ?? 'normal'],
         local.class,
       )}
       {...others}
@@ -334,11 +353,7 @@ export const FormCharacterCount = (props: {
         {local.current}
         {local.max && ` / ${local.max}`}
         {local.min && ` (min: ${local.min})`}
-        {local.max && (
-          <span class="ml-1">
-            ({Math.round(percentage())}%)
-          </span>
-        )}
+        {local.max && <span class="ml-1">({Math.round(percentage())}%)</span>}
       </div>
 
       {/* Progress Bar */}
@@ -347,12 +362,12 @@ export const FormCharacterCount = (props: {
           <div
             class={cn(
               'h-1 rounded-full transition-all duration-200 ease-in-out',
-              getProgressColor()
+              getProgressColor(),
             )}
             style={{ width: `${percentage()}%` }}
             role="progressbar"
             aria-valuenow={local.current}
-            aria-valuemin={local.min || 0}
+            aria-valuemin={local.min ?? 0}
             aria-valuemax={local.max}
           />
         </div>
@@ -386,20 +401,26 @@ export const FormPasswordStrength = (props: {
       <div class="flex space-x-1">
         <div class="h-1 flex-1 bg-gray-200 rounded-full overflow-hidden">
           <div
-            class={cn('h-full transition-all duration-300', config.color, config.width)}
+            class={cn(
+              'h-full transition-all duration-300',
+              config.color,
+              config.width,
+            )}
           />
         </div>
       </div>
 
       {/* Strength Label */}
       {local.showLabel && (
-        <div class={cn(
-          'text-xs',
-          local.strength === 'weak' && 'text-red-500',
-          local.strength === 'fair' && 'text-yellow-600',
-          local.strength === 'good' && 'text-blue-600',
-          local.strength === 'strong' && 'text-green-600'
-        )}>
+        <div
+          class={cn(
+            'text-xs',
+            local.strength === 'weak' && 'text-red-500',
+            local.strength === 'fair' && 'text-yellow-600',
+            local.strength === 'good' && 'text-blue-600',
+            local.strength === 'strong' && 'text-green-600',
+          )}
+        >
           Password strength: {config.text}
         </div>
       )}

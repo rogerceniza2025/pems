@@ -112,7 +112,9 @@ export const FormMessage = (props: FormMessageProps) => {
   }
 
   const textColorClass = () => {
-    return local.type ? messageColorClasses[local.type] : 'text-muted-foreground'
+    return local.type
+      ? messageColorClasses[local.type]
+      : 'text-muted-foreground'
   }
 
   return (
@@ -126,13 +128,9 @@ export const FormMessage = (props: FormMessageProps) => {
       aria-live={local.type === 'error' ? 'polite' : 'polite'}
       {...others}
     >
-      <Show when={defaultMessageIcon()}>
-        {defaultMessageIcon()}
-      </Show>
+      <Show when={defaultMessageIcon()}>{defaultMessageIcon()}</Show>
 
-      <span class="break-words">
-        {local.children}
-      </span>
+      <span class="break-words">{local.children}</span>
     </div>
   )
 }
@@ -146,11 +144,7 @@ export const FormSuccessMessage = (props: {
   children: JSX.Element
 }) => {
   return (
-    <FormMessage
-      type="success"
-      class={props.class}
-      icon={props.icon}
-    >
+    <FormMessage type="success" class={props.class} icon={props.icon}>
       {props.children}
     </FormMessage>
   )
@@ -165,11 +159,7 @@ export const FormWarningMessage = (props: {
   children: JSX.Element
 }) => {
   return (
-    <FormMessage
-      type="warning"
-      class={props.class}
-      icon={props.icon}
-    >
+    <FormMessage type="warning" class={props.class} icon={props.icon}>
       {props.children}
     </FormMessage>
   )
@@ -184,11 +174,7 @@ export const FormInfoMessage = (props: {
   children: JSX.Element
 }) => {
   return (
-    <FormMessage
-      type="info"
-      class={props.class}
-      icon={props.icon}
-    >
+    <FormMessage type="info" class={props.class} icon={props.icon}>
       {props.children}
     </FormMessage>
   )
@@ -216,7 +202,7 @@ export const FormMessageCard = (props: {
     'onDismiss',
   ])
 
-  const messageType = local.type || 'info'
+  const messageType = local.type ?? 'info'
   const defaultIcon = MessageIcons[messageType]
 
   const cardColorClasses = {
@@ -239,16 +225,10 @@ export const FormMessageCard = (props: {
     >
       <div class="flex items-start justify-between gap-3">
         <div class="flex items-start gap-3 flex-1">
-          <div class="flex-shrink-0 mt-0.5">
-            {local.icon || defaultIcon()}
-          </div>
+          <div class="flex-shrink-0 mt-0.5">{local.icon ?? defaultIcon()}</div>
           <div class="space-y-1">
-            {local.title && (
-              <h4 class="font-medium">{local.title}</h4>
-            )}
-            <div class="text-sm">
-              {local.children}
-            </div>
+            {local.title && <h4 class="font-medium">{local.title}</h4>}
+            <div class="text-sm">{local.children}</div>
           </div>
         </div>
 
@@ -288,9 +268,14 @@ export const FormMessageBanner = (props: {
   icon?: JSX.Element
   children: JSX.Element
 }) => {
-  const [local, others] = splitProps(props, ['type', 'class', 'icon', 'children'])
+  const [local, others] = splitProps(props, [
+    'type',
+    'class',
+    'icon',
+    'children',
+  ])
 
-  const messageType = local.type || 'info'
+  const messageType = local.type ?? 'info'
   const defaultIcon = MessageIcons[messageType]
 
   const bannerColorClasses = {
@@ -311,12 +296,8 @@ export const FormMessageBanner = (props: {
       aria-live="polite"
       {...others}
     >
-      <div class="flex-shrink-0">
-        {local.icon || defaultIcon()}
-      </div>
-      <div class="text-sm flex-1">
-        {local.children}
-      </div>
+      <div class="flex-shrink-0">{local.icon ?? defaultIcon()}</div>
+      <div class="text-sm flex-1">{local.children}</div>
     </div>
   )
 }
@@ -330,23 +311,25 @@ export const FormProgressMessage = (props: {
   message?: string
   class?: string
 }) => {
-  const [local, others] = splitProps(props, ['progress', 'total', 'message', 'class'])
+  const [local, others] = splitProps(props, [
+    'progress',
+    'total',
+    'message',
+    'class',
+  ])
 
   const percentage = () => Math.round((local.progress / local.total) * 100)
   const isComplete = () => local.progress >= local.total
 
   return (
     <div
-      class={cn(
-        'space-y-2',
-        local.class,
-      )}
+      class={cn('space-y-2', local.class)}
       role="status"
       aria-live="polite"
       {...others}
     >
       <div class="flex items-center justify-between text-sm">
-        <span>{local.message || 'Processing...'}</span>
+        <span>{local.message ?? 'Processing...'}</span>
         <span class="text-muted-foreground">
           {local.progress} / {local.total} ({percentage()}%)
         </span>
@@ -357,7 +340,7 @@ export const FormProgressMessage = (props: {
         <div
           class={cn(
             'h-2 rounded-full transition-all duration-300 ease-in-out',
-            isComplete() ? 'bg-green-600' : 'bg-primary'
+            isComplete() ? 'bg-green-600' : 'bg-primary',
           )}
           style={{ width: `${percentage()}%` }}
           role="progressbar"

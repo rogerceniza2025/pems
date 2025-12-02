@@ -1,9 +1,8 @@
 import type { JSX, ValidComponent } from 'solid-js'
 import { Show, splitProps } from 'solid-js'
 
-import * as LabelPrimitive from '@kobalte/core/label'
-import type { PolymorphicProps } from '@kobalte/core/polymorphic'
-import type { VariantProps } from 'class-variance-authority'
+import { FormControlLabel as LabelPrimitive } from '@kobalte/core'
+import type { PolymorphicProps } from '@kobalte/core'
 import { cva } from 'class-variance-authority'
 
 import { cn } from '../../../lib/utils'
@@ -48,7 +47,7 @@ const formLabelVariants = cva(
  * with form-specific features like validation states and tooltips
  */
 const FormLabel = <T extends ValidComponent = 'label'>(
-  props: PolymorphicProps<T, FormLabelProps<T>>
+  props: PolymorphicProps<T, FormLabelProps>,
 ) => {
   const [local, others] = splitProps(props as FormLabelProps, [
     'for',
@@ -63,7 +62,7 @@ const FormLabel = <T extends ValidComponent = 'label'>(
 
   return (
     <div class="flex items-center gap-2">
-      <LabelPrimitive.Root
+      <LabelPrimitive
         class={cn(
           formLabelVariants({
             validationState: local.validationState,
@@ -76,9 +75,7 @@ const FormLabel = <T extends ValidComponent = 'label'>(
         {...others}
       >
         {local.icon && (
-          <span class="mr-1 inline-flex items-center">
-            {local.icon}
-          </span>
+          <span class="mr-1 inline-flex items-center">{local.icon}</span>
         )}
 
         {local.children}
@@ -104,7 +101,7 @@ const FormLabel = <T extends ValidComponent = 'label'>(
             (optional)
           </span>
         )}
-      </LabelPrimitive.Root>
+      </LabelPrimitive>
 
       {/* Tooltip */}
       <Show when={local.tooltip}>
@@ -219,9 +216,7 @@ export const FormLabelWithActions = (props: {
         {props.children}
       </FormLabel>
       {props.actions && (
-        <div class="flex items-center gap-2">
-          {props.actions}
-        </div>
+        <div class="flex items-center gap-2">{props.actions}</div>
       )}
     </div>
   )
@@ -250,9 +245,7 @@ export const FormLabelWithHint = (props: {
         {props.children}
       </FormLabel>
       {props.hint && (
-        <div class="text-xs text-muted-foreground">
-          {props.hint}
-        </div>
+        <div class="text-xs text-muted-foreground">{props.hint}</div>
       )}
     </div>
   )
@@ -262,7 +255,7 @@ export const FormLabelWithHint = (props: {
  * Compact form label for minimal space usage
  */
 export const CompactFormLabel = <T extends ValidComponent = 'label'>(
-  props: PolymorphicProps<T, Omit<FormLabelProps<T>, 'size' | 'weight'>>
+  props: PolymorphicProps<T, Omit<FormLabelProps, 'size' | 'weight'>>,
 ) => {
   const [local, others] = splitProps(props as FormLabelProps, [
     'for',
@@ -277,7 +270,7 @@ export const CompactFormLabel = <T extends ValidComponent = 'label'>(
 
   return (
     <div class="flex items-center gap-1">
-      <LabelPrimitive.Root
+      <LabelPrimitive
         class={cn(
           'text-xs font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70',
           formLabelVariants({
@@ -291,23 +284,19 @@ export const CompactFormLabel = <T extends ValidComponent = 'label'>(
         {...others}
       >
         {local.icon && (
-          <span class="mr-0.5 inline-flex items-center">
-            {local.icon}
-          </span>
+          <span class="mr-0.5 inline-flex items-center">{local.icon}</span>
         )}
 
         {local.children}
 
-        {local.required && (
-          <span class="text-destructive ml-0.5">*</span>
-        )}
+        {local.required && <span class="text-destructive ml-0.5">*</span>}
 
         {local.optional && (
           <span class="text-muted-foreground ml-0.5 text-xs font-normal">
             (optional)
           </span>
         )}
-      </LabelPrimitive.Root>
+      </LabelPrimitive>
 
       <Show when={local.tooltip}>
         <div class="group relative inline-block">

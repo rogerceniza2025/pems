@@ -1,4 +1,4 @@
-import { createSignal, Show } from 'solid-js'
+import { createSignal, Show, createEffect } from 'solid-js'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 import { Label } from '../ui/label'
@@ -39,13 +39,26 @@ export const RegisterForm = (props: RegisterFormProps) => {
   const [password, setPassword] = createSignal('')
   const [confirmPassword, setConfirmPassword] = createSignal('')
   const [name, setName] = createSignal('')
-  const [tenantId, setTenantId] = createSignal(props.selectedTenant || '')
+  const [tenantId, setTenantId] = createSignal(props.selectedTenant ?? '')
+
+  // Track selectedTenant prop changes
+  createEffect(() => {
+    if (props.selectedTenant !== undefined) {
+      setTenantId(props.selectedTenant)
+    }
+  })
   const [phone, setPhone] = createSignal('')
   const [isLoading, setIsLoading] = createSignal(false)
   const [error, setError] = createSignal('')
 
   const validateForm = () => {
-    if (!email() || !password() || !confirmPassword() || !name() || !tenantId()) {
+    if (
+      !email() ||
+      !password() ||
+      !confirmPassword() ||
+      !name() ||
+      !tenantId()
+    ) {
       setError('Please fill in all required fields')
       return false
     }
@@ -58,7 +71,9 @@ export const RegisterForm = (props: RegisterFormProps) => {
     // Enhanced password validation
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/
     if (!passwordRegex.test(password())) {
-      setError('Password must contain at least one lowercase letter, one uppercase letter, and one number')
+      setError(
+        'Password must contain at least one lowercase letter, one uppercase letter, and one number',
+      )
       return false
     }
 
@@ -125,10 +140,12 @@ export const RegisterForm = (props: RegisterFormProps) => {
               value={tenantId()}
               onChange={setTenantId}
               disabled={isLoading() || props.loading}
-              options={props.tenants?.map(tenant => ({
-                value: tenant.id,
-                label: tenant.name
-              })) || []}
+              options={
+                props.tenants?.map((tenant) => ({
+                  value: tenant.id,
+                  label: tenant.name,
+                })) ?? []
+              }
             />
           </div>
 
@@ -186,7 +203,8 @@ export const RegisterForm = (props: RegisterFormProps) => {
               autocomplete="new-password"
             />
             <div class="text-xs text-muted-foreground">
-              Password must be at least 8 characters with uppercase, lowercase, and numbers
+              Password must be at least 8 characters with uppercase, lowercase,
+              and numbers
             </div>
           </div>
 
@@ -204,10 +222,8 @@ export const RegisterForm = (props: RegisterFormProps) => {
             />
           </div>
 
-          <Show when={error() || props.error}>
-            <Alert variant="destructive">
-              {error() || props.error}
-            </Alert>
+          <Show when={error() ?? props.error}>
+            <Alert variant="destructive">{error() ?? props.error}</Alert>
           </Show>
 
           <Button

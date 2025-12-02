@@ -35,7 +35,11 @@ export type FormSpacing = 'compact' | 'normal' | 'relaxed'
 /**
  * Form validation trigger options
  */
-export type FormValidationTrigger = 'onChange' | 'onBlur' | 'onSubmit' | 'manual'
+export type FormValidationTrigger =
+  | 'onChange'
+  | 'onBlur'
+  | 'onSubmit'
+  | 'manual'
 
 /**
  * Form validation mode
@@ -63,8 +67,7 @@ export interface BaseFormFieldProps {
 /**
  * Form field component props
  */
-export interface FormFieldProps<T extends FieldValues = FieldValues>
-  extends BaseFormFieldProps {
+export interface FormFieldProps extends BaseFormFieldProps {
   class?: string
   layout?: 'vertical' | 'horizontal'
   validationState?: ValidationState
@@ -125,6 +128,7 @@ export interface FormControlProps {
  */
 export interface FormDescriptionProps {
   class?: string
+  id?: string
   children: JSX.Element
 }
 
@@ -135,6 +139,19 @@ export interface FormSubmitProps {
   loading?: boolean
   loadingText?: string
   disabled?: boolean
+  variant?:
+    | 'default'
+    | 'destructive'
+    | 'outline'
+    | 'secondary'
+    | 'ghost'
+    | 'link'
+    | null
+  size?: 'default' | 'sm' | 'lg' | 'icon' | null
+  confirmMode?: boolean
+  confirmText?: string
+  confirmDelay?: number
+  onConfirm?: () => void
   class?: string
   children: JSX.Element
 }
@@ -258,43 +275,59 @@ export interface FormFieldRenderProps<T extends FieldValues = FieldValues> {
  * Common validation schemas
  */
 export const commonSchemas = {
-  email: z.string().email('Please enter a valid email address'),
-  password: z
-    .string()
-    .min(8, 'Password must be at least 8 characters')
-    .regex(
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
-      'Password must contain at least one uppercase letter, one lowercase letter, and one number'
-    ),
-  requiredString: z.string().min(1, 'This field is required'),
-  phone: z.string().regex(/^[+]?[\d\s\-()]+$/, 'Please enter a valid phone number'),
-  url: z.string().url('Please enter a valid URL'),
-  positiveNumber: z.number().positive('Must be a positive number'),
-  nonNegativeNumber: z.number().nonnegative('Must be a non-negative number'),
+  email: () => z.string().email('Please enter a valid email address'),
+  password: () =>
+    z
+      .string()
+      .min(8, 'Password must be at least 8 characters')
+      .regex(
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
+        'Password must contain at least one uppercase letter, one lowercase letter, and one number',
+      ),
+  requiredString: () => z.string().min(1, 'This field is required'),
+  phone: () =>
+    z.string().regex(/^[+]?[\d\s\-()]+$/, 'Please enter a valid phone number'),
+  url: () => z.string().url('Please enter a valid URL'),
+  positiveNumber: () => z.number().positive('Must be a positive number'),
+  nonNegativeNumber: () =>
+    z.number().nonnegative('Must be a non-negative number'),
 } as const
 
 /**
  * User form schema example
  */
-export const userFormSchema = z.object({
-  firstName: z.string().min(1, 'First name is required').max(50, 'First name must be less than 50 characters'),
-  lastName: z.string().min(1, 'Last name is required').max(50, 'Last name must be less than 50 characters'),
-  email: commonSchemas.email,
-  password: commonSchemas.password,
-  confirmPassword: z.string(),
-  age: z.number().min(18, 'Must be at least 18 years old').max(120, 'Must be less than 120 years old'),
-  phone: commonSchemas.phone.optional(),
-  website: commonSchemas.url.optional(),
-  bio: z.string().max(500, 'Bio must be less than 500 characters').optional(),
-  newsletter: z.boolean().default(false),
-  terms: z.boolean().refine(val => val === true, 'You must accept the terms and conditions'),
-}).refine(
-  (data) => data.password === data.confirmPassword,
-  {
+export const userFormSchema = z
+  .object({
+    firstName: z
+      .string()
+      .min(1, 'First name is required')
+      .max(50, 'First name must be less than 50 characters'),
+    lastName: z
+      .string()
+      .min(1, 'Last name is required')
+      .max(50, 'Last name must be less than 50 characters'),
+    email: commonSchemas.email(),
+    password: commonSchemas.password(),
+    confirmPassword: z.string(),
+    age: z
+      .number()
+      .min(18, 'Must be at least 18 years old')
+      .max(120, 'Must be less than 120 years old'),
+    phone: commonSchemas.phone().optional(),
+    website: commonSchemas.url().optional(),
+    bio: z.string().max(500, 'Bio must be less than 500 characters').optional(),
+    newsletter: z.boolean().default(false),
+    terms: z
+      .boolean()
+      .refine(
+        (val: boolean) => val === true,
+        'You must accept the terms and conditions',
+      ),
+  })
+  .refine((data: any) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
-    path: ["confirmPassword"],
-  }
-)
+    path: ['confirmPassword'],
+  })
 
 /**
  * User form type
@@ -305,10 +338,19 @@ export type UserFormData = z.infer<typeof userFormSchema>
  * Contact form schema example
  */
 export const contactFormSchema = z.object({
-  name: z.string().min(1, 'Name is required').max(100, 'Name must be less than 100 characters'),
-  email: commonSchemas.email,
-  subject: z.string().min(1, 'Subject is required').max(200, 'Subject must be less than 200 characters'),
-  message: z.string().min(10, 'Message must be at least 10 characters').max(2000, 'Message must be less than 2000 characters'),
+  name: z
+    .string()
+    .min(1, 'Name is required')
+    .max(100, 'Name must be less than 100 characters'),
+  email: commonSchemas.email(),
+  subject: z
+    .string()
+    .min(1, 'Subject is required')
+    .max(200, 'Subject must be less than 200 characters'),
+  message: z
+    .string()
+    .min(10, 'Message must be at least 10 characters')
+    .max(2000, 'Message must be less than 2000 characters'),
   priority: z.enum(['low', 'medium', 'high']).default('medium'),
   copyToSender: z.boolean().default(false),
 })

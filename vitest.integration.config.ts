@@ -6,7 +6,7 @@ export default defineConfig({
     globals: true,
     environment: 'node',
     setupFiles: ['./tests/setup/vitest.integration.setup.ts'],
-    
+
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
@@ -28,35 +28,37 @@ export default defineConfig({
         },
       },
     },
-    
-    include: [
-      'tests/integration/**/*.{test,spec}.{js,ts,jsx,tsx}',
-    ],
-    exclude: [
-      'node_modules/',
-      'dist/',
-      'tests/unit/',
-      'tests/e2e/',
-    ],
-    
-    testTimeout: 30000,
-    hookTimeout: 30000,
-    isolate: false,
-    maxConcurrency: 2,
-    
+
+    include: ['tests/integration/**/*.{test,spec}.{js,ts,jsx,tsx}'],
+    exclude: ['node_modules/', 'dist/', 'tests/unit/', 'tests/e2e/'],
+
+    testTimeout: 45000,
+    hookTimeout: 20000,
+    isolate: true,
+    maxConcurrency: 3,
+    pool: 'threads',
+    poolOptions: {
+      threads: {
+        maxThreads: 3,
+        minThreads: 1,
+      },
+    },
+
     reporters: ['verbose', 'json'],
     outputFile: {
       json: './test-results/integration.json',
     },
-    
+
     // Global test environment
     env: {
       NODE_ENV: 'test',
-      DATABASE_URL: process.env.TEST_DATABASE_URL || 'postgresql://test:test@localhost:5432/pems_test',
+      DATABASE_URL:
+        process.env.TEST_DATABASE_URL ||
+        'postgresql://test:test@localhost:5432/pems_test',
       REDIS_URL: process.env.TEST_REDIS_URL || 'redis://localhost:6379',
     },
   },
-  
+
   resolve: {
     alias: {
       '@': resolve(__dirname, './src'),

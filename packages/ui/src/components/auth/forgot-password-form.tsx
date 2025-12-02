@@ -1,4 +1,4 @@
-import { createSignal, Show } from 'solid-js'
+import { createSignal, Show, createEffect } from 'solid-js'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 import { Label } from '../ui/label'
@@ -19,10 +19,7 @@ export interface Tenant {
 }
 
 export interface ForgotPasswordFormProps {
-  onSubmit?: (data: {
-    email: string
-    tenantId: string
-  }) => Promise<void>
+  onSubmit?: (data: { email: string; tenantId: string }) => Promise<void>
   onSignIn?: () => void
   loading?: boolean
   error?: string
@@ -33,7 +30,14 @@ export interface ForgotPasswordFormProps {
 
 export const ForgotPasswordForm = (props: ForgotPasswordFormProps) => {
   const [email, setEmail] = createSignal('')
-  const [tenantId, setTenantId] = createSignal(props.selectedTenant || '')
+  const [tenantId, setTenantId] = createSignal(props.selectedTenant ?? '')
+
+  // Track selectedTenant prop changes
+  createEffect(() => {
+    if (props.selectedTenant !== undefined) {
+      setTenantId(props.selectedTenant)
+    }
+  })
   const [isLoading, setIsLoading] = createSignal(false)
   const [error, setError] = createSignal('')
 
@@ -68,7 +72,9 @@ export const ForgotPasswordForm = (props: ForgotPasswordFormProps) => {
         tenantId: tenantId(),
       })
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to send reset email')
+      setError(
+        err instanceof Error ? err.message : 'Failed to send reset email',
+      )
     } finally {
       setIsLoading(false)
     }
@@ -79,7 +85,8 @@ export const ForgotPasswordForm = (props: ForgotPasswordFormProps) => {
       <CardHeader>
         <CardTitle>Reset Password</CardTitle>
         <CardDescription>
-          Enter your email address and we'll send you a link to reset your password
+          Enter your email address and we'll send you a link to reset your
+          password
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -93,10 +100,12 @@ export const ForgotPasswordForm = (props: ForgotPasswordFormProps) => {
                 value={tenantId()}
                 onChange={setTenantId}
                 disabled={isLoading() || props.loading}
-                options={props.tenants?.map(tenant => ({
-                  value: tenant.id,
-                  label: tenant.name
-                })) || []}
+                options={
+                  props.tenants?.map((tenant) => ({
+                    value: tenant.id,
+                    label: tenant.name,
+                  })) ?? []
+                }
               />
             </div>
 
@@ -114,10 +123,8 @@ export const ForgotPasswordForm = (props: ForgotPasswordFormProps) => {
               />
             </div>
 
-            <Show when={error() || props.error}>
-              <Alert variant="destructive">
-                {error() || props.error}
-              </Alert>
+            <Show when={error() ?? props.error}>
+              <Alert variant="destructive">{error() ?? props.error}</Alert>
             </Show>
 
             <Button
@@ -125,7 +132,9 @@ export const ForgotPasswordForm = (props: ForgotPasswordFormProps) => {
               class="w-full"
               disabled={isLoading() || props.loading}
             >
-              {isLoading() || props.loading ? 'Sending reset link...' : 'Send Reset Link'}
+              {isLoading() || props.loading
+                ? 'Sending reset link...'
+                : 'Send Reset Link'}
             </Button>
 
             <div class="text-center">
@@ -161,8 +170,8 @@ export const ForgotPasswordForm = (props: ForgotPasswordFormProps) => {
             </div>
 
             <p class="text-muted-foreground">
-              We've sent a password reset link to {email()}.
-              Please check your email and follow the instructions to reset your password.
+              We've sent a password reset link to {email()}. Please check your
+              email and follow the instructions to reset your password.
             </p>
 
             <Button

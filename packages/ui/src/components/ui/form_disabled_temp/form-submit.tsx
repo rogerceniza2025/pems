@@ -13,11 +13,17 @@ export const FormSubmit = (props: FormSubmitProps) => {
     'loading',
     'loadingText',
     'disabled',
+    'variant',
+    'size',
+    'confirmMode',
+    'confirmText',
+    'confirmDelay',
+    'onConfirm',
     'class',
     'children',
   ])
 
-  const isDisabled = () => local.disabled || local.loading
+  const isDisabled = () => local.disabled ?? local.loading
 
   return (
     <Button
@@ -56,7 +62,7 @@ export const FormReset = (props: {
   return (
     <Button
       type="reset"
-      variant={local.variant || 'outline'}
+      variant={local.variant ?? 'outline'}
       size={local.size}
       disabled={local.disabled}
       onClick={local.onClick}
@@ -91,7 +97,7 @@ export const FormCancelButton = (props: {
   return (
     <Button
       type="button"
-      variant={local.variant || 'ghost'}
+      variant={local.variant ?? 'ghost'}
       size={local.size}
       disabled={local.disabled}
       onClick={local.onClick}
@@ -136,8 +142,8 @@ export const FormActions = (props: {
     <div
       class={cn(
         'flex items-center',
-        alignmentClasses[local.align || 'right'],
-        spacingClasses[local.spacing || 'normal'],
+        alignmentClasses[local.align ?? 'right'],
+        spacingClasses[local.spacing ?? 'normal'],
         local.class,
       )}
       {...others}
@@ -277,11 +283,11 @@ export const FormSaveButton = (props: {
   return (
     <PrimaryFormSubmit
       loading={props.loading}
-      loadingText={props.loadingText || 'Saving...'}
+      loadingText={props.loadingText ?? 'Saving...'}
       disabled={props.disabled}
       class={props.class}
     >
-      {props.children || defaultChildren}
+      {props.children ?? defaultChildren}
     </PrimaryFormSubmit>
   )
 }
@@ -299,7 +305,7 @@ export const FormNextButton = (props: {
 }) => {
   const defaultChildren = (
     <>
-      {props.children || 'Next'}
+      {props.children ?? 'Next'}
       {props.showIcon !== false && (
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -321,7 +327,7 @@ export const FormNextButton = (props: {
   return (
     <PrimaryFormSubmit
       loading={props.loading}
-      loadingText={props.loadingText || 'Next...'}
+      loadingText={props.loadingText ?? 'Next...'}
       disabled={props.disabled}
       class={props.class}
     >
@@ -357,7 +363,7 @@ export const FormPreviousButton = (props: {
           <polyline points="15 18 9 12 15 6" />
         </svg>
       )}
-      {props.children || 'Previous'}
+      {props.children ?? 'Previous'}
     </>
   )
 
@@ -401,14 +407,14 @@ export const FormCompleteButton = (props: {
           <polyline points="20 6 9 17 4 12" />
         </svg>
       )}
-      {props.children || 'Complete'}
+      {props.children ?? 'Complete'}
     </>
   )
 
   return (
     <PrimaryFormSubmit
       loading={props.loading}
-      loadingText={props.loadingText || 'Completing...'}
+      loadingText={props.loadingText ?? 'Completing...'}
       disabled={props.disabled}
       class={props.class}
     >
@@ -430,7 +436,7 @@ export const FormContinueButton = (props: {
 }) => {
   const defaultChildren = (
     <>
-      {props.children || 'Continue'}
+      {props.children ?? 'Continue'}
       {props.showIcon !== false && (
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -453,7 +459,7 @@ export const FormContinueButton = (props: {
   return (
     <PrimaryFormSubmit
       loading={props.loading}
-      loadingText={props.loadingText || 'Continuing...'}
+      loadingText={props.loadingText ?? 'Continuing...'}
       disabled={props.disabled}
       class={props.class}
     >

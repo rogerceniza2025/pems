@@ -48,7 +48,7 @@ export const MFASetupForm = (props: MFASetupFormProps) => {
         if (response.success) {
           setIsSetup(true)
         } else {
-          setError(response.error || 'Failed to setup MFA')
+          setError(response.error ?? 'Failed to setup MFA')
         }
       }
     } catch (err) {
@@ -77,7 +77,9 @@ export const MFASetupForm = (props: MFASetupFormProps) => {
   }
 
   const handleDisable = async () => {
-    if (!confirm('Are you sure you want to disable two-factor authentication?')) {
+    if (
+      !confirm('Are you sure you want to disable two-factor authentication?')
+    ) {
       return
     }
 
@@ -96,7 +98,9 @@ export const MFASetupForm = (props: MFASetupFormProps) => {
   }
 
   const handleCodeInput = (e: Event) => {
-    const value = (e.currentTarget as HTMLInputElement).value.replace(/\D/g, '').slice(0, 6)
+    const value = (e.currentTarget as HTMLInputElement).value
+      .replace(/\D/g, '')
+      .slice(0, 6)
     setCode(value)
   }
 
@@ -110,9 +114,8 @@ export const MFASetupForm = (props: MFASetupFormProps) => {
           {props.isEnabled
             ? 'Manage your two-factor authentication settings'
             : isSetup()
-            ? 'Scan the QR code with your authenticator app'
-            : 'Enhance your account security with two-factor authentication'
-          }
+              ? 'Scan the QR code with your authenticator app'
+              : 'Enhance your account security with two-factor authentication'}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -126,11 +129,14 @@ export const MFASetupForm = (props: MFASetupFormProps) => {
                   clip-rule="evenodd"
                 />
               </svg>
-              <span class="ml-2">Two-factor authentication is currently enabled</span>
+              <span class="ml-2">
+                Two-factor authentication is currently enabled
+              </span>
             </Alert>
 
             <div class="text-sm text-muted-foreground">
-              Your account is protected by two-factor authentication. You can disable it below, but this will make your account less secure.
+              Your account is protected by two-factor authentication. You can
+              disable it below, but this will make your account less secure.
             </div>
 
             <Button
@@ -142,11 +148,7 @@ export const MFASetupForm = (props: MFASetupFormProps) => {
               {isLoading() ? 'Disabling...' : 'Disable 2FA'}
             </Button>
 
-            <Button
-              variant="outline"
-              class="w-full"
-              onClick={props.onBack}
-            >
+            <Button variant="outline" class="w-full" onClick={props.onBack}>
               Back
             </Button>
           </div>
@@ -155,13 +157,13 @@ export const MFASetupForm = (props: MFASetupFormProps) => {
         <Show when={!props.isEnabled && !isSetup()}>
           <div class="space-y-4">
             <div class="text-sm text-muted-foreground">
-              Two-factor authentication adds an extra layer of security to your account by requiring a verification code in addition to your password.
+              Two-factor authentication adds an extra layer of security to your
+              account by requiring a verification code in addition to your
+              password.
             </div>
 
-            <Show when={error() || props.error}>
-              <Alert variant="destructive">
-                {error() || props.error}
-              </Alert>
+            <Show when={error() ?? props.error}>
+              <Alert variant="destructive">{error() ?? props.error}</Alert>
             </Show>
 
             <Button
@@ -172,11 +174,7 @@ export const MFASetupForm = (props: MFASetupFormProps) => {
               {isLoading() ? 'Setting up...' : 'Setup 2FA'}
             </Button>
 
-            <Button
-              variant="outline"
-              class="w-full"
-              onClick={props.onBack}
-            >
+            <Button variant="outline" class="w-full" onClick={props.onBack}>
               Back
             </Button>
           </div>
@@ -187,18 +185,17 @@ export const MFASetupForm = (props: MFASetupFormProps) => {
             <Show when={mfaData()?.qrCode}>
               <div class="text-center">
                 <div class="mb-4">
-                  <img
-                    src={mfaData()?.qrCode}
-                    alt="QR Code"
-                    class="mx-auto"
-                  />
+                  <img src={mfaData()?.qrCode} alt="QR Code" class="mx-auto" />
                 </div>
                 <p class="text-sm text-muted-foreground mb-2">
-                  Scan this QR code with your authenticator app (Google Authenticator, Authy, etc.)
+                  Scan this QR code with your authenticator app (Google
+                  Authenticator, Authy, etc.)
                 </p>
                 <Show when={mfaData()?.secret}>
                   <details class="text-left">
-                    <summary class="cursor-pointer text-sm font-medium">Can't scan? Enter manually</summary>
+                    <summary class="cursor-pointer text-sm font-medium">
+                      Can't scan? Enter manually
+                    </summary>
                     <code class="block mt-2 p-2 bg-muted rounded text-xs break-all">
                       {mfaData()?.secret}
                     </code>
@@ -211,14 +208,14 @@ export const MFASetupForm = (props: MFASetupFormProps) => {
               <div class="bg-yellow-50 p-4 rounded-md">
                 <h4 class="font-medium text-sm mb-2">Backup Codes</h4>
                 <p class="text-xs text-muted-foreground mb-2">
-                  Save these backup codes in a safe place. You can use them to access your account if you lose access to your authenticator device.
+                  Save these backup codes in a safe place. You can use them to
+                  access your account if you lose access to your authenticator
+                  device.
                 </p>
                 <div class="grid grid-cols-2 gap-1 text-xs font-mono">
-                  <For each={mfaData()?.backupCodes || []}>
+                  <For each={mfaData()?.backupCodes ?? []}>
                     {(code) => (
-                      <div class="p-1 bg-white rounded border">
-                        {code}
-                      </div>
+                      <div class="p-1 bg-white rounded border">{code}</div>
                     )}
                   </For>
                 </div>
@@ -241,25 +238,19 @@ export const MFASetupForm = (props: MFASetupFormProps) => {
               />
             </div>
 
-            <Show when={error() || props.error}>
-              <Alert variant="destructive">
-                {error() || props.error}
-              </Alert>
+            <Show when={error() ?? props.error}>
+              <Alert variant="destructive">{error() ?? props.error}</Alert>
             </Show>
 
             <Button
               class="w-full"
               onClick={handleVerify}
-              disabled={isLoading() || props.loading || !code()}
+              disabled={isLoading() || (props.loading ?? false) || !code()}
             >
               {isLoading() ? 'Verifying...' : 'Verify and Enable 2FA'}
             </Button>
 
-            <Button
-              variant="outline"
-              class="w-full"
-              onClick={props.onBack}
-            >
+            <Button variant="outline" class="w-full" onClick={props.onBack}>
               Cancel
             </Button>
           </div>

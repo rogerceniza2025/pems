@@ -20,10 +20,10 @@
     "@pems/rpc": "workspace:*",
     "@pems/shared": "workspace:*",
     "@pems/tenant-management": "workspace:*",
-    "@prisma/client": "^5.22.0",
+    "@prisma/client": "^7.0.1",
     "better-auth": "^1.4.4",
     "hono": "^4.10.7",
-    "ioredis": "^5.4.1",
+    "ioredis": "^5.8.2",
     "orpc": "^0.1.1",
     "zod": "^4.1.13"
   },
@@ -33,6 +33,6 @@
     "playwright": "^1.57.0",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
-    "vitest": "^4.0.14"
+    "vitest": "^4.0.15"
   }
 }

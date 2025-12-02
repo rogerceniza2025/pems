@@ -14,7 +14,7 @@
     "@pems/shared-types": "workspace:*",
     "@pems/shared-utils": "workspace:*",
     "playwright": "^1.57.0",
-    "vitest": "^4.0.14"
+    "vitest": "^4.0.15"
   },
   "devDependencies": {
     "@types/node": "^24.10.1",

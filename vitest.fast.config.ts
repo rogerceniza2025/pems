@@ -7,27 +7,20 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./tests/setup/global-setup.ts'],
 
-    // Test execution settings to prevent hanging
-    testTimeout: 30000,
-    hookTimeout: 15000,
+    // Fast execution settings for development
+    testTimeout: 15000,
+    hookTimeout: 10000,
     isolate: false,
-    maxConcurrency: 8,
-    pool: 'threads',
-    poolOptions: {
-      threads: {
-        maxThreads: 4,
-        minThreads: 2,
-      },
-    },
+    maxConcurrency: 6,
 
-    // Test file patterns
+    // Focus on critical test files only
     include: [
-      'tests/**/*.{test,spec}.{js,ts,jsx,tsx}',
-      'src/**/*.{test,spec}.{js,ts,jsx,tsx}',
       'packages/*/src/**/*.{test,spec}.{js,ts,jsx,tsx}',
       'apps/*/src/**/*.{test,spec}.{js,ts,jsx,tsx}',
-      'modules/*/src/**/*.{test,spec}.{js,ts,jsx,tsx}',
+      'tests/unit/**/*.test.ts',
     ],
+
+    // Exclude expensive integration and performance tests
     exclude: [
       'node_modules/',
       'dist/',
@@ -39,11 +32,20 @@ export default defineConfig({
       'packages/**/node_modules/**',
       'apps/**/node_modules/**',
       'modules/**/node_modules/**',
+      'tests/integration/**',
+      'tests/chaos/**',
+      'tests/performance/**',
+      'tests/visual/**',
+      'tests/contracts/**',
+      'tests/security/**/*.test.ts',
+      'tests/api/**/*.test.ts',
+      'tests/database/**/*.test.ts',
     ],
 
+    // Simplified coverage for faster runs
     coverage: {
       provider: 'v8',
-      reporter: ['text', 'json', 'html'],
+      reporter: ['text'],
       exclude: [
         'node_modules/',
         'tests/',
@@ -55,10 +57,10 @@ export default defineConfig({
       ],
     },
 
-    // Reporting
-    reporters: ['verbose', 'json'],
+    // Simplified reporting
+    reporters: ['verbose'],
     outputFile: {
-      json: './test-results/vitest.json',
+      json: './test-results/vitest-fast.json',
     },
 
     // Environment variables

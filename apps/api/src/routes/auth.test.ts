@@ -12,10 +12,9 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { authRouter } from './auth'
 import { Hono } from 'hono'
-import { HTTPException } from 'hono/http-exception'
 
 // Mock BetterAuth and related services
-vi.mock('@pems/infrastructure-auth', () => ({
+vi.mock('@pems/auth', () => ({
   auth: {
     api: {
       signIn: vi.fn(),
@@ -41,16 +40,22 @@ vi.mock('@pems/infrastructure-auth', () => ({
 
 // Mock middleware
 vi.mock('@pems/middleware', () => ({
-  getCurrentUser: vi.fn((c) => c.get('mockUser') || {
-    id: 'test-user-id',
-    email: 'test@example.com',
-    tenantId: 'test-tenant-id',
-  }),
-  getCurrentSession: vi.fn((c) => c.get('mockSession') || {
-    id: 'test-session-id',
-    token: 'test-token',
-    userId: 'test-user-id',
-  }),
+  getCurrentUser: vi.fn(
+    (c) =>
+      c.get('mockUser') ?? {
+        id: 'test-user-id',
+        email: 'test@example.com',
+        tenantId: 'test-tenant-id',
+      },
+  ),
+  getCurrentSession: vi.fn(
+    (c) =>
+      c.get('mockSession') ?? {
+        id: 'test-session-id',
+        token: 'test-token',
+        userId: 'test-user-id',
+      },
+  ),
 }))
 
 describe('Authentication API Routes', () => {
@@ -81,9 +86,11 @@ describe('Authentication API Routes', () => {
         },
       }
 
-      const { auth } = await import('@pems/infrastructure-auth')
+      const { auth } = await import('@pems/auth')
       vi.mocked(auth.api.signIn).mockResolvedValue(mockSignInResult)
-      vi.mocked(auth.api.validateSessionToken).mockResolvedValue(mockSignInResult)
+      vi.mocked(auth.api.validateSessionToken).mockResolvedValue(
+        mockSignInResult,
+      )
 
       const response = await app.request('/api/auth/sign-in', {
         method: 'POST',
@@ -120,8 +127,8 @@ describe('Authentication API Routes', () => {
         },
       }
 
-      const { auth } = await import('@pems/infrastructure-auth')
-      const { mfaService } = await import('@pems/infrastructure-auth')
+      const { auth } = await import('@pems/auth')
+      const { mfaService } = await import('@pems/auth')
 
       vi.mocked(auth.api.signIn).mockResolvedValue(mockSignInResult)
       vi.mocked(mfaService.isMFAEnabled).mockResolvedValue(true)
@@ -156,8 +163,8 @@ describe('Authentication API Routes', () => {
         },
       }
 
-      const { auth } = await import('@pems/infrastructure-auth')
-      const { mfaService } = await import('@pems/infrastructure-auth')
+      const { auth } = await import('@pems/auth')
+      const { mfaService } = await import('@pems/auth')
 
       vi.mocked(auth.api.signIn).mockResolvedValue(mockSignInResult)
       vi.mocked(mfaService.isMFAEnabled).mockResolvedValue(true)
@@ -180,12 +187,17 @@ describe('Authentication API Routes', () => {
       expect(response.status).toBe(200)
       const data = await response.json()
       expect(data.success).toBe(true)
-      expect(mfaService.verifyMFACode).toHaveBeenCalledWith('test-user-id', '123456')
+      expect(mfaService.verifyMFACode).toHaveBeenCalledWith(
+        'test-user-id',
+        '123456',
+      )
     })
 
     it('should reject invalid credentials', async () => {
-      const { auth } = await import('@pems/infrastructure-auth')
-      vi.mocked(auth.api.signIn).mockRejectedValue(new Error('Invalid credentials'))
+      const { auth } = await import('@pems/auth')
+      vi.mocked(auth.api.signIn).mockRejectedValue(
+        new Error('Invalid credentials'),
+      )
 
       const response = await app.request('/api/auth/sign-in', {
         method: 'POST',
@@ -199,7 +211,9 @@ describe('Authentication API Routes', () => {
 
       expect(response.status).toBe(500)
       const data = await response.json()
-      expect(data.message).toBe('Authentication service temporarily unavailable')
+      expect(data.message).toBe(
+        'Authentication service temporarily unavailable',
+      )
     })
 
     it('should validate required fields', async () => {
@@ -227,7 +241,7 @@ describe('Authentication API Routes', () => {
         },
       }
 
-      const { auth } = await import('@pems/infrastructure-auth')
+      const { auth } = await import('@pems/auth')
       vi.mocked(auth.api.signUp).mockResolvedValue(mockSignUpResult)
 
       const response = await app.request('/api/auth/sign-up', {
@@ -266,8 +280,10 @@ describe('Authentication API Routes', () => {
     })
 
     it('should handle duplicate email error', async () => {
-      const { auth } = await import('@pems/infrastructure-auth')
-      vi.mocked(auth.api.signUp).mockRejectedValue(new Error('User with this email already exists'))
+      const { auth } = await import('@pems/auth')
+      vi.mocked(auth.api.signUp).mockRejectedValue(
+        new Error('User with this email already exists'),
+      )
 
       const response = await app.request('/api/auth/sign-up', {
         method: 'POST',
@@ -288,22 +304,8 @@ describe('Authentication API Routes', () => {
 
   describe('POST /api/auth/sign-out', () => {
     it('should sign out user successfully', async () => {
-      const { auth } = await import('@pems/infrastructure-auth')
+      const { auth } = await import('@pems/auth')
       vi.mocked(auth.api.signOut).mockResolvedValue({})
-
-      // Mock authenticated context
-      const mockContext = {
-        get: vi.fn((key) => {
-          if (key === 'mockSession') {
-            return {
-              id: 'test-session-id',
-              token: 'test-token',
-              userId: 'test-user-id',
-            }
-          }
-          return null
-        }),
-      }
 
       const response = await app.request('/api/auth/sign-out', {
         method: 'POST',
@@ -317,8 +319,10 @@ describe('Authentication API Routes', () => {
     })
 
     it('should handle sign out errors gracefully', async () => {
-      const { auth } = await import('@pems/infrastructure-auth')
-      vi.mocked(auth.api.signOut).mockRejectedValue(new Error('Sign out failed'))
+      const { auth } = await import('@pems/auth')
+      vi.mocked(auth.api.signOut).mockRejectedValue(
+        new Error('Sign out failed'),
+      )
 
       const response = await app.request('/api/auth/sign-out', {
         method: 'POST',
@@ -333,7 +337,7 @@ describe('Authentication API Routes', () => {
 
   describe('POST /api/auth/forgot-password', () => {
     it('should send password reset email', async () => {
-      const { auth } = await import('@pems/infrastructure-auth')
+      const { auth } = await import('@pems/auth')
       vi.mocked(auth.api.forgotPassword).mockResolvedValue({})
 
       const response = await app.request('/api/auth/forgot-password', {
@@ -352,8 +356,10 @@ describe('Authentication API Routes', () => {
     })
 
     it('should always return success for email enumeration protection', async () => {
-      const { auth } = await import('@pems/infrastructure-auth')
-      vi.mocked(auth.api.forgotPassword).mockRejectedValue(new Error('User not found'))
+      const { auth } = await import('@pems/auth')
+      vi.mocked(auth.api.forgotPassword).mockRejectedValue(
+        new Error('User not found'),
+      )
 
       const response = await app.request('/api/auth/forgot-password', {
         method: 'POST',
@@ -372,7 +378,7 @@ describe('Authentication API Routes', () => {
 
   describe('POST /api/auth/reset-password', () => {
     it('should reset password with valid token', async () => {
-      const { auth } = await import('@pems/infrastructure-auth')
+      const { auth } = await import('@pems/auth')
       vi.mocked(auth.api.resetPassword).mockResolvedValue({})
 
       const response = await app.request('/api/auth/reset-password', {
@@ -391,8 +397,10 @@ describe('Authentication API Routes', () => {
     })
 
     it('should reject invalid reset token', async () => {
-      const { auth } = await import('@pems/infrastructure-auth')
-      vi.mocked(auth.api.resetPassword).mockRejectedValue(new Error('Invalid or expired reset token'))
+      const { auth } = await import('@pems/auth')
+      vi.mocked(auth.api.resetPassword).mockRejectedValue(
+        new Error('Invalid or expired reset token'),
+      )
 
       const response = await app.request('/api/auth/reset-password', {
         method: 'POST',
@@ -411,17 +419,13 @@ describe('Authentication API Routes', () => {
 
   describe('POST /api/auth/mfa/setup', () => {
     it('should setup MFA for user', async () => {
-      const { mfaService } = await import('@pems/infrastructure-auth')
+      const { mfaService } = await import('@pems/auth')
       vi.mocked(mfaService.setupMFA).mockResolvedValue({
         success: true,
         secret: 'test-secret',
         qrCode: 'data:image/png;base64,test',
         backupCodes: ['1234-5678', '8765-4321'],
       })
-
-      // Mock authenticated user
-      const mockUser = { id: 'test-user-id' }
-      const mockContext = { get: vi.fn(() => mockUser) }
 
       const response = await app.request('/api/auth/mfa/setup', {
         method: 'POST',
@@ -440,7 +444,7 @@ describe('Authentication API Routes', () => {
     })
 
     it('should handle MFA setup failure', async () => {
-      const { mfaService } = await import('@pems/infrastructure-auth')
+      const { mfaService } = await import('@pems/auth')
       vi.mocked(mfaService.setupMFA).mockResolvedValue({
         success: false,
         error: 'MFA already enabled',
@@ -462,7 +466,7 @@ describe('Authentication API Routes', () => {
 
   describe('POST /api/auth/mfa/verify', () => {
     it('should verify MFA setup', async () => {
-      const { mfaService } = await import('@pems/infrastructure-auth')
+      const { mfaService } = await import('@pems/auth')
       vi.mocked(mfaService.verifyMFASetup).mockResolvedValue({
         success: true,
         user: { id: 'test-user-id' },
@@ -483,7 +487,7 @@ describe('Authentication API Routes', () => {
     })
 
     it('should reject invalid MFA code', async () => {
-      const { mfaService } = await import('@pems/infrastructure-auth')
+      const { mfaService } = await import('@pems/auth')
       vi.mocked(mfaService.verifyMFASetup).mockResolvedValue({
         success: false,
         error: 'Invalid verification code',
@@ -505,7 +509,7 @@ describe('Authentication API Routes', () => {
 
   describe('GET /api/auth/mfa/status', () => {
     it('should return MFA status for user', async () => {
-      const { mfaService } = await import('@pems/infrastructure-auth')
+      const { mfaService } = await import('@pems/auth')
       vi.mocked(mfaService.getMFAStatus).mockResolvedValue({
         enabled: true,
         hasBackupCodes: true,
@@ -523,7 +527,7 @@ describe('Authentication API Routes', () => {
     })
 
     it('should handle MFA status check failure', async () => {
-      const { mfaService } = await import('@pems/infrastructure-auth')
+      const { mfaService } = await import('@pems/auth')
       vi.mocked(mfaService.getMFAStatus).mockResolvedValue(null)
 
       const response = await app.request('/api/auth/mfa/status', {
@@ -606,13 +610,13 @@ describe('Authentication API Routes', () => {
             password: 'password123',
             tenantId: 'test-tenant-id',
           }),
-        })
+        }),
       )
 
       const responses = await Promise.allSettled(requests)
 
       // All requests should be handled (some may fail due to auth, not rate limiting)
-      responses.forEach(response => {
+      responses.forEach((response) => {
         expect(response.status === 'fulfilled').toBe(true)
       })
     })
