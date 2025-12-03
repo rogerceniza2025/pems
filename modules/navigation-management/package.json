@@ -1,0 +1,40 @@
+{
+  "name": "@pems/navigation-management",
+  "version": "1.0.0",
+  "description": "Navigation management module for PEMS with permission-based filtering and caching",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "vitest",
+    "test:watch": "vitest --watch",
+    "test:coverage": "vitest --coverage"
+  },
+  "dependencies": {
+    "@pems/auth": "workspace:*",
+    "@pems/database": "workspace:*",
+    "@pems/shared-types": "workspace:*",
+    "@pems/shared-utils": "workspace:*",
+    "zod": "^3.22.4",
+    "nanoid": "^5.0.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "typescript": "^5.3.0",
+    "vitest": "^1.0.0",
+    "@vitest/ui": "^1.0.0"
+  },
+  "peerDependencies": {
+    "better-auth": "^1.0.0"
+  },
+  "keywords": [
+    "navigation",
+    "permissions",
+    "rbac",
+    "caching",
+    "ddd"
+  ],
+  "author": "PEMS Team",
+  "license": "MIT"
+}

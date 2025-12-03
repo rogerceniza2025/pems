@@ -1,10 +1,11 @@
+import type { JSX } from 'solid-js'
 import { splitProps } from 'solid-js'
 import { cn } from '../../lib/utils'
 
 export interface AlertProps {
   variant?: 'default' | 'destructive' | 'warning'
   class?: string
-  children: any
+  children: JSX.Element
 }
 
 export const Alert = (props: AlertProps) => {

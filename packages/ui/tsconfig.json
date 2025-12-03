@@ -30,9 +30,9 @@
     "build",
     ".storybook",
     "src/components/ui/form_disabled",
-    "src/components/ui/form_disabled_temp",
     "src/components/ui/modal_disabled",
+    "src/test/**/*",
     "test/**/*",
-    "src/test/**/*"
+    "tests/**/*"
   ]
 }

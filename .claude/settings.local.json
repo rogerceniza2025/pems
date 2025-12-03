@@ -17,7 +17,10 @@
       "WebSearch",
       "Bash(pnpm build:*)",
       "mcp__filesystem__list_directory",
-      "Bash(pnpm list:*)"
+      "Bash(pnpm list:*)",
+      "mcp__filesystem__directory_tree",
+      "mcp__filesystem__list_allowed_directories",
+      "mcp__filesystem__write_file"
     ],
     "deny": [],
     "ask": []
