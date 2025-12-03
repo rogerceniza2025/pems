@@ -1,0 +1,351 @@
+# Gitleaks Configuration for PEMS Project
+# This configuration defines rules for detecting secrets in code
+
+title = "Gitleaks config"
+
+# Extend base config
+[extend]
+useDefault = true
+
+# Custom rules for PEMS-specific secrets
+[[rules]]
+description = "PEMS Internal API Key"
+id = "pems-api-key"
+regex = '''pems_sk_[a-zA-Z0-9]{24,}'''
+keywords = ["pems_sk"]
+
+[[rules]]
+description = "PEMS Database Connection String"
+id = "pems-db-connection"
+regex = '''(mongodb|postgres|mysql)://[^\\s]+:[^\\s]+@[^\\s]*(pems|tenant|db)[^\\s]*'''
+keywords = ["pems", "tenant", "database"]
+
+[[rules]]
+description = "PEMS JWT Secret"
+id = "pems-jwt-secret"
+regex = '''jwt[_-]?secret[_-]?[a-zA-Z0-9]{16,}'''
+keywords = ["jwt", "secret", "pems"]
+
+[[rules]]
+description = "Multi-tenant Database Key"
+id = "tenant-db-key"
+regex = '''tenant[_-]?(db|database)[_-]?key[_-]?[a-zA-Z0-9]{16,}'''
+keywords = ["tenant", "database", "key"]
+
+# Allowlist for known test values
+[allowlist]
+description = "Allowlist for test and example values"
+paths = [
+  '''tests/''',
+  '''test/''',
+  '''spec/''',
+  '''fixtures/''',
+  '''mocks/''',
+  '''examples/''',
+  '''\.env\.example''',
+  '''\.env\.sample''',
+  '''\.env\.template''',
+  '''package-lock\.json''',
+  '''yarn\.lock''',
+  '''pnpm-lock\.yaml''',
+  '''dist/''',
+  '''build/''',
+  '''\.next/''',
+  '''node_modules/''',
+  '''coverage/''',
+  '''\.git/''',
+]
+
+# Allow specific patterns (false positives)
+[[allowlist]]
+description = "Test tokens and examples"
+regexes = [
+  "test-token",
+  "demo-token",
+  "example-token",
+  "sample-token",
+  "fake-token",
+  "placeholder-token",
+  "test-api-key",
+  "demo-api-key",
+  "example-api-key",
+  "sample-api-key",
+  "fake-api-key",
+  "test-secret",
+  "demo-secret",
+  "example-secret",
+  "sample-secret",
+  "fake-secret",
+  "test-password",
+  "demo-password",
+  "example-password",
+  "sample-password",
+  "fake-password",
+  "pems_test_",
+  "sk_test_",
+]
+
+[[allowlist]]
+description = "Common configuration examples"
+regexes = [
+  "http://localhost",
+  "https://localhost",
+  "http://127.0.0.1",
+  "https://127.0.0.1",
+  "mongodb://localhost",
+  "postgres://localhost",
+  "mysql://localhost",
+  "redis://localhost",
+]
+
+# File-specific allowlists
+[[allowlist.files]]
+description = "Test configuration files"
+path = '''tests/.*\.config\.(js|ts)'''
+
+[[allowlist.files]]
+description = "Docker development files"
+path = '''docker-compose\.override\.yml'''
+
+[[allowlist.files]]
+description = "Development environment files"
+path = '''src/config/development\.(js|ts)'''
+
+[[allowlist.files]]
+description = "Local configuration"
+path = '''src/config/local\.(js|ts)'''
+
+# Commit-specific allowlists
+[[allowlist.commits]]
+description = "Example or template commits"
+regex = ".*example.*|.*template.*|.*sample.*"
+
+[[allowlist.commits]]
+description = "Test-related commits"
+regex = ".*test.*|.*spec.*|.*fixture.*"
+
+# Repository-specific settings
+[report]
+  # Exclude certain file types from scanning
+  excludeFiles = [
+    "*.log",
+    "*.tmp",
+    "*.cache",
+    "*.pid",
+    "*.lock",
+    "*.swp",
+    "*.swo",
+    "*~",
+    ".DS_Store",
+    "Thumbs.db",
+  ]
+
+  # Maximum file size to scan (in MB)
+  maxFileSize = 5
+
+# Custom entropy settings
+[entropy]
+  # Minimum entropy for unknown patterns
+  min = 3.5
+
+  # Maximum entropy for known non-secrets
+  max = 4.5
+
+  # Extensions to ignore for entropy scanning
+  ignoreExtensions = [
+    ".md",
+    ".txt",
+    ".log",
+    ".cache",
+  ]
+
+# Secret validation
+[validation]
+  # Validate URLs and check if they're reachable
+  validateURLs = false
+
+  # Validate file paths exist
+  validateFilePaths = false
+
+  # Validate email addresses format
+  validateEmails = true
+
+# Severity levels
+[severity]
+  # High severity patterns
+  high = [
+    "pems-api-key",
+    "pems-db-connection",
+    "pems-jwt-secret",
+    "tenant-db-key",
+    "generic-api-key",
+    "private-key",
+    "aws-access-key",
+    "github-token",
+    "jwt-token",
+  ]
+
+  # Medium severity patterns
+  medium = [
+    "password",
+    "secret",
+    "token",
+    "key",
+    "credential",
+  ]
+
+# Integration settings
+[integrations]
+  # Git integration
+  git = {
+    # Scan all branches
+    allBranches = false
+
+    # Scan only committed files
+    committedOnly = true
+  }
+
+  # GitHub integration
+  github = {
+    # Create issues for new secrets
+    createIssues = true
+
+    # Issue labels
+    issueLabels = ["security", "secrets", "high-priority"]
+
+    # Issue assignees
+    issueAssignees = ["security-team"]
+  }
+
+# Monitoring and alerts
+[monitoring]
+  # Enable monitoring dashboard
+  enableDashboard = true
+
+  # Alert on new secrets
+  alertOnNewSecrets = true
+
+  # Trend analysis
+  enableTrends = true
+
+# Reporting settings
+[reporting]
+  # Generate JSON reports
+  json = true
+
+  # Generate SARIF reports
+  sarif = true
+
+  # Generate HTML reports
+  html = false
+
+  # Report output directory
+  outputDir = "gitleaks-reports"
+
+# Performance settings
+[performance]
+  # Maximum number of concurrent scans
+  maxConcurrentScans = 4
+
+  # Timeout for individual file scans (in seconds)
+  fileScanTimeout = 30
+
+  # Memory usage limit (in MB)
+  memoryLimit = 512
+
+# Custom patterns for PEMS-specific secrets
+[[rules]]
+description = "Tenant-specific configuration"
+id = "tenant-config"
+regex = '''tenant[_-]?(config|settings)[_-]?[a-zA-Z0-9]{8,}'''
+keywords = ["tenant", "config", "settings"]
+
+[[rules]]
+description = "User authentication token"
+id = "user-auth-token"
+regex = '''user[_-]?auth[_-]?token[_-]?[a-zA-Z0-9]{20,}'''
+keywords = ["user", "auth", "token"]
+
+[[rules]]
+description = "Service account key"
+id = "service-account-key"
+regex = '''service[_-]?account[_-]?key[_-]?[a-zA-Z0-9]{24,}'''
+keywords = ["service", "account", "key"]
+
+[[rules]]
+description = "Integration webhook secret"
+id = "webhook-secret"
+regex = '''webhook[_-]?secret[_-]?[a-zA-Z0-9]{16,}'''
+keywords = ["webhook", "secret"]
+
+[[rules]]
+description = "Database encryption key"
+id = "db-encryption-key"
+regex = '''db[_-]?enc[_-]?key[_-]?[a-zA-Z0-9]{32,}'''
+keywords = ["db", "encryption", "key"]
+
+[[rules]]
+description = "Session encryption key"
+id = "session-encryption-key"
+regex = '''session[_-]?enc[_-]?key[_-]?[a-zA-Z0-9]{32,}'''
+keywords = ["session", "encryption", "key"]
+
+# Exclude common development and testing patterns
+[exclude]
+  patterns = [
+    # Test data
+    '''test.*@.*\.com''',
+    '''demo.*@.*\.com''',
+    '''example.*@.*\.com''',
+    '''sample.*@.*\.com''',
+
+    # Local development URLs
+    '''localhost:\d+''',
+    '''127\.0\.0\.1:\d+''',
+    '''0\.0\.0\.0:\d+''',
+
+    # Common test passwords
+    '''password123''',
+    '''test123''',
+    '''demo123''',
+    '''admin123''',
+
+    # Example keys
+    '''example-key''',
+    '''test-key''',
+    '''demo-key''',
+    '''sample-key''',
+
+    # Placeholder values
+    '''your-.*-here''',
+    '''replace-.*-here''',
+    '''enter-.*-here''',
+  ]
+
+  # Exclude files with these extensions
+  extensions = [
+    ".log",
+    ".tmp",
+    ".cache",
+    ".pid",
+    ".lock",
+    ".bak",
+    ".old",
+    ".orig",
+    ".swp",
+    ".swo",
+  ]
+
+# Global settings for the PEMS project
+[global]
+  # Project name for reporting
+  projectName = "pems"
+
+  # Enable strict mode for production
+  strictMode = true
+
+  # Configuration version
+  version = "1.0"
+
+  # Last updated
+  lastUpdated = "2024-01-15"

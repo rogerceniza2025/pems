@@ -12,7 +12,12 @@
       "Bash(pnpm lint)",
       "Bash(pnpm lint:styles:*)",
       "Bash(cat:*)",
-      "Bash(pnpm db:migrate --name add-rls-policies)"
+      "Bash(pnpm db:migrate --name add-rls-policies)",
+      "mcp__exa__web_search_exa",
+      "WebSearch",
+      "Bash(pnpm build:*)",
+      "mcp__filesystem__list_directory",
+      "Bash(pnpm list:*)"
     ],
     "deny": [],
     "ask": []

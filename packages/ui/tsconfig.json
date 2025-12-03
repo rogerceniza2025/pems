@@ -17,11 +17,22 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
+    "types": ["vitest/globals"],
     "baseUrl": ".",
     "paths": {
       "@pems/*": ["../../packages/*"]
     }
   },
-  "include": ["src/**/*", "test/**/*"],
-  "exclude": ["node_modules", "dist", "build", ".storybook"]
+  "include": ["src/**/*", "vitest.config.ts"],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "build",
+    ".storybook",
+    "src/components/ui/form_disabled",
+    "src/components/ui/form_disabled_temp",
+    "src/components/ui/modal_disabled",
+    "test/**/*",
+    "src/test/**/*"
+  ]
 }

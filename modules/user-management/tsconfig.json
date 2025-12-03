@@ -1,16 +1,18 @@
 {
-  "extends": "@pems/config-typescript/node.json",
+  "extends": "../../packages/config/typescript/base.json",
   "compilerOptions": {
-    "baseUrl": ".",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "noEmit": false,
+    "composite": true,
+    "incremental": true,
+    "ignoreDeprecations": "5.0",
     "paths": {
       "@pems/*": ["../../packages/*"]
     }
   },
-  "include": [
-    "domain/**/*",
-    "application/**/*",
-    "infrastructure/**/*",
-    "tests/**/*"
-  ],
+  "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]
 }

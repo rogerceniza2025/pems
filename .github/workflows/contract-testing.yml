@@ -1,0 +1,484 @@
+name: Contract Testing
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+    inputs:
+      consumer:
+        description: 'Consumer to test (leave empty for all)'
+        required: false
+        type: string
+      provider:
+        description: 'Provider to verify (leave empty for all)'
+        required: false
+        type: string
+      publish_contracts:
+        description: 'Publish contracts to broker'
+        required: false
+        default: true
+        type: boolean
+
+env:
+  NODE_VERSION: '20'
+  PACT_BROKER_URL: ${{ secrets.PACT_BROKER_URL }}
+  PACT_BROKER_TOKEN: ${{ secrets.PACT_BROKER_TOKEN }}
+  TEST_AUTH_TOKEN: ${{ secrets.TEST_AUTH_TOKEN }}
+
+jobs:
+  contract-consumer-tests:
+    name: Consumer Contract Tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        consumer: [pems-frontend, pems-admin]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Setup test environment
+        run: |
+          echo "CONSUMER=${{ matrix.consumer }}" >> $GITHUB_ENV
+          echo "CONSUMER_VERSION=${{ github.sha }}" >> $GITHUB_ENV
+          echo "GIT_BRANCH=${{ github.ref_name }}" >> $GITHUB_ENV
+          echo "BUILD_URL=${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" >> $GITHUB_ENV
+
+      - name: Start mock services
+        run: |
+          pnpm dev &
+          sleep 10
+          # Wait for services to be ready
+          timeout 60 bash -c 'until curl -f http://localhost:3000/health; do sleep 2; done'
+
+      - name: Run consumer contract tests
+        run: |
+          echo "🧪 Running consumer contract tests for ${{ matrix.consumer }}"
+
+          # Run specific consumer tests
+          if [ "${{ matrix.consumer }}" = "pems-frontend" ]; then
+            pnpm test tests/contracts/consumer/auth-contract.test.ts
+            pnpm test tests/contracts/consumer/user-service-contract.test.ts
+          elif [ "${{ matrix.consumer }}" = "pems-admin" ]; then
+            pnpm test tests/contracts/consumer/admin-contract.test.ts
+          fi
+
+      - name: Generate contract reports
+        if: always()
+        run: |
+          mkdir -p test-results/contract-consumer
+
+          # Copy generated pact files
+          find tests/contracts -name "*.json" -type f -exec cp {} test-results/contract-consumer/ \;
+
+          # Generate test report
+          echo "## 📊 Consumer Contract Test Results" > test-results/contract-consumer/summary.md
+          echo "" >> test-results/contract-consumer/summary.md
+          echo "**Consumer:** ${{ matrix.consumer }}" >> test-results/contract-consumer/summary.md
+          echo "**Branch:** ${{ github.ref_name }}" >> test-results/contract-consumer/summary.md
+          echo "**Commit:** ${{ github.sha }}" >> test-results/contract-consumer/summary.md
+          echo "" >> test-results/contract-consumer/summary.md
+
+          # Count generated contracts
+          CONTRACT_COUNT=$(find test-results/contract-consumer -name "*.json" | wc -l)
+          echo "**Generated Contracts:** $CONTRACT_COUNT" >> test-results/contract-consumer/summary.md
+
+      - name: Upload consumer contract artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: consumer-contracts-${{ matrix.consumer }}
+          path: |
+            test-results/contract-consumer/
+            tests/contracts/consumer/
+          retention-days: 7
+
+      - name: Publish contracts to broker
+        if: ${{ github.event.inputs.publish_contracts != 'false' && github.ref == 'refs/heads/main' }}
+        run: |
+          echo "📤 Publishing contracts for ${{ matrix.consumer }} to Pact broker"
+          node scripts/contract-publish.js publish
+        env:
+          FRONTEND_VERSION: ${{ github.sha }}
+          GITHUB_REF_NAME: ${{ github.ref_name }}
+          GITHUB_SHA: ${{ github.sha }}
+          CI_BUILD_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+      - name: Tag contracts
+        if: ${{ github.event.inputs.publish_contracts != 'false' && github.ref == 'refs/heads/main' }}
+        run: |
+          # Tag contracts based on branch and environment
+          if [ "${{ github.ref_name }}" = "main" ]; then
+            node scripts/contract-publish.js tag production stable
+          elif [ "${{ github.ref_name }}" = "develop" ]; then
+            node scripts/contract-publish.js tag development staging
+          else
+            node scripts/contract-publish.js tag feature ${{ github.ref_name }}
+          fi
+
+  provider-verification:
+    name: Provider Verification
+    runs-on: ubuntu-latest
+    needs: contract-consumer-tests
+    if: github.event.inputs.publish_contracts != 'false'
+    strategy:
+      matrix:
+        provider: [pems-auth-service, pems-user-service, pems-tenant-service, pems-notification-service]
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: pems_contract_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Setup provider environment
+        run: |
+          echo "PROVIDER=${{ matrix.provider }}" >> $GITHUB_ENV
+          echo "PROVIDER_URL=http://localhost:3001" >> $GITHUB_ENV
+
+          # Set specific service URLs based on provider
+          case "${{ matrix.provider }}" in
+            "pems-auth-service")
+              echo "AUTH_SERVICE_URL=http://localhost:3001" >> $GITHUB_ENV
+              echo "PROVIDER_URL=http://localhost:3001" >> $GITHUB_ENV
+              ;;
+            "pems-user-service")
+              echo "USER_SERVICE_URL=http://localhost:3002" >> $GITHUB_ENV
+              echo "PROVIDER_URL=http://localhost:3002" >> $GITHUB_ENV
+              ;;
+            "pems-tenant-service")
+              echo "TENANT_SERVICE_URL=http://localhost:3004" >> $GITHUB_ENV
+              echo "PROVIDER_URL=http://localhost:3004" >> $GITHUB_ENV
+              ;;
+            "pems-notification-service")
+              echo "NOTIFICATION_SERVICE_URL=http://localhost:3003" >> $GITHUB_ENV
+              echo "PROVIDER_URL=http://localhost:3003" >> $GITHUB_ENV
+              ;;
+          esac
+
+      - name: Build provider service
+        run: pnpm build
+
+      - name: Start provider service
+        run: |
+          # Start the appropriate service based on provider
+          case "${{ matrix.provider }}" in
+            "pems-auth-service")
+              cd apps/auth-service && pnpm start &
+              ;;
+            "pems-user-service")
+              cd apps/user-service && pnpm start &
+              ;;
+            "pems-tenant-service")
+              cd apps/tenant-service && pnpm start &
+              ;;
+            "pems-notification-service")
+              cd apps/notification-service && pnpm start &
+              ;;
+            *)
+              # Start all services for general testing
+              pnpm dev &
+              ;;
+          esac
+
+          sleep 15
+
+      - name: Wait for provider service
+        run: |
+          timeout 60 bash -c 'until curl -f $PROVIDER_URL/health; do sleep 2; done'
+
+      - name: Setup provider states
+        run: |
+          echo "🔧 Setting up provider states for ${{ matrix.provider }}"
+
+          # Create test data for provider verification
+          curl -X POST "${PROVIDER_URL}/api/v1/pact/states" \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer $TEST_AUTH_TOKEN" \
+            -d '{
+              "consumer": "pems-frontend",
+              "state": "user exists",
+              "params": {
+                "userId": "test-user-123",
+                "email": "test@example.com"
+              }
+            }' || echo "Provider states endpoint not available - continuing without setup"
+
+      - name: Download consumer contracts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: consumer-contracts-*
+          path: test-results/downloaded-contracts/
+          merge-multiple: true
+
+      - name: Run provider verification
+        run: |
+          echo "🔍 Verifying provider: ${{ matrix.provider }}"
+
+          # Verify provider against published contracts
+          npx pact-broker verify-provider \
+            --provider-base-url="$PROVIDER_URL" \
+            --provider="${{ matrix.provider }}" \
+            --provider-version="${{ github.sha }}" \
+            --broker-base-url="$PACT_BROKER_URL" \
+            --broker-token="$PACT_BROKER_TOKEN" \
+            --publish-verification-results \
+            --verbose
+
+      - name: Generate provider verification report
+        if: always()
+        run: |
+          mkdir -p test-results/provider-verification
+
+          echo "## 🔍 Provider Verification Results" > test-results/provider-verification/summary.md
+          echo "" >> test-results/provider-verification/summary.md
+          echo "**Provider:** ${{ matrix.provider }}" >> test-results/provider-verification/summary.md
+          echo "**Branch:** ${{ github.ref_name }}" >> test-results/provider-verification/summary.md
+          echo "**Commit:** ${{ github.sha }}" >> test-results/provider-verification/summary.md
+          echo "" >> test-results/provider-verification/summary.md
+          echo "**Status:** ${{ job.status }}" >> test-results/provider-verification/summary.md
+
+      - name: Upload provider verification artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: provider-verification-${{ matrix.provider }}
+          path: |
+            test-results/provider-verification/
+            pact-results/
+          retention-days: 7
+
+  contract-integration-tests:
+    name: Contract Integration Tests
+    runs-on: ubuntu-latest
+    needs: [contract-consumer-tests, provider-verification]
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: pems_integration_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build application
+        run: pnpm build
+
+      - name: Setup integration test environment
+        run: |
+          echo "AUTH_SERVICE_URL=http://localhost:3001" >> $GITHUB_ENV
+          echo "USER_SERVICE_URL=http://localhost:3002" >> $GITHUB_ENV
+          echo "TENANT_SERVICE_URL=http://localhost:3004" >> $GITHUB_ENV
+          echo "NOTIFICATION_SERVICE_URL=http://localhost:3003" >> $GITHUB_ENV
+
+      - name: Start all services
+        run: |
+          pnpm dev &
+          sleep 20
+
+      - name: Wait for services
+        run: |
+          for service in auth-service user-service tenant-service notification-service; do
+            echo "Waiting for $service..."
+            timeout 60 bash -c "until curl -f http://localhost:300${service: -1}/health; do sleep 2; done"
+          done
+
+      - name: Run contract integration tests
+        run: |
+          echo "🧪 Running contract integration tests"
+
+          # Run service integration tests
+          pnpm test tests/contracts/integration/
+
+          # Run OpenAPI validation tests
+          pnpm test tests/contracts/schemas/
+
+      - name: Generate integration test report
+        if: always()
+        run: |
+          mkdir -p test-results/contract-integration
+
+          echo "## 🔗 Contract Integration Test Results" > test-results/contract-integration/summary.md
+          echo "" >> test-results/contract-integration/summary.md
+          echo "**Branch:** ${{ github.ref_name }}" >> test-results/contract-integration/summary.md
+          echo "**Commit:** ${{ github.sha }}" >> test-results/contract-integration/summary.md
+          echo "" >> test-results/contract-integration/summary.md
+          echo "**Status:** ${{ job.status }}" >> test-results/contract-integration/summary.md
+
+      - name: Upload integration test artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: contract-integration-tests
+          path: |
+            test-results/contract-integration/
+            coverage/
+          retention-days: 7
+
+  contract-testing-summary:
+    name: Contract Testing Summary
+    runs-on: ubuntu-latest
+    needs: [contract-consumer-tests, provider-verification, contract-integration-tests]
+    if: always()
+
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: all-artifacts/
+
+      - name: Generate comprehensive report
+        run: |
+          echo "## 📋 Contract Testing Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Generated:** $(date -u +%Y-%m-%dT%H:%M:%SZ)" >> $GITHUB_STEP_SUMMARY
+          echo "**Repository:** ${{ github.repository }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Consumer Tests Summary
+          echo "### 🧪 Consumer Contract Tests" >> $GITHUB_STEP_SUMMARY
+          if [ -d "all-artifacts/consumer-contracts-pems-frontend" ]; then
+            echo "- ✅ Frontend Consumer Tests" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- ❌ Frontend Consumer Tests" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          if [ -d "all-artifacts/consumer-contracts-pems-admin" ]; then
+            echo "- ✅ Admin Consumer Tests" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- ❌ Admin Consumer Tests" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Provider Verification Summary
+          echo "### 🔍 Provider Verification" >> $GITHUB_STEP_SUMMARY
+          providers=("pems-auth-service" "pems-user-service" "pems-tenant-service" "pems-notification-service")
+          for provider in "${providers[@]}"; do
+            if [ -d "all-artifacts/provider-verification-$provider" ]; then
+              echo "- ✅ $provider" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "- ❌ $provider" >> $GITHUB_STEP_SUMMARY
+            fi
+          done
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Integration Tests Summary
+          echo "### 🔗 Integration Tests" >> $GITHUB_STEP_SUMMARY
+          if [ -d "all-artifacts/contract-integration-tests" ]; then
+            echo "- ✅ Service Integration Tests" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- ❌ Service Integration Tests" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Overall Status
+          echo "### 📊 Overall Status" >> $GITHUB_STEP_SUMMARY
+          consumer_status="${{ needs.contract-consumer-tests.result }}"
+          provider_status="${{ needs.provider-verification.result }}"
+          integration_status="${{ needs.contract-integration-tests.result }}"
+
+          if [ "$consumer_status" = "success" ] && [ "$provider_status" = "success" ] && [ "$integration_status" = "success" ]; then
+            echo "✅ **All contract tests passed**" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "The application meets all contract requirements and is ready for deployment." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **Some contract tests failed**" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Please review the failed tests and address contract violations before deployment." >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
+
+      - name: Upload final report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: contract-testing-final-report
+          path: all-artifacts/
+          retention-days: 30
+
+      - name: Notify on failure
+        if: failure()
+        run: |
+          echo "🚨 Contract testing failed! Review the artifacts and fix contract violations." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Action Required:" >> $GITHUB_STEP_SUMMARY
+          echo "1. Review failed consumer tests" >> $GITHUB_STEP_SUMMARY
+          echo "2. Check provider verification results" >> $GITHUB_STEP_SUMMARY
+          echo "3. Fix contract violations" >> $GITHUB_STEP_SUMMARY
+          echo "4. Re-run tests to verify fixes" >> $GITHUB_STEP_SUMMARY

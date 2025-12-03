@@ -2,11 +2,11 @@
   "extends": "@pems/config-typescript/node.json",
   "compilerOptions": {
     "baseUrl": ".",
-    "rootDir": "./src",
+    "rootDir": "./",
     "paths": {
       "@pems/*": ["../../packages/*"]
     }
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "tests/**/*"],
   "exclude": ["node_modules", "dist"]
 }
