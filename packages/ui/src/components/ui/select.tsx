@@ -117,7 +117,10 @@ export const Select = (props: SelectProps) => {
       case 'Enter':
         e.preventDefault()
         if (highlightedIndex() >= 0) {
-          handleSelect(local.options[highlightedIndex()])
+          const option = local.options[highlightedIndex()]
+          if (option) {
+            handleSelect(option)
+          }
         }
         break
     }

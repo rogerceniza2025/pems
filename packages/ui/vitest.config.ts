@@ -57,6 +57,9 @@ export default defineConfig({
     jsxFactory: 'h',
     jsxFragment: 'Fragment',
   },
+  optimizeDeps: {
+    exclude: ['solid-js'],
+  },
   
   resolve: {
     alias: {

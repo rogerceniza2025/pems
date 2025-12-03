@@ -318,7 +318,7 @@ export const Breadcrumb = (props: BreadcrumbProps) => {
         <Show when={local.home}>
           <Show when={local.home}>
             <a
-              href={local.home?.href || '#'}
+              href={local.home?.href ?? '#'}
               class="flex items-center space-x-2 hover:text-primary"
             >
               <Show when={local.home?.icon} fallback={
