@@ -299,7 +299,8 @@ describe('Navigation API Endpoints', () => {
 
       expect(res.status).toBe(201)
       const json = await res.json()
-      expect(json.menu).toEqual(createdMenu)
+      // Compare JSON strings to avoid Date object comparison issues
+      expect(JSON.stringify(json.menu)).toEqual(JSON.stringify(createdMenu))
       expect(mockNavigationService.createNavigationMenu).toHaveBeenCalledWith(newMenu)
     })
 
