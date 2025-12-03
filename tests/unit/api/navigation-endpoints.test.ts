@@ -54,6 +54,20 @@ describe('Navigation API Endpoints', () => {
       await next()
     })
 
+    // Middleware to add headers to all responses
+    app.use('*', async (c, next) => {
+      await next()
+      // Add request ID header
+      const requestId = c.get('requestId')
+      if (requestId) {
+        c.header('x-request-id', requestId)
+      }
+      // Add security headers
+      c.header('x-content-type-options', 'nosniff')
+      c.header('x-frame-options', 'DENY')
+      c.header('x-xss-protection', '1; mode=block')
+    })
+
     // Navigation routes
     app.get('/api/navigation', async (c) => {
       const navigationService = c.get('navigationService')

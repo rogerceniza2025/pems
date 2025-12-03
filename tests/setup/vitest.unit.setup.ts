@@ -23,7 +23,7 @@ process.env.ENCRYPTION_KEY = 'test-encryption-key'
 // Mock date for consistent testing
 const mockDate = new Date('2024-01-01T00:00:00.000Z')
 vi.spyOn(Date, 'now').mockReturnValue(mockDate.getTime())
-vi.spyOn(global, 'Date').mockImplementation(() => mockDate)
+vi.spyOn(global, "Date").mockImplementation(function (...args) { if (args.length === 0) return mockDate; return new (global.Date as any)(...args); })
 
 // Mock UUID generation
 vi.mock('uuid', () => ({

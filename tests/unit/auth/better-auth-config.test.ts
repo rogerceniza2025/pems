@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { betterAuth } from 'better-auth'
-import { authConfig } from '@packages/infrastructure/auth/src/index'
+import { authConfig } from './packages/infrastructure/auth/src'
 
 // Mock environment variables
 const originalEnv = process.env

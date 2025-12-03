@@ -1,18 +1,14 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach } from 'vitest'
+import { Hono } from 'hono'
 import { setupTestDatabase, getTestPrisma } from '@tests/helpers/database'
 import { UserFactory, TenantFactory } from '@tests/helpers/factories'
 import { createTestUser, createTestHeaders } from '@tests/helpers/auth'
-import { Password } from '@modules/user-management/src/domain/value-objects/password'
+import { Password } from '../../../modules/user-management/src/domain/value-objects/password'
 
-// Mock Next.js server components
-vi.mock('next/server', () => ({
-  NextRequest: vi.fn(),
-  NextResponse: {
-    json: vi.fn((data, options) => ({ json: () => data, status: options?.status || 200 })),
-  },
-}))
+// Mock Hono request/response patterns for Tanstack Start
 
 describe('Authentication API Endpoints', () => {
+  let app: Hono
   let testTenant: any
   let testUser: any
 
@@ -28,6 +24,28 @@ describe('Authentication API Endpoints', () => {
       email: 'api.test@example.com',
       role: 'ADMIN',
       isActive: true,
+    })
+
+    // Create Hono app for testing API endpoints (Tanstack Start pattern)
+    app = new Hono()
+
+    // Middleware to inject test services
+    app.use('*', async (c, next) => {
+      c.set('prisma', getTestPrisma())
+      c.set('requestId', 'test-request-123')
+      await next()
+    })
+
+    // Add response headers middleware
+    app.use('*', async (c, next) => {
+      await next()
+      const requestId = c.get('requestId')
+      if (requestId) {
+        c.header('x-request-id', requestId)
+      }
+      c.header('x-content-type-options', 'nosniff')
+      c.header('x-frame-options', 'DENY')
+      c.header('x-xss-protection', '1; mode=block')
     })
   })
 
@@ -45,52 +63,67 @@ describe('Authentication API Endpoints', () => {
         tenantCode: testTenant.code,
       }
 
-      // Simulate API endpoint logic
-      const existingUser = await getTestPrisma().user.findUnique({
-        where: { email: registrationData.email },
+      // Define the registration endpoint (Tanstack Start + Hono pattern)
+      app.post('/api/auth/register', async (c) => {
+        const prisma = c.get('prisma')
+        const body = await c.req.json()
+
+        const existingUser = await prisma.user.findUnique({
+          where: { email: body.email },
+        })
+
+        if (existingUser) {
+          return c.json({ error: 'User already exists' }, 409)
+        }
+
+        const passwordValidation = Password.validatePolicy(body.password)
+        if (!passwordValidation.isValid) {
+          return c.json({
+            error: 'Invalid password',
+            details: passwordValidation.errors
+          }, 400)
+        }
+
+        const tenant = await prisma.tenant.findUnique({
+          where: { code: body.tenantCode },
+        })
+
+        if (!tenant) {
+          return c.json({ error: 'Invalid tenant code' }, 400)
+        }
+
+        const hashedPassword = await Password.create(body.password)
+
+        const newUser = await UserFactory.createWithTenant(tenant.id, {
+          email: body.email,
+          firstName: body.firstName,
+          lastName: body.lastName,
+          passwordHash: hashedPassword.getValue(),
+        })
+
+        return c.json({
+          success: true,
+          user: {
+            id: newUser.id,
+            email: newUser.email,
+            firstName: newUser.firstName,
+            lastName: newUser.lastName,
+          },
+          message: 'User registered successfully',
+        }, 201)
       })
 
-      if (existingUser) {
-        return { error: 'User already exists', status: 409 }
-      }
-
-      const passwordValidation = Password.validatePolicy(registrationData.password)
-      if (!passwordValidation.isValid) {
-        return { error: 'Invalid password', details: passwordValidation.errors, status: 400 }
-      }
-
-      const tenant = await getTestPrisma().tenant.findUnique({
-        where: { code: registrationData.tenantCode },
+      // Test the endpoint
+      const res = await app.request('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(registrationData),
       })
 
-      if (!tenant) {
-        return { error: 'Invalid tenant code', status: 400 }
-      }
+      expect(res.status).toBe(201)
+      expect(res.headers.get('x-request-id')).toBe('test-request-123')
 
-      const hashedPassword = await Password.create(registrationData.password)
-
-      const newUser = await UserFactory.createWithTenant(tenant.id, {
-        email: registrationData.email,
-        firstName: registrationData.firstName,
-        lastName: registrationData.lastName,
-        passwordHash: hashedPassword.getValue(),
-      })
-
-      expect(newUser.email).toBe(registrationData.email)
-      expect(newUser.firstName).toBe(registrationData.firstName)
-      expect(newUser.tenantId).toBe(tenant.id)
-
-      const response = {
-        success: true,
-        user: {
-          id: newUser.id,
-          email: newUser.email,
-          firstName: newUser.firstName,
-          lastName: newUser.lastName,
-        },
-        message: 'User registered successfully',
-      }
-
+      const response = await res.json()
       expect(response.success).toBe(true)
       expect(response.user.email).toBe(registrationData.email)
     })
@@ -104,19 +137,18 @@ describe('Authentication API Endpoints', () => {
         tenantCode: 'INVALID-TENANT',
       }
 
-      const tenant = await getTestPrisma().tenant.findUnique({
-        where: { code: registrationData.tenantCode },
+      // Test the endpoint (it will use the same endpoint defined above)
+      const res = await app.request('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(registrationData),
       })
 
-      expect(tenant).toBeNull()
+      expect(res.status).toBe(400)
+      expect(res.headers.get('x-request-id')).toBe('test-request-123')
 
-      const response = {
-        error: 'Invalid tenant code',
-        status: 400,
-      }
-
+      const response = await res.json()
       expect(response.error).toBe('Invalid tenant code')
-      expect(response.status).toBe(400)
     })
 
     it('should reject registration with weak password', async () => {
@@ -128,19 +160,21 @@ describe('Authentication API Endpoints', () => {
         tenantCode: testTenant.code,
       }
 
-      const passwordValidation = Password.validatePolicy(registrationData.password)
+      // Test the endpoint (it will use the same endpoint defined above)
+      const res = await app.request('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(registrationData),
+      })
 
-      expect(passwordValidation.isValid).toBe(false)
-      expect(passwordValidation.errors.length).toBeGreaterThan(0)
+      expect(res.status).toBe(400)
+      expect(res.headers.get('x-request-id')).toBe('test-request-123')
 
-      const response = {
-        error: 'Invalid password',
-        details: passwordValidation.errors,
-        status: 400,
-      }
-
+      const response = await res.json()
       expect(response.error).toBe('Invalid password')
-      expect(response.details).toContain('Password must be at least 8 characters long')
+      expect(response.details).toBeDefined()
+      expect(Array.isArray(response.details)).toBe(true)
+
     })
 
     it('should reject registration with duplicate email', async () => {

@@ -1,6 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { NextRequest, NextResponse } from 'next/server'
-import { authorizationMiddleware } from '@packages/infrastructure/middleware/src/authorization-middleware'
+// Mock Next.js server components for TanStack Start migration
+const NextRequest = vi.fn()
+const NextResponse = {
+  json: vi.fn(),
+  redirect: vi.fn(),
+  next: vi.fn(),
+}
+import { authorizationMiddleware } from './packages/infrastructure/middleware/src'
 import { PrismaClient } from '@prisma/client'
 
 // Mock Prisma
