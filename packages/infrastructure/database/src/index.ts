@@ -16,3 +16,6 @@ export * from './client'
 // export { DatabaseConnection } from './connection'
 // export { Migrator } from './migrator'
 // export { Seeder } from './seeder'
+
+// Migration services for BetterAuth integration
+export { UserMigrationService, userMigrationService } from './migration/user-migration.service'

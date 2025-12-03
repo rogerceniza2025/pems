@@ -4,7 +4,8 @@
     "baseUrl": ".",
     "outDir": "./dist",
     "exactOptionalPropertyTypes": false,
-    "strictPropertyInitialization": false
+    "strictPropertyInitialization": false,
+    "types": ["vitest/globals"]
   },
   "include": ["src/**/*.ts", "src/**/*.tsx", "test/**/*.ts"],
   "exclude": ["node_modules", "dist", "**/*.d.ts"]

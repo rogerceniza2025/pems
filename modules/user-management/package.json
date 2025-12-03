@@ -2,7 +2,7 @@
   "name": "@pems/user-management",
   "private": true,
   "type": "module",
-  "main": "./index.ts",
+  "main": "./src/index.ts",
   "scripts": {
     "lint": "echo 'No TypeScript files to lint in user-management module'",
     "lint:fix": "echo 'No TypeScript files to lint in user-management module'",
@@ -11,15 +11,20 @@
     "test:integration": "vitest run --config vitest.integration.config.ts"
   },
   "dependencies": {
+    "@hono/zod-validator": "^0.7.5",
+    "@pems/auth": "workspace:*",
+    "@pems/database": "workspace:*",
+    "@pems/middleware": "workspace:*",
     "@pems/shared-types": "workspace:*",
     "@pems/shared-utils": "workspace:*",
-    "@pems/database": "workspace:*",
-    "@pems/auth": "workspace:*",
-    "zod": "^3.24.1"
+    "bcryptjs": "^3.0.3",
+    "hono": "^4.10.7",
+    "zod": "^4.1.13"
   },
   "devDependencies": {
-    "@types/node": "^22.10.5",
+    "@types/bcryptjs": "^3.0.0",
+    "@types/node": "^24.10.1",
     "typescript": "^5.9.3",
-    "vitest": "^2.1.8"
+    "vitest": "^4.0.15"
   }
 }

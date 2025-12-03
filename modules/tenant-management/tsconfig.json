@@ -1,0 +1,17 @@
+{
+  "extends": "../../packages/config/typescript/base.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "outDir": "./dist",
+    "noEmit": false,
+    "composite": true,
+    "incremental": true,
+    "ignoreDeprecations": "5.0",
+    "paths": {
+      "@pems/*": ["../../packages/*"]
+    }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}

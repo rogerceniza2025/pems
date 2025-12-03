@@ -8,20 +8,25 @@
 import type {
   TenantDomainEntity,
   TenantSettingDomainEntity,
-  CreateTenantSchema,
-  UpdateTenantSchema,
-  TenantSettingSchema,
   TenantCreatedEvent,
   TenantUpdatedEvent,
   TenantSettingUpdatedEvent,
+} from '../domain'
+import { z } from 'zod'
+import {
+  CreateTenantSchema,
+  UpdateTenantSchema,
+  TenantSettingSchema,
   TenantNotFoundError,
-  TenantSlugAlreadyExistsError
+  TenantSlugAlreadyExistsError,
 } from '../domain'
 import type { ITenantRepository } from '../infrastructure'
 
 export interface ITenantService {
   // Tenant operations
-  createTenant(data: CreateTenantSchema): Promise<TenantDomainEntity>
+  createTenant(
+    data: z.infer<typeof CreateTenantSchema>,
+  ): Promise<TenantDomainEntity>
   getTenant(id: string): Promise<TenantDomainEntity>
   getTenantBySlug(slug: string): Promise<TenantDomainEntity>
   listTenants(options?: { page?: number; limit?: number }): Promise<{
@@ -31,26 +36,41 @@ export interface ITenantService {
     limit: number
     totalPages: number
   }>
-  updateTenant(id: string, data: UpdateTenantSchema): Promise<TenantDomainEntity>
+  updateTenant(
+    id: string,
+    data: z.infer<typeof UpdateTenantSchema>,
+  ): Promise<TenantDomainEntity>
   deleteTenant(id: string): Promise<void>
 
   // Tenant settings
-  upsertTenantSetting(tenantId: string, data: TenantSettingSchema): Promise<TenantSettingDomainEntity>
-  getTenantSetting(tenantId: string, key: string): Promise<TenantSettingDomainEntity | null>
+  upsertTenantSetting(
+    tenantId: string,
+    data: z.infer<typeof TenantSettingSchema>,
+  ): Promise<TenantSettingDomainEntity>
+  getTenantSetting(
+    tenantId: string,
+    key: string,
+  ): Promise<TenantSettingDomainEntity | null>
   getAllTenantSettings(tenantId: string): Promise<TenantSettingDomainEntity[]>
   deleteTenantSetting(tenantId: string, key: string): Promise<void>
 
   // Domain events
-  getDomainEvents(): Array<TenantCreatedEvent | TenantUpdatedEvent | TenantSettingUpdatedEvent>
+  getDomainEvents(): Array<
+    TenantCreatedEvent | TenantUpdatedEvent | TenantSettingUpdatedEvent
+  >
   clearDomainEvents(): void
 }
 
 export class TenantService implements ITenantService {
-  private domainEvents: Array<TenantCreatedEvent | TenantUpdatedEvent | TenantSettingUpdatedEvent> = []
+  private domainEvents: Array<
+    TenantCreatedEvent | TenantUpdatedEvent | TenantSettingUpdatedEvent
+  > = []
 
   constructor(private readonly tenantRepository: ITenantRepository) {}
 
-  async createTenant(data: CreateTenantSchema): Promise<TenantDomainEntity> {
+  async createTenant(
+    data: z.infer<typeof CreateTenantSchema>,
+  ): Promise<TenantDomainEntity> {
     // Validate tenant slug uniqueness
     const existingTenant = await this.tenantRepository.findBySlug(data.slug)
     if (existingTenant) {
@@ -65,7 +85,7 @@ export class TenantService implements ITenantService {
       tenantId: tenant.id,
       name: tenant.name,
       slug: tenant.slug,
-      occurredAt: new Date()
+      occurredAt: new Date(),
     })
 
     return tenant
@@ -94,7 +114,7 @@ export class TenantService implements ITenantService {
 
     const [tenants, total] = await Promise.all([
       this.tenantRepository.findMany({ skip, take: limit }),
-      this.tenantRepository.count()
+      this.tenantRepository.count(),
     ])
 
     return {
@@ -102,11 +122,14 @@ export class TenantService implements ITenantService {
       total,
       page,
       limit,
-      totalPages: Math.ceil(total / limit)
+      totalPages: Math.ceil(total / limit),
     }
   }
 
-  async updateTenant(id: string, data: UpdateTenantSchema): Promise<TenantDomainEntity> {
+  async updateTenant(
+    id: string,
+    data: z.infer<typeof UpdateTenantSchema>,
+  ): Promise<TenantDomainEntity> {
     // Validate tenant exists
     const existingTenant = await this.getTenant(id)
 
@@ -137,7 +160,10 @@ export class TenantService implements ITenantService {
     if (data.timezone && data.timezone !== existingTenant.timezone) {
       changes.timezone = data.timezone
     }
-    if (data.metadata && JSON.stringify(data.metadata) !== JSON.stringify(existingTenant.metadata)) {
+    if (
+      data.metadata &&
+      JSON.stringify(data.metadata) !== JSON.stringify(existingTenant.metadata)
+    ) {
       changes.metadata = data.metadata
     }
 
@@ -146,7 +172,7 @@ export class TenantService implements ITenantService {
         type: 'TENANT_UPDATED',
         tenantId: id,
         changes,
-        occurredAt: new Date()
+        occurredAt: new Date(),
       })
     }
 
@@ -162,7 +188,7 @@ export class TenantService implements ITenantService {
 
   async upsertTenantSetting(
     tenantId: string,
-    data: TenantSettingSchema
+    data: z.infer<typeof TenantSettingSchema>,
   ): Promise<TenantSettingDomainEntity> {
     // Validate tenant exists
     await this.getTenant(tenantId)
@@ -175,20 +201,25 @@ export class TenantService implements ITenantService {
       tenantId,
       key: data.key,
       value: data.value,
-      occurredAt: new Date()
+      occurredAt: new Date(),
     })
 
     return setting
   }
 
-  async getTenantSetting(tenantId: string, key: string): Promise<TenantSettingDomainEntity | null> {
+  async getTenantSetting(
+    tenantId: string,
+    key: string,
+  ): Promise<TenantSettingDomainEntity | null> {
     // Validate tenant exists
     await this.getTenant(tenantId)
 
     return this.tenantRepository.getSetting(tenantId, key)
   }
 
-  async getAllTenantSettings(tenantId: string): Promise<TenantSettingDomainEntity[]> {
+  async getAllTenantSettings(
+    tenantId: string,
+  ): Promise<TenantSettingDomainEntity[]> {
     // Validate tenant exists
     await this.getTenant(tenantId)
 
@@ -202,7 +233,9 @@ export class TenantService implements ITenantService {
     await this.tenantRepository.deleteSetting(tenantId, key)
   }
 
-  getDomainEvents(): Array<TenantCreatedEvent | TenantUpdatedEvent | TenantSettingUpdatedEvent> {
+  getDomainEvents(): Array<
+    TenantCreatedEvent | TenantUpdatedEvent | TenantSettingUpdatedEvent
+  > {
     return [...this.domainEvents]
   }
 
@@ -210,9 +243,12 @@ export class TenantService implements ITenantService {
     this.domainEvents = []
   }
 
-  private addDomainEvent<T extends TenantCreatedEvent | TenantUpdatedEvent | TenantSettingUpdatedEvent>(
-    event: T
-  ): void {
+  private addDomainEvent<
+    T extends
+      | TenantCreatedEvent
+      | TenantUpdatedEvent
+      | TenantSettingUpdatedEvent,
+  >(event: T): void {
     this.domainEvents.push(event)
   }
 }

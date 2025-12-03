@@ -1,0 +1,269 @@
+# Percy Configuration for PEMS Visual Regression Testing
+# This configures automated visual testing across different browsers and viewports
+
+version: 2
+snapshot:
+  # Enable JavaScript rendering for dynamic content
+  javascript: true
+
+  # Capture full page screenshots
+  widths: [375, 768, 1024, 1280, 1440]
+
+  # Minimum height to capture full page
+  min-height: 1024
+
+  # Enable Percy-specific features
+  percy-css: |
+    /* Hide dynamic elements that cause false positives */
+    .skeleton-loader,
+    .loading-spinner,
+    .live-clock,
+    .real-time-counter,
+    .dynamic-date {
+      visibility: hidden !important;
+    }
+
+    /* Stabilize animations */
+    * {
+      animation-duration: 0s !important;
+      transition-duration: 0s !important;
+    }
+
+    /* Standardize form elements */
+    input::placeholder,
+    textarea::placeholder {
+      color: #999 !important;
+    }
+
+# Discrete browsers to test against
+discovery:
+  allowed-hostnames:
+    - localhost
+    - 127.0.0.1
+    - staging.pems.com
+
+agent:
+  asset-discovery:
+    network-idle-timeout: 75
+
+# Default browser targets
+default_targets:
+  - chrome
+  - firefox
+  - safari
+
+# Custom browsers and viewports for comprehensive testing
+browsers:
+  chrome:
+    # Chrome latest stable
+    version: latest
+  firefox:
+    # Firefox latest stable
+    version: latest
+  safari:
+    # Safari latest stable
+    version: latest
+  edge:
+    # Edge latest stable
+    version: latest
+
+# Viewport configurations for responsive testing
+viewports:
+  # Mobile devices
+  mobile-small:
+    width: 375
+    height: 667
+    label: 'Mobile Small (iPhone SE)'
+  mobile-large:
+    width: 414
+    height: 896
+    label: 'Mobile Large (iPhone 11)'
+
+  # Tablet devices
+  tablet:
+    width: 768
+    height: 1024
+    label: 'Tablet (iPad)'
+
+  # Desktop
+  desktop-small:
+    width: 1024
+    height: 768
+    label: 'Desktop Small'
+  desktop-medium:
+    width: 1280
+    height: 800
+    label: 'Desktop Medium'
+  desktop-large:
+    width: 1440
+    height: 900
+    label: 'Desktop Large'
+  desktop-xlarge:
+    width: 1920
+    height: 1080
+    label: 'Desktop XLarge'
+
+# Enable advanced visual comparison features
+visual-comparison:
+  # Ignore dynamic content areas
+  ignore-changes:
+    # Timestamps and dynamic dates
+    selectors:
+      - '[data-testid="timestamp"]'
+      - '[data-testid="current-date"]'
+      - '[class*="date"]'
+      - '[class*="time"]'
+
+    # User-generated content areas
+    user-content:
+      - '[data-testid="user-avatar"]'
+      - '[data-testid="profile-image"]'
+
+    # Loading states
+    loading:
+      - '[class*="loading"]'
+      - '[class*="skeleton"]'
+
+  # Sensitivity settings for different content types
+  sensitivity:
+    # High sensitivity for critical UI elements
+    high:
+      - navigation
+      - buttons
+      - forms
+      - alerts
+
+    # Medium sensitivity for content areas
+    medium:
+      - cards
+      - lists
+      - tables
+
+    # Low sensitivity for decorative elements
+    low:
+      - background-images
+      - decorative-icons
+
+# Storybook integration
+storybook:
+  # Storybook URL
+  url: http://localhost:6006
+
+  # Stories to test
+  include:
+    - '**/*.stories.@(js|jsx|ts|tsx|mdx)'
+
+  # Exclude certain stories
+  exclude:
+    - '**/*.decorator.*'
+    - '**/*.test.*'
+
+  # Storybook-specific configurations
+  config-path: .storybook/main.js
+
+  # Capture all stories by default
+  capture-all: true
+
+  # Configure snapshot options for Storybook
+  snapshot-options:
+    # Capture the full story
+    fullpage: true
+
+    # Wait for animations to complete
+    wait-for-selector: '[data-test-ready="true"]'
+
+    # Custom viewport configurations for components
+    viewports:
+      default: desktop-medium
+      responsive: [mobile-small, tablet, desktop-medium, desktop-large]
+
+# CI/CD Integration
+ci:
+  # GitHub Actions integration
+  github:
+    # Create pull request comments
+    pr-comments: true
+
+    # Create status checks
+    status-checks: true
+
+    # Auto-approve when no visual changes detected
+    auto-approve-changes: false
+
+    # Require approval for visual changes
+    require-approval: true
+
+  # Parallel execution
+  parallel:
+    # Number of parallel snapshots
+    parallelism: 4
+
+    # Shard snapshots across parallel jobs
+    sharding: true
+
+# Integration with existing tools
+integration:
+  # Playwright integration
+  playwright:
+    # Enable Percy visual testing in Playwright
+    enabled: true
+
+    # Automatic screenshot on test failure
+    screenshot-on-failure: true
+
+    # Percy CSS for Playwright tests
+    percy-css: |
+      /* Stabilize Playwright tests */
+      * {
+        caret-color: transparent !important;
+      }
+
+  # Test framework integration
+  frameworks:
+    # Vitest integration
+    vitest:
+      # Enable Percy in Vitest tests
+      enabled: true
+
+    # Jest integration
+    jest:
+      # Enable Percy in Jest tests
+      enabled: true
+
+# Custom configurations for different environments
+environments:
+  development:
+    # Local development settings
+    base-url: http://localhost:3000
+
+    # Faster snapshot execution
+    snapshot-timeout: 30000
+
+    # Enable debug mode
+    debug: true
+
+  staging:
+    # Staging environment settings
+    base-url: https://staging.pems.com
+
+    # Longer timeout for staging
+    snapshot-timeout: 60000
+
+    # Enable comprehensive browser testing
+    browsers: [chrome, firefox, safari, edge]
+
+    # All viewport sizes
+    viewports: [mobile-small, mobile-large, tablet, desktop-small, desktop-medium, desktop-large]
+
+  production:
+    # Production monitoring
+    base-url: https://pems.com
+
+    # Conservative approach for production
+    require-approval: true
+
+    # Limited browser set for production monitoring
+    browsers: [chrome, firefox]
+
+    # Essential viewports only
+    viewports: [mobile-small, tablet, desktop-medium]

@@ -1,0 +1,438 @@
+name: Test Analytics Collection
+
+on:
+  push:
+    branches: [ main, develop, feature/* ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    # Run daily at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+    inputs:
+      collect_analytics:
+        description: 'Force analytics collection'
+        required: false
+        default: 'true'
+      update_dashboard:
+        description: 'Update analytics dashboard'
+        required: false
+        default: 'false'
+
+jobs:
+  collect-coverage-analytics:
+    name: Coverage Analytics Collection
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || github.event_name == 'workflow_dispatch'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Create analytics directory
+        run: mkdir -p .analytics
+
+      - name: Collect Coverage Analytics
+        run: |
+          echo "🔍 Collecting coverage analytics data..."
+          node scripts/coverage-validation.js
+        env:
+          NODE_ENV: 'production'
+
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./coverage/lcov.info
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: false
+
+      - name: Store analytics artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-analytics
+          path: |
+            .analytics/
+            coverage/
+            coverage-summary.json
+          retention-days: 30
+
+  collect-performance-analytics:
+    name: Performance Analytics Collection
+    runs-on: ubuntu-latest
+    needs: collect-coverage-analytics
+    if: github.event_name != 'pull_request' || github.event_name == 'workflow_dispatch'
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: test_analytics
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Download analytics artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-analytics
+          path: ./
+
+      - name: Build application
+        run: pnpm build
+        env:
+          NODE_ENV: 'production'
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_analytics
+          REDIS_URL: redis://localhost:6379
+
+      - name: Start application
+        run: |
+          pnpm start &
+          sleep 30  # Wait for application to start
+
+      - name: Collect Performance Analytics
+        run: |
+          echo "🚀 Collecting performance analytics data..."
+          node scripts/performance-budget.js --report
+        env:
+          NODE_ENV: 'production'
+
+      - name: Run Performance Regression Gate
+        run: |
+          echo "🔍 Running performance regression detection..."
+          node scripts/performance-regression-gate.js --report
+        continue-on-error: true
+
+      - name: Store performance artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: performance-analytics
+          path: |
+            .analytics/
+            performance-budget-report.json
+            performance-regression-report.json
+            dist/
+          retention-days: 30
+
+  run-analytics-dashboard:
+    name: Analytics Dashboard
+    runs-on: ubuntu-latest
+    needs: [collect-coverage-analytics, collect-performance-analytics]
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' && github.event.inputs.update_dashboard == 'true'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Download analytics artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-analytics
+          path: ./
+
+      - name: Download performance artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: performance-analytics
+          path: ./
+
+      - name: Generate Analytics Dashboard
+        run: |
+          echo "📊 Generating analytics dashboard..."
+          mkdir -p public/analytics
+
+          # Generate dashboard data
+          node -e "
+            const fs = require('fs');
+            const path = require('path');
+
+            // Combine all analytics data
+            const analyticsData = {
+              generatedAt: new Date().toISOString(),
+              gitInfo: {
+                commitHash: '${{ github.sha }}',
+                branch: '${{ github.ref_name }}',
+                author: '${{ github.actor }}'
+              },
+              coverage: fs.existsSync('coverage-summary.json') ?
+                JSON.parse(fs.readFileSync('coverage-summary.json', 'utf8')) : {},
+              performance: fs.existsSync('performance-budget-report.json') ?
+                JSON.parse(fs.readFileSync('performance-budget-report.json', 'utf8')) : {},
+              regressions: fs.existsSync('performance-regression-report.json') ?
+                JSON.parse(fs.readFileSync('performance-regression-report.json', 'utf8')) : {}
+            };
+
+            fs.writeFileSync('public/analytics/dashboard-data.json', JSON.stringify(analyticsData, null, 2));
+            console.log('✅ Analytics dashboard data generated');
+          "
+
+      - name: Deploy analytics dashboard
+        uses: peaceiris/actions-gh-pages@v3
+        if: github.ref == 'refs/heads/main'
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public/analytics
+          destination_dir: analytics
+
+  generate-quality-report:
+    name: Quality Report Generation
+    runs-on: ubuntu-latest
+    needs: [collect-coverage-analytics, collect-performance-analytics]
+    if: always()
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Download all analytics artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: "*-analytics"
+          merge-multiple: true
+
+      - name: Generate Comprehensive Quality Report
+        run: |
+          echo "📈 Generating comprehensive quality report..."
+
+          node -e "
+            const fs = require('fs');
+            const path = require('path');
+
+            const report = {
+              timestamp: new Date().toISOString(),
+              workflow: {
+                runId: '${{ github.run_id }}',
+                repository: '${{ github.repository }}',
+                branch: '${{ github.ref_name }}',
+                commit: '${{ github.sha }}',
+                actor: '${{ github.actor }}',
+                event: '${{ github.event_name }}'
+              },
+              coverage: {},
+              performance: {},
+              quality: {
+                status: 'unknown',
+                score: 0,
+                issues: [],
+                recommendations: []
+              },
+              trends: {},
+              regressions: []
+            };
+
+            // Load coverage data
+            if (fs.existsSync('coverage-summary.json')) {
+              report.coverage = JSON.parse(fs.readFileSync('coverage-summary.json', 'utf8'));
+            }
+
+            // Load performance data
+            if (fs.existsSync('performance-budget-report.json')) {
+              report.performance = JSON.parse(fs.readFileSync('performance-budget-report.json', 'utf8'));
+            }
+
+            // Load regression data
+            if (fs.existsSync('performance-regression-report.json')) {
+              const regressionReport = JSON.parse(fs.readFileSync('performance-regression-report.json', 'utf8'));
+              report.regressions = regressionReport.regressions || [];
+            }
+
+            // Calculate overall quality score
+            let score = 100;
+
+            // Deduct points for coverage issues
+            if (report.coverage.total) {
+              const coverageThreshold = 80;
+              const linesCoverage = report.coverage.total.lines?.pct || 0;
+              if (linesCoverage < coverageThreshold) {
+                score -= (coverageThreshold - linesCoverage);
+                report.quality.issues.push(\`Lines coverage \${linesCoverage}% below threshold \${coverageThreshold}%\`);
+              }
+            }
+
+            // Deduct points for performance issues
+            if (report.performance.summary) {
+              const failedBundles = report.performance.summary.bundles?.total - report.performance.summary.bundles?.passed || 0;
+              const failedApis = report.performance.summary.api?.total - report.performance.summary.api?.passed || 0;
+
+              if (failedBundles > 0) {
+                score -= failedBundles * 5;
+                report.quality.issues.push(\`\${failedBundles} bundles exceed size limits\`);
+              }
+
+              if (failedApis > 0) {
+                score -= failedApis * 10;
+                report.quality.issues.push(\`\${failedApis} API endpoints too slow\`);
+              }
+            }
+
+            // Deduct points for regressions
+            report.regressions.forEach(regression => {
+              if (regression.severity === 'critical') {
+                score -= 20;
+              } else if (regression.severity === 'high') {
+                score -= 10;
+              } else if (regression.severity === 'medium') {
+                score -= 5;
+              }
+            });
+
+            report.quality.score = Math.max(0, Math.min(100, score));
+            report.quality.status = score >= 85 ? 'excellent' : score >= 70 ? 'good' : score >= 50 ? 'fair' : 'poor';
+
+            // Add recommendations
+            if (report.quality.score < 85) {
+              report.quality.recommendations.push('Focus on improving test coverage and performance metrics');
+            }
+            if (report.regressions.length > 0) {
+              report.quality.recommendations.push('Address performance regressions before next release');
+            }
+
+            // Save comprehensive report
+            fs.writeFileSync('quality-report.json', JSON.stringify(report, null, 2));
+            console.log(\`✅ Quality report generated with score: \${report.quality.score}\`);
+          "
+
+      - name: Comment PR with quality report
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+
+            if (fs.existsSync('quality-report.json')) {
+              const report = JSON.parse(fs.readFileSync('quality-report.json', 'utf8'));
+
+              const comment = `
+              ## 📊 Quality Report
+
+              **Overall Score:** \`${report.quality.score}/100\` (${report.quality.status.toUpperCase()})
+
+              ### Coverage
+              ${report.coverage.total ? `
+              - Lines: \`${report.coverage.total.lines?.pct || 0}%\`
+              - Functions: \`${report.coverage.total.functions?.pct || 0}%\`
+              - Branches: \`${report.coverage.total.branches?.pct || 0}%\`
+              - Statements: \`${report.coverage.total.statements?.pct || 0}%\`
+              ` : 'No coverage data available'}
+
+              ### Performance
+              ${report.performance.summary ? `
+              - Bundles: \`${report.performance.summary.bundles?.passed || 0}/${report.performance.summary.bundles?.total || 0}\` passed
+              - APIs: \`${report.performance.summary.api?.passed || 0}/${report.performance.summary.api?.total || 0}\` passed
+              - Lighthouse: \`${report.performance.summary.lighthouse?.passed || 0}/${report.performance.summary.lighthouse?.total || 0}\` passed
+              ` : 'No performance data available'}
+
+              ### Regressions
+              ${report.regressions.length > 0 ? `
+              🚨 **\${report.regressions.length} regression(s) detected**
+              ${report.regressions.slice(0, 3).map(r => `- \${r.type}: \${r.description}`).join('\\n')}
+              ` : '✅ No regressions detected'}
+
+              ### Recommendations
+              ${report.quality.recommendations.length > 0 ? report.quality.recommendations.map(r => `- ${r}`).join('\\n') : 'No specific recommendations'}
+
+              ---
+              *Generated by Test Analytics Workflow*
+              `;
+
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: comment
+              });
+            }
+
+      - name: Upload quality report
+        uses: actions/upload-artifact@v4
+        with:
+          name: quality-report
+          path: quality-report.json
+          retention-days: 90
+
+  notify-on-issues:
+    name: Notify on Issues
+    runs-on: ubuntu-latest
+    needs: [collect-coverage-analytics, collect-performance-analytics]
+    if: always() && (needs.collect-coverage-analytics.result == 'failure' || needs.collect-performance-analytics.result == 'failure')
+
+    steps:
+      - name: Notify Slack on failure
+        if: always()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: failure
+          channel: '#development'
+          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+          text: |
+            🚨 Test Analytics Collection Failed
+
+            Repository: ${{ github.repository }}
+            Branch: ${{ github.ref_name }}
+            Commit: ${{ github.sha }}
+            Workflow: ${{ github.workflow }}
+
+            Please check the workflow logs for details.
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}

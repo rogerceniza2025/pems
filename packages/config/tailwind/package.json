@@ -23,10 +23,10 @@
   },
   "devDependencies": {
     "@pems/config-typescript": "workspace:*",
-    "@types/node": "^22.10.5",
+    "@types/node": "^24.10.1",
     "tailwindcss": "^4.1.17",
     "typescript": "^5.9.3",
-    "vitest": "^3.0.5"
+    "vitest": "^4.0.15"
   },
   "peerDependencies": {
     "tailwindcss": "^4.1.17"

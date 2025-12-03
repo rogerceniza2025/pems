@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient } from '@pems/database'
 import { Hono } from 'hono'
 import Redis from 'ioredis'
 
@@ -29,7 +29,9 @@ interface ServiceStatus {
 
 export function setupHealthRoutes(app: Hono) {
   const prisma = new PrismaClient()
-  const redis = new Redis(process.env.REDIS_URL)
+  const redis = process.env.REDIS_URL
+    ? new Redis(process.env.REDIS_URL)
+    : new Redis()
   const startTime = Date.now()
 
   // Basic health check
@@ -71,12 +73,23 @@ async function performHealthCheck(
     checkDisk(),
   ])
 
-  const [dbStatus, redisStatus, memoryStatus, diskStatus] = checks.map(
-    (result) =>
+  const results = checks.map(
+    (result): ServiceStatus =>
       result.status === 'fulfilled'
         ? result.value
-        : { status: 'error', error: 'Check failed' },
+        : {
+            status: 'error',
+            error: 'Check failed',
+            lastCheck: new Date().toISOString(),
+          },
   )
+
+  const [dbStatus, redisStatus, memoryStatus, diskStatus] = results as [
+    ServiceStatus,
+    ServiceStatus,
+    ServiceStatus,
+    ServiceStatus,
+  ]
 
   const overallStatus = determineOverallStatus([
     dbStatus,

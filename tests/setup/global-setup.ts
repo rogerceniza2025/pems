@@ -47,18 +47,19 @@ global.IntersectionObserver = vi.fn().mockImplementation(() => ({
 }))
 
 // Setup global test utilities
-import { setupTestDatabase } from '@tests/helpers/database'
-import { createTestFactories } from '@tests/helpers/factories'
+// Commented out for basic unit tests to avoid database dependencies
+// import { setupTestDatabase } from '@tests/helpers/database'
+// import { createTestFactories } from '@tests/helpers/factories'
 
-beforeAll(async () => {
-  await setupTestDatabase()
-  createTestFactories()
-})
+// beforeAll(async () => {
+//   await setupTestDatabase()
+//   createTestFactories()
+// })
 
-afterAll(async () => {
-  // Cleanup test database
-  await setupTestDatabase().cleanup()
-})
+// afterAll(async () => {
+//   // Cleanup test database
+//   await setupTestDatabase().cleanup()
+// })
 
 // Global test timeout
 vi.setConfig({ testTimeout: 10000 })

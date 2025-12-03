@@ -1,0 +1,208 @@
+# GitGuardian Configuration
+# This file configures GitGuardian secret detection for the PEMS project
+
+# Define patterns to ignore (false positives)
+paths-ignore:
+  - "**/*.test.js"
+  - "**/*.test.ts"
+  - "**/test/**"
+  - "**/tests/**"
+  - "**/fixtures/**"
+  - "**/mocks/**"
+  - "**/examples/**"
+  - "**/documentation/**"
+  - "**/docs/**"
+  - "package-lock.json"
+  - "yarn.lock"
+  - "pnpm-lock.yaml"
+  - "dist/**"
+  - "build/**"
+  - ".next/**"
+  - "node_modules/**"
+  - ".git/**"
+  - "coverage/**"
+  - ".nyc_output/**"
+  - ".pytest_cache/**"
+  - "__pycache__/**"
+
+# Define secrets to ignore (known test values)
+secrets-ignore:
+  - "test-token"
+  - "test-secret"
+  - "demo-api-key"
+  - "example-secret"
+  - "sample-token"
+  - "fake-key"
+  - "test-password"
+  - "demo-password"
+  - "mock-secret"
+  - "placeholder-token"
+  - "example-api-key"
+  - "dummy-secret"
+
+# Exclude common development configurations
+secrets-excluded-paths:
+  - "src/config/development.config.js"
+  - "src/config/local.config.js"
+  - ".env.example"
+  - ".env.sample"
+  - ".env.template"
+  - "docker-compose.override.yml"
+  "**/*.config.js"
+  "**/*.config.ts"
+  "scripts/development/**"
+
+# Enable detection for specific file types
+secrets-files:
+  - "**/*.js"
+  - "**/*.jsx"
+  - "**/*.ts"
+  - "**/*.tsx"
+  - "**/*.json"
+  - "**/*.yml"
+  - "**/*.yaml"
+  - "**/.env*"
+  - "**/*.config.*"
+  - "**/Dockerfile*"
+  - "**/Makefile"
+  - "Makefile"
+  - "**/*.sh"
+  - "**/*.py"
+  - "**/*.rb"
+  - "**/*.php"
+  - "**/*.java"
+  - "**/*.go"
+  - "**/*.rs"
+  - "**/*.c"
+  - "**/*.cpp"
+  - "**/*.h"
+
+# Configure custom secret patterns
+custom-secrets:
+  - name: "PEMS Internal Token"
+    description: "Internal PEMS authentication tokens"
+    pattern: "pems_[a-zA-Z0-9]{32,}"
+    examples:
+      - "pems_1234567890abcdef1234567890abcdef"
+
+  - name: "Database Connection String"
+    description: "Database connection strings"
+    pattern: "(mongodb|postgres|mysql)://[^\\s]+:[^\\s]+@[^\\s]+:[0-9]+/"
+    examples:
+      - "mongodb://user:password@localhost:27017/"
+      - "postgres://user:password@localhost:5432/"
+
+# Severity levels for different types of secrets
+severity:
+  # Critical: Production credentials
+  critical:
+    - "aws_access_key_id"
+    - "aws_secret_access_key"
+    - "private_key"
+    - "password"
+    - "secret_key"
+    - "api_key.*production"
+    - "database_url"
+
+  # High: Development/test credentials
+  high:
+    - "token"
+    - "api_key"
+    - "client_secret"
+    - "refresh_token"
+    - "access_token"
+
+  # Medium: Configuration values
+  medium:
+    - "license_key"
+    - "webhook_secret"
+    - "encryption_key"
+
+# Integration settings
+integrations:
+  # GitHub integration
+  github:
+    # Create pull request comments for new secrets
+    pr-comments: true
+
+    # Create status checks
+    status-checks: true
+
+    # Block merge if high severity secrets found
+    block-on-high-severity: true
+
+    # Allowlisted branches (no blocking)
+    allowed-branches:
+      - "main"
+      - "develop"
+      - "release/*"
+
+    # Configure PR check behavior
+    pr-check:
+      # Only check changed files
+      changed-files-only: true
+
+      # Max secrets to show in PR comment
+      max-secrets-shown: 10
+
+# Notification settings
+notifications:
+  # Slack integration
+  slack:
+    enabled: false
+    webhook-url: "https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK"
+    channel: "#security-alerts"
+
+  # Email notifications
+  email:
+    enabled: false
+    recipients:
+      - "security@pems.com"
+
+# Advanced settings
+advanced:
+  # Enable secret scanning on file rename
+  scan-renamed-files: true
+
+  # Maximum file size to scan (in MB)
+  max-file-size: 5
+
+  # Enable entropy analysis for unknown patterns
+  entropy-analysis: true
+
+  # Minimum entropy threshold (0-8)
+  min-entropy-threshold: 3.5
+
+  # Ignore files larger than this (in KB)
+  ignore-large-files: 100
+
+# Monitoring and reporting
+monitoring:
+  # Track secret trends
+  trend-analysis: true
+
+  # Generate weekly reports
+  weekly-reports: true
+
+  # Dashboard configuration
+  dashboard:
+    show-severity-breakdown: true
+    show-trend-charts: true
+    show-recent-secrets: true
+
+# Compliance settings
+compliance:
+  # OWASP compliance
+  owasp:
+    enabled: true
+    level: "high"  # high, medium, low
+
+  # GDPR compliance
+  gdpr:
+    enabled: true
+    notify-on-pii: true
+
+  # SOC 2 compliance
+  soc2:
+    enabled: true
+    track-access-controls: true

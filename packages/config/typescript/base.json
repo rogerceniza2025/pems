@@ -28,7 +28,7 @@
     "strictPropertyInitialization": true,
     "alwaysStrict": true,
     "noImplicitOverride": true,
-    "exactOptionalPropertyTypes": true,
+    "exactOptionalPropertyTypes": false,
     "noPropertyAccessFromIndexSignature": false
   },
   "include": ["src/**/*", "**/*.ts", "**/*.tsx"],
