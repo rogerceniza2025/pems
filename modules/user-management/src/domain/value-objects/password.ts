@@ -13,13 +13,14 @@ export class Password {
   private readonly REQUIRE_NUMBERS = true
   private readonly REQUIRE_SPECIAL_CHARS = true
 
-  constructor(private readonly value: string) {
-    if (!this.isValid(value)) {
+  constructor(private readonly value: string, private readonly isHashed: boolean = false) {
+    // Only validate plain text passwords, not hashed ones
+    if (!isHashed && !this.isValidForPlain(value)) {
       throw new InvalidPasswordError()
     }
   }
 
-  private isValid(password: string): boolean {
+  private isValidForPlain(password: string): boolean {
     if (password.length < this.MIN_LENGTH) return false
 
     if (this.REQUIRE_UPPERCASE && !/[A-Z]/.test(password)) return false
@@ -71,6 +72,39 @@ export class Password {
     const strength = score <= 2 ? 'weak' : score <= 4 ? 'medium' : 'strong'
 
     return { strength, score, feedback }
+  }
+
+  // Static methods for test compatibility  static async create(plainPassword: string): Promise<Password> {    // Validate the plain password policy first    const validation = Password.validatePolicy(plainPassword)    if (!validation.isValid) {      throw new InvalidPasswordError(`${validation.errors.join(", ")}`)    }    const salt = await bcrypt.genSalt(12)    const hashedPassword = await bcrypt.hash(plainPassword, salt)    return new Password(hashedPassword, true)  }
+  }
+
+  }
+  static createFromHash(hashedPassword: string): Password {
+    return new Password(hashedPassword)
+  }
+
+  static validatePolicy(password: string): { isValid: boolean; errors: string[] } {
+    const errors: string[] = []
+
+    if (password.length < 8) {
+      errors.push('Password must be at least 8 characters long')
+    }
+    if (!/[A-Z]/.test(password)) {
+      errors.push('Password must contain at least one uppercase letter')
+    }
+    if (!/[a-z]/.test(password)) {
+      errors.push('Password must contain at least one lowercase letter')
+    }
+    if (!/\d/.test(password)) {
+      errors.push('Password must contain at least one number')
+    }
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+      errors.push('Password must contain at least one special character')
+    }
+
+    return {
+      isValid: errors.length === 0,
+      errors
+    }
   }
 }
 

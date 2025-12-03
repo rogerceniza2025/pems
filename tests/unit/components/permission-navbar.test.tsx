@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { render, screen, fireEvent, waitFor } from '@testing-library/solid'
+import { render, screen, fireEvent } from 'solid-testing-library'
 import { Role } from '@packages/infrastructure/auth/src/rbac'
 import {
   createTestNavigationStructure,

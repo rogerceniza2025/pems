@@ -146,7 +146,7 @@ describe('NavigationService', () => {
         permissions: [],
         role: 'viewer',
         isSystemAdmin: false
-      })
+      });
 
       const navigationItems = await navigationService.getNavigationForUser(
         userContext

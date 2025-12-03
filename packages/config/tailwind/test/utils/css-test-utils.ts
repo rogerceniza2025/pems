@@ -201,10 +201,10 @@ export function expectReducedMotionSupport(element: HTMLElement) {
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function renderComponent(component: any): HTMLElement {
-  const container = document.createElement('div')
+  const container = document.createElement("div")
   document.body.appendChild(container)
 
-  // Use hydrate instead of render to avoid server-side rendering issues
+  // Use render to avoid server-side rendering issues
   render(() => component, container)
 
   return container.firstChild as HTMLElement

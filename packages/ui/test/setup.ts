@@ -12,6 +12,15 @@
 // Import CSS test utilities to make them globally available
 import '@pems/config-tailwind/test/utils/css-test-utils'
 
+// Configure Solid.js for client-side testing
+global.isServer = false
+
+// Mock server-side rendering APIs to force client-side mode
+Object.defineProperty(global, "window", {
+  value: global.window,
+  writable: true
+})
+
 // Setup global test environment
 beforeEach(() => {
   // Mock window.location to avoid triggering browser-specific behavior
