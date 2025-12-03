@@ -1,6 +1,12 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { NextRequest, NextResponse } from 'next/server'
-import { authMiddleware } from '@packages/infrastructure/middleware/src/auth-middleware'
+// Mock Next.js server components for TanStack Start migration
+const NextRequest = vi.fn()
+const NextResponse = {
+  json: vi.fn(),
+  redirect: vi.fn(),
+  next: vi.fn(),
+}
+import { authMiddleware } from './packages/infrastructure/middleware/src'
 import { betterAuth } from 'better-auth'
 
 // Mock betterAuth

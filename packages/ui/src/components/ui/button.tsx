@@ -289,22 +289,24 @@ const Button = <T extends ValidComponent = 'button'>(
 
       {/* Ripple effects */}
       <Show when={local.ripple && !prefersReducedMotion()}>
-        <Portal>
-          <For each={ripples()}>
-            {(ripple) => (
-              <span
-                class="absolute pointer-events-none rounded-full bg-current opacity-30 animate-ping"
-                style={{
-                  left: `${ripple.x}px`,
-                  top: `${ripple.y}px`,
-                  width: `${ripple.size}px`,
-                  height: `${ripple.size}px`,
-                  'background-color': local.rippleColor ?? 'currentColor',
-                }}
-              />
-            )}
-          </For>
-        </Portal>
+        <Show when={typeof window !== 'undefined'}>
+          <Portal>
+            <For each={ripples()}>
+              {(ripple) => (
+                <span
+                  class="absolute pointer-events-none rounded-full bg-current opacity-30 animate-ping"
+                  style={{
+                    left: `${ripple.x}px`,
+                    top: `${ripple.y}px`,
+                    width: `${ripple.size}px`,
+                    height: `${ripple.size}px`,
+                    'background-color': local.rippleColor ?? 'currentColor',
+                  }}
+                />
+              )}
+            </For>
+          </Portal>
+        </Show>
       </Show>
     </ButtonPrimitive.Root>
   )

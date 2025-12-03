@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import bcrypt from 'bcryptjs'
-import { Password } from '@modules/user-management/src/domain/value-objects/password'
+import { Password } from '../../../modules/user-management/src/domain/value-objects/password'
 
 // Mock bcrypt for consistent testing
 vi.mock('bcryptjs', () => ({
