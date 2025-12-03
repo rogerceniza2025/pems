@@ -108,14 +108,20 @@ describe('Animation Utilities', () => {
 
   describe('Transition Utilities', () => {
     it('should generate transition CSS strings', () => {
-      const createTransition = (properties: string[], duration: string, easing: string) => {
-        return properties.map(prop => `${prop} ${duration} ${easing}`).join(', ')
+      const createTransition = (
+        properties: string[],
+        duration: string,
+        easing: string,
+      ) => {
+        return properties
+          .map((prop) => `${prop} ${duration} ${easing}`)
+          .join(', ')
       }
 
       const transition = createTransition(
         ['opacity', 'transform'],
         '250ms',
-        'cubic-bezier(0.4, 0, 0.2, 1)'
+        'cubic-bezier(0.4, 0, 0.2, 1)',
       )
 
       expect(transition).toContain('opacity 250ms')
@@ -124,11 +130,19 @@ describe('Animation Utilities', () => {
     })
 
     it('should handle single property transitions', () => {
-      const createTransition = (property: string, duration: string, easing: string) => {
+      const createTransition = (
+        property: string,
+        duration: string,
+        easing: string,
+      ) => {
         return `${property} ${duration} ${easing}`
       }
 
-      const transition = createTransition('background-color', '200ms', 'ease-in-out')
+      const transition = createTransition(
+        'background-color',
+        '200ms',
+        'ease-in-out',
+      )
 
       expect(transition).toBe('background-color 200ms ease-in-out')
     })
@@ -146,7 +160,10 @@ describe('Animation Utilities', () => {
       // Simulate adding animation end listener
       element.addEventListener('animationend', mockCallback)
 
-      expect(element.addEventListener).toHaveBeenCalledWith('animationend', mockCallback)
+      expect(element.addEventListener).toHaveBeenCalledWith(
+        'animationend',
+        mockCallback,
+      )
     })
 
     it('should handle transition end events', () => {
@@ -160,7 +177,10 @@ describe('Animation Utilities', () => {
       // Simulate adding transition end listener
       element.addEventListener('transitionend', mockCallback)
 
-      expect(element.addEventListener).toHaveBeenCalledWith('transitionend', mockCallback)
+      expect(element.addEventListener).toHaveBeenCalledWith(
+        'transitionend',
+        mockCallback,
+      )
     })
   })
 
@@ -169,13 +189,14 @@ describe('Animation Utilities', () => {
       const performantProperties = ['transform', 'opacity']
       const nonPerformantProperties = ['width', 'height', 'left', 'top']
 
-      const isPerformant = (property: string) => performantProperties.includes(property)
+      const isPerformant = (property: string) =>
+        performantProperties.includes(property)
 
-      performantProperties.forEach(prop => {
+      performantProperties.forEach((prop) => {
         expect(isPerformant(prop)).toBe(true)
       })
 
-      nonPerformantProperties.forEach(prop => {
+      nonPerformantProperties.forEach((prop) => {
         expect(isPerformant(prop)).toBe(false)
       })
     })
@@ -200,14 +221,18 @@ describe('Animation Utilities', () => {
 
   describe('Accessibility', () => {
     it('should respect reduced motion preferences', () => {
-      const shouldAnimate = (prefersReducedMotion: boolean) => !prefersReducedMotion
+      const shouldAnimate = (prefersReducedMotion: boolean) =>
+        !prefersReducedMotion
 
       expect(shouldAnimate(false)).toBe(true)
       expect(shouldAnimate(true)).toBe(false)
     })
 
     it('should provide alternative content for animations', () => {
-      const createAnimatedElement = (animated: boolean, fallbackContent: string) => {
+      const createAnimatedElement = (
+        animated: boolean,
+        fallbackContent: string,
+      ) => {
         return {
           animated,
           'aria-label': animated ? undefined : fallbackContent,

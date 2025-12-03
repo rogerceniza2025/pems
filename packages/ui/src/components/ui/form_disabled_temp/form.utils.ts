@@ -5,7 +5,7 @@ import {
   type FormStore,
 } from '@tanstack/solid-form'
 import { createEffect, createSignal } from 'solid-js'
-import type { z } from 'zod'
+import { z } from 'zod'
 
 import type { ValidationState } from '../input'
 import type {
@@ -19,7 +19,7 @@ import type {
  * Zod validator adapter for TanStack Form
  */
 export function zodValidator<T extends FieldValues>(
-  schema: ZodSchema<T>,
+  schema: z.ZodSchema<T>,
 ): {
   validate: (
     value: unknown,
@@ -34,7 +34,7 @@ export function zodValidator<T extends FieldValues>(
         return { data: result.data }
       } else {
         const errors: Record<string, string[]> = {}
-        result.error.issues.forEach((issue) => {
+        result.error.issues.forEach((issue: any) => {
           const path = issue.path.join('.')
           if (!errors[path]) {
             errors[path] = []
@@ -58,14 +58,15 @@ export function zodValidator<T extends FieldValues>(
             return undefined
           } else {
             const fieldError = fullResult.error.issues.find(
-              (issue) => issue.path.length === 1 && issue.path[0] === field,
+              (issue: any) =>
+                issue.path.length === 1 && issue.path[0] === field,
             )
             return fieldError?.message
           }
         } else {
           return result.error.issues[0]?.message
         }
-      } catch (error) {
+      } catch {
         return 'Validation error'
       }
     },
@@ -83,17 +84,6 @@ export function createForm<T extends FieldValues>(
     onSubmit: async ({ value }) => {
       if (config.onSubmit) {
         await config.onSubmit(value)
-      }
-    },
-    onSubmitInvalid: ({ formApi }) => {
-      const errors = Object.entries(formApi.state.errors).map(
-        ([field, messages]) => ({
-          field,
-          message: Array.isArray(messages) ? messages[0] : messages,
-        }),
-      )
-      if (config.onValidationError) {
-        config.onValidationError(errors)
       }
     },
     validators: {
@@ -287,7 +277,7 @@ export async function validateForm<T extends FieldValues>(
   try {
     await form.validateAllFields()
     return !hasValidationErrors(form.state)
-  } catch (error) {
+  } catch {
     return false
   }
 }
@@ -336,7 +326,7 @@ export function createFieldValidationSignal<T extends FieldValues>(
       const error = getErrorMessage(form.state.errors[fieldName as string])
       return mapValidationState(
         !error,
-        field.state.meta.isTouched || false,
+        field.state.meta.isTouched ?? false,
         error ? [error] : [],
       )
     },
@@ -373,7 +363,7 @@ export function isFieldRequired<T extends FieldValues>(
   fieldName: keyof T,
 ): boolean {
   const field = form.getFieldInfo(fieldName as string)
-  return field.state.meta.isRequired || false
+  return field.state.meta.isRequired ?? false
 }
 
 /**
@@ -384,7 +374,7 @@ export function isFieldDisabled<T extends FieldValues>(
   fieldName: keyof T,
 ): boolean {
   const field = form.getFieldInfo(fieldName as string)
-  return field.state.meta.isDisabled || false
+  return field.state.meta.isDisabled ?? false
 }
 
 /**

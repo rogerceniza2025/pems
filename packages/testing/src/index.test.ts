@@ -4,14 +4,14 @@ import {
   createMockEvent,
   createTestTenant,
   createTestUser,
-  mockApiResponse
+  mockApiResponse,
 } from './index'
 
 describe('Testing Utilities', () => {
   describe('createTestUser', () => {
     it('should create a test user with default values', () => {
       const user = createTestUser()
-      
+
       expect(user.id).toBe('test-user-id')
       expect(user.email).toBe('test@example.com')
       expect(user.name).toBe('Test User')
@@ -21,10 +21,10 @@ describe('Testing Utilities', () => {
     it('should create a test user with overridden values', () => {
       const overrides = {
         id: 'custom-id',
-        email: 'custom@example.com'
+        email: 'custom@example.com',
       }
       const user = createTestUser(overrides)
-      
+
       expect(user.id).toBe('custom-id')
       expect(user.email).toBe('custom@example.com')
       expect(user.name).toBe('Test User') // Default value
@@ -33,7 +33,7 @@ describe('Testing Utilities', () => {
 
     it('should handle partial overrides correctly', () => {
       const user = createTestUser({ name: 'Custom Name' })
-      
+
       expect(user.name).toBe('Custom Name')
       expect(user.email).toBe('test@example.com') // Default value
     })
@@ -42,7 +42,7 @@ describe('Testing Utilities', () => {
   describe('createTestTenant', () => {
     it('should create a test tenant with default values', () => {
       const tenant = createTestTenant()
-      
+
       expect(tenant.id).toBe('test-tenant-id')
       expect(tenant.name).toBe('Test Tenant')
       expect(tenant.slug).toBe('test-tenant')
@@ -51,10 +51,10 @@ describe('Testing Utilities', () => {
     it('should create a test tenant with overridden values', () => {
       const overrides = {
         id: 'custom-tenant-id',
-        name: 'Custom Tenant'
+        name: 'Custom Tenant',
       }
       const tenant = createTestTenant(overrides)
-      
+
       expect(tenant.id).toBe('custom-tenant-id')
       expect(tenant.name).toBe('Custom Tenant')
       expect(tenant.slug).toBe('test-tenant') // Default value
@@ -62,36 +62,33 @@ describe('Testing Utilities', () => {
   })
 
   describe('mockApiResponse', () => {
-    beforeEach(() => {
-      vi.useFakeTimers()
-    })
-
-    afterEach(() => {
-      vi.useRealTimers()
-    })
-
     it('should resolve with data immediately when no delay', async () => {
       const testData = { message: 'test' }
       const result = await mockApiResponse(testData)
-      
+
       expect(result).toEqual(testData)
     })
 
     it('should resolve with data after delay', async () => {
+      vi.useFakeTimers()
+
       const testData = { message: 'test' }
-      
-      // Fast forward time
+      const promise = mockApiResponse(testData, 100)
+
+      // Fast forward time to resolve the promise
       vi.advanceTimersByTime(100)
-      const result = await vi.runAllTimersAsync()
-      
+      const result = await promise
+
       expect(result).toEqual(testData)
+
+      vi.useRealTimers()
     })
   })
 
   describe('createMockEvent', () => {
     it('should create a mock event with default values', () => {
       const event = createMockEvent()
-      
+
       expect(event.type).toBe('click')
       expect(event.bubbles).toBe(true)
       expect(event.cancelable).toBe(true)
@@ -100,10 +97,10 @@ describe('Testing Utilities', () => {
     it('should create a mock event with overridden values', () => {
       const overrides = {
         type: 'mouseover',
-        bubbles: false
+        bubbles: false,
       }
       const event = createMockEvent(overrides)
-      
+
       expect(event.type).toBe('mouseover')
       expect(event.bubbles).toBe(false)
       expect(event.cancelable).toBe(true) // Default value
@@ -116,9 +113,9 @@ describe('Testing Utilities', () => {
         id: 'test',
         email: 'test@example.com',
         name: 'Test',
-        tenantId: 'tenant'
+        tenantId: 'tenant',
       }
-      
+
       expect(user.id).toBe('test')
       expect(user.email).toBe('test@example.com')
       expect(user.name).toBe('Test')
@@ -129,9 +126,9 @@ describe('Testing Utilities', () => {
       const tenant: TestTenant = {
         id: 'tenant-id',
         name: 'Tenant Name',
-        slug: 'tenant-slug'
+        slug: 'tenant-slug',
       }
-      
+
       expect(tenant.id).toBe('tenant-id')
       expect(tenant.name).toBe('Tenant Name')
       expect(tenant.slug).toBe('tenant-slug')

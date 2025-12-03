@@ -1,1 +1,219 @@
-{"numTotalTestSuites":9,"numPassedTestSuites":5,"numFailedTestSuites":4,"numPendingTestSuites":0,"numTotalTests":13,"numPassedTests":13,"numFailedTests":0,"numPendingTests":0,"numTodoTests":0,"snapshot":{"added":0,"failure":false,"filesAdded":0,"filesRemoved":0,"filesRemovedList":[],"filesUnmatched":0,"filesUpdated":0,"matched":0,"total":0,"unchecked":0,"uncheckedKeysByFile":[],"unmatched":0,"updated":0,"didUpdate":false},"startTime":1764664151779,"success":false,"testResults":[{"assertionResults":[],"startTime":1764664151779,"endTime":1764664151779,"status":"failed","message":"Cannot find package 'next/server' imported from 'D:/pems/tests/unit/auth/auth-middleware.test.ts'","name":"D:/pems/tests/unit/auth/auth-middleware.test.ts"},{"assertionResults":[],"startTime":1764664151779,"endTime":1764664151779,"status":"failed","message":"Cannot find package 'next/server' imported from 'D:/pems/tests/unit/auth/authorization-middleware.test.ts'","name":"D:/pems/tests/unit/auth/authorization-middleware.test.ts"},{"assertionResults":[],"startTime":1764664151779,"endTime":1764664151779,"status":"failed","message":"Cannot find package '@packages/infrastructure/auth/src/index' imported from 'D:/pems/tests/unit/auth/better-auth-config.test.ts'","name":"D:/pems/tests/unit/auth/better-auth-config.test.ts"},{"assertionResults":[{"ancestorTitles":["Password Security (Standalone)","Password Validation"],"fullName":"Password Security (Standalone) Password Validation should accept strong password","status":"passed","title":"should accept strong password","duration":5.681700000000092,"failureMessages":[],"meta":{}},{"ancestorTitles":["Password Security (Standalone)","Password Validation"],"fullName":"Password Security (Standalone) Password Validation should reject short password","status":"passed","title":"should reject short password","duration":1.688199999999597,"failureMessages":[],"meta":{}},{"ancestorTitles":["Password Security (Standalone)","Password Validation"],"fullName":"Password Security (Standalone) Password Validation should reject password without uppercase","status":"passed","title":"should reject password without uppercase","duration":0.7448000000003958,"failureMessages":[],"meta":{}},{"ancestorTitles":["Password Security (Standalone)","Password Validation"],"fullName":"Password Security (Standalone) Password Validation should reject password without lowercase","status":"passed","title":"should reject password without lowercase","duration":0.8517999999994572,"failureMessages":[],"meta":{}},{"ancestorTitles":["Password Security (Standalone)","Password Validation"],"fullName":"Password Security (Standalone) Password Validation should reject password without numbers","status":"passed","title":"should reject password without numbers","duration":0.9528999999993175,"failureMessages":[],"meta":{}},{"ancestorTitles":["Password Security (Standalone)","Password Validation"],"fullName":"Password Security (Standalone) Password Validation should reject password without special characters","status":"passed","title":"should reject password without special characters","duration":0.6045000000003711,"failureMessages":[],"meta":{}},{"ancestorTitles":["Password Security (Standalone)","Password Validation"],"fullName":"Password Security (Standalone) Password Validation should reject password with repeated characters","status":"passed","title":"should reject password with repeated characters","duration":0.5252000000000407,"failureMessages":[],"meta":{}},{"ancestorTitles":["Password Security (Standalone)","Password Strength Calculation"],"fullName":"Password Security (Standalone) Password Strength Calculation should calculate high strength for strong password","status":"passed","title":"should calculate high strength for strong password","duration":0.4710000000004584,"failureMessages":[],"meta":{}},{"ancestorTitles":["Password Security (Standalone)","Password Strength Calculation"],"fullName":"Password Security (Standalone) Password Strength Calculation should calculate medium strength for moderate password","status":"passed","title":"should calculate medium strength for moderate password","duration":0.6831999999994878,"failureMessages":[],"meta":{}},{"ancestorTitles":["Password Security (Standalone)","Password Strength Calculation"],"fullName":"Password Security (Standalone) Password Strength Calculation should calculate low strength for weak password","status":"passed","title":"should calculate low strength for weak password","duration":0.4940999999998894,"failureMessages":[],"meta":{}},{"ancestorTitles":["Password Security (Standalone)","Edge Cases"],"fullName":"Password Security (Standalone) Edge Cases should handle empty password","status":"passed","title":"should handle empty password","duration":0.533900000000358,"failureMessages":[],"meta":{}},{"ancestorTitles":["Password Security (Standalone)","Edge Cases"],"fullName":"Password Security (Standalone) Edge Cases should handle password with only special characters","status":"passed","title":"should handle password with only special characters","duration":0.8494000000000597,"failureMessages":[],"meta":{}},{"ancestorTitles":["Password Security (Standalone)","Edge Cases"],"fullName":"Password Security (Standalone) Edge Cases should handle password with unicode characters","status":"passed","title":"should handle password with unicode characters","duration":0.5357000000003609,"failureMessages":[],"meta":{}}],"startTime":1764664159431,"endTime":1764664159447.5356,"status":"passed","message":"","name":"D:/pems/tests/unit/auth/password-standalone.test.ts"},{"assertionResults":[],"startTime":1764664151779,"endTime":1764664151779,"status":"failed","message":"Cannot find package '@modules/user-management/src/domain/value-objects/password' imported from 'D:/pems/tests/unit/auth/password.test.ts'","name":"D:/pems/tests/unit/auth/password.test.ts"}]}
+{
+  "numTotalTestSuites": 9,
+  "numPassedTestSuites": 5,
+  "numFailedTestSuites": 4,
+  "numPendingTestSuites": 0,
+  "numTotalTests": 13,
+  "numPassedTests": 13,
+  "numFailedTests": 0,
+  "numPendingTests": 0,
+  "numTodoTests": 0,
+  "snapshot": {
+    "added": 0,
+    "failure": false,
+    "filesAdded": 0,
+    "filesRemoved": 0,
+    "filesRemovedList": [],
+    "filesUnmatched": 0,
+    "filesUpdated": 0,
+    "matched": 0,
+    "total": 0,
+    "unchecked": 0,
+    "uncheckedKeysByFile": [],
+    "unmatched": 0,
+    "updated": 0,
+    "didUpdate": false
+  },
+  "startTime": 1764714561067,
+  "success": false,
+  "testResults": [
+    {
+      "assertionResults": [],
+      "startTime": 1764714561067,
+      "endTime": 1764714561067,
+      "status": "failed",
+      "message": "Cannot find package 'next/server' imported from 'D:/pems/tests/unit/auth/auth-middleware.test.ts'",
+      "name": "D:/pems/tests/unit/auth/auth-middleware.test.ts"
+    },
+    {
+      "assertionResults": [],
+      "startTime": 1764714561067,
+      "endTime": 1764714561067,
+      "status": "failed",
+      "message": "Cannot find package 'next/server' imported from 'D:/pems/tests/unit/auth/authorization-middleware.test.ts'",
+      "name": "D:/pems/tests/unit/auth/authorization-middleware.test.ts"
+    },
+    {
+      "assertionResults": [],
+      "startTime": 1764714561067,
+      "endTime": 1764714561067,
+      "status": "failed",
+      "message": "Cannot find package '@packages/infrastructure/auth/src/index' imported from 'D:/pems/tests/unit/auth/better-auth-config.test.ts'",
+      "name": "D:/pems/tests/unit/auth/better-auth-config.test.ts"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": [
+            "Password Security (Standalone)",
+            "Password Validation"
+          ],
+          "fullName": "Password Security (Standalone) Password Validation should accept strong password",
+          "status": "passed",
+          "title": "should accept strong password",
+          "duration": 3.359399999999937,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": [
+            "Password Security (Standalone)",
+            "Password Validation"
+          ],
+          "fullName": "Password Security (Standalone) Password Validation should reject short password",
+          "status": "passed",
+          "title": "should reject short password",
+          "duration": 1.0027999999999793,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": [
+            "Password Security (Standalone)",
+            "Password Validation"
+          ],
+          "fullName": "Password Security (Standalone) Password Validation should reject password without uppercase",
+          "status": "passed",
+          "title": "should reject password without uppercase",
+          "duration": 0.408800000000042,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": [
+            "Password Security (Standalone)",
+            "Password Validation"
+          ],
+          "fullName": "Password Security (Standalone) Password Validation should reject password without lowercase",
+          "status": "passed",
+          "title": "should reject password without lowercase",
+          "duration": 0.44020000000000437,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": [
+            "Password Security (Standalone)",
+            "Password Validation"
+          ],
+          "fullName": "Password Security (Standalone) Password Validation should reject password without numbers",
+          "status": "passed",
+          "title": "should reject password without numbers",
+          "duration": 0.49739999999997053,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": [
+            "Password Security (Standalone)",
+            "Password Validation"
+          ],
+          "fullName": "Password Security (Standalone) Password Validation should reject password without special characters",
+          "status": "passed",
+          "title": "should reject password without special characters",
+          "duration": 0.33609999999998763,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": [
+            "Password Security (Standalone)",
+            "Password Validation"
+          ],
+          "fullName": "Password Security (Standalone) Password Validation should reject password with repeated characters",
+          "status": "passed",
+          "title": "should reject password with repeated characters",
+          "duration": 0.37259999999992033,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": [
+            "Password Security (Standalone)",
+            "Password Strength Calculation"
+          ],
+          "fullName": "Password Security (Standalone) Password Strength Calculation should calculate high strength for strong password",
+          "status": "passed",
+          "title": "should calculate high strength for strong password",
+          "duration": 0.3488000000000966,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": [
+            "Password Security (Standalone)",
+            "Password Strength Calculation"
+          ],
+          "fullName": "Password Security (Standalone) Password Strength Calculation should calculate medium strength for moderate password",
+          "status": "passed",
+          "title": "should calculate medium strength for moderate password",
+          "duration": 0.4155999999999267,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": [
+            "Password Security (Standalone)",
+            "Password Strength Calculation"
+          ],
+          "fullName": "Password Security (Standalone) Password Strength Calculation should calculate low strength for weak password",
+          "status": "passed",
+          "title": "should calculate low strength for weak password",
+          "duration": 0.2923999999999296,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Password Security (Standalone)", "Edge Cases"],
+          "fullName": "Password Security (Standalone) Edge Cases should handle empty password",
+          "status": "passed",
+          "title": "should handle empty password",
+          "duration": 0.30930000000000746,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Password Security (Standalone)", "Edge Cases"],
+          "fullName": "Password Security (Standalone) Edge Cases should handle password with only special characters",
+          "status": "passed",
+          "title": "should handle password with only special characters",
+          "duration": 0.4674999999999727,
+          "failureMessages": [],
+          "meta": {}
+        },
+        {
+          "ancestorTitles": ["Password Security (Standalone)", "Edge Cases"],
+          "fullName": "Password Security (Standalone) Edge Cases should handle password with unicode characters",
+          "status": "passed",
+          "title": "should handle password with unicode characters",
+          "duration": 0.27959999999995944,
+          "failureMessages": [],
+          "meta": {}
+        }
+      ],
+      "startTime": 1764714561426,
+      "endTime": 1764714561436.2795,
+      "status": "passed",
+      "message": "",
+      "name": "D:/pems/tests/unit/auth/password-standalone.test.ts"
+    },
+    {
+      "assertionResults": [],
+      "startTime": 1764714561067,
+      "endTime": 1764714561067,
+      "status": "failed",
+      "message": "Cannot find package '@modules/user-management/src/domain/value-objects/password' imported from 'D:/pems/tests/unit/auth/password.test.ts'",
+      "name": "D:/pems/tests/unit/auth/password.test.ts"
+    }
+  ]
+}

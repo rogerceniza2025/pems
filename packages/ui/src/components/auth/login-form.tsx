@@ -1,4 +1,4 @@
-import { createSignal, Show } from 'solid-js'
+import { createSignal, Show, createEffect } from 'solid-js'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 import { Label } from '../ui/label'
@@ -38,7 +38,14 @@ export interface LoginFormProps {
 export const LoginForm = (props: LoginFormProps) => {
   const [email, setEmail] = createSignal('')
   const [password, setPassword] = createSignal('')
-  const [tenantId, setTenantId] = createSignal(props.selectedTenant || '')
+  const [tenantId, setTenantId] = createSignal(props.selectedTenant ?? '')
+
+  // Track selectedTenant prop changes
+  createEffect(() => {
+    if (props.selectedTenant !== undefined) {
+      setTenantId(props.selectedTenant)
+    }
+  })
   const [mfaCode, setMfaCode] = createSignal('')
   const [isLoading, setIsLoading] = createSignal(false)
   const [error, setError] = createSignal('')
@@ -96,8 +103,7 @@ export const LoginForm = (props: LoginFormProps) => {
         <CardDescription>
           {props.requiresMFA
             ? 'Enter your multi-factor authentication code to continue'
-            : 'Enter your credentials to access your account'
-          }
+            : 'Enter your credentials to access your account'}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -111,10 +117,12 @@ export const LoginForm = (props: LoginFormProps) => {
                 value={tenantId()}
                 onChange={setTenantId}
                 disabled={isLoading() || props.loading}
-                options={props.tenants?.map(tenant => ({
-                  value: tenant.id,
-                  label: tenant.name
-                })) || []}
+                options={
+                  props.tenants?.map((tenant) => ({
+                    value: tenant.id,
+                    label: tenant.name,
+                  })) ?? []
+                }
               />
             </div>
 
@@ -156,7 +164,9 @@ export const LoginForm = (props: LoginFormProps) => {
                 placeholder="Enter 6-digit code"
                 value={mfaCode()}
                 onInput={(e) => {
-                  const value = e.currentTarget.value.replace(/\D/g, '').slice(0, 6)
+                  const value = e.currentTarget.value
+                    .replace(/\D/g, '')
+                    .slice(0, 6)
                   setMfaCode(value)
                 }}
                 maxLength={6}
@@ -168,10 +178,8 @@ export const LoginForm = (props: LoginFormProps) => {
             </div>
           </Show>
 
-          <Show when={error() || props.error}>
-            <Alert variant="destructive">
-              {error() || props.error}
-            </Alert>
+          <Show when={error() ?? props.error}>
+            <Alert variant="destructive">{error() ?? props.error}</Alert>
           </Show>
 
           <Button
@@ -180,9 +188,12 @@ export const LoginForm = (props: LoginFormProps) => {
             disabled={isLoading() || props.loading}
           >
             {isLoading() || props.loading
-              ? (props.requiresMFA ? 'Verifying...' : 'Signing in...')
-              : (props.requiresMFA ? 'Verify Code' : 'Sign In')
-            }
+              ? props.requiresMFA
+                ? 'Verifying...'
+                : 'Signing in...'
+              : props.requiresMFA
+                ? 'Verify Code'
+                : 'Sign In'}
           </Button>
 
           <Show when={!props.requiresMFA}>

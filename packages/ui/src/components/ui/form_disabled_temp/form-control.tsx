@@ -31,12 +31,8 @@ export const FormControl = (props: FormControlProps) => {
 
   return (
     <div
-      class={cn(
-        'relative w-full',
-        getValidationClasses(),
-        local.class,
-      )}
-      data-validation-state={local.validationState || 'none'}
+      class={cn('relative w-full', getValidationClasses(), local.class)}
+      data-validation-state={local.validationState ?? 'none'}
       {...others}
     >
       {local.children}
@@ -74,8 +70,9 @@ export const FormControlGroup = (props: {
   return (
     <div
       class={cn(
-        orientationClasses[local.orientation || 'vertical'],
-        local.orientation === 'horizontal' && spacingClasses[local.spacing || 'normal'],
+        orientationClasses[local.orientation ?? 'vertical'],
+        local.orientation === 'horizontal' &&
+          spacingClasses[local.spacing ?? 'normal'],
         local.class,
       )}
       {...others}
@@ -139,11 +136,13 @@ export const FormControlWithAddon = (props: {
 
       {/* Form Control */}
       <FormControl validationState={local.validationState}>
-        <div class={cn(
-          getValidationClasses(),
-          getInputPaddingClasses(),
-          'relative w-full'
-        )}>
+        <div
+          class={cn(
+            getValidationClasses(),
+            getInputPaddingClasses(),
+            'relative w-full',
+          )}
+        >
           {local.children}
         </div>
       </FormControl>
@@ -176,7 +175,7 @@ export const FormControlWithIcon = (props: {
     'children',
   ])
 
-  const iconPosition = local.iconPosition || 'left'
+  const iconPosition = local.iconPosition ?? 'left'
   const hasIcon = !!local.icon
 
   const getValidationClasses = () => {
@@ -205,7 +204,7 @@ export const FormControlWithIcon = (props: {
         <div
           class={cn(
             'absolute top-1/2 transform -translate-y-1/2 text-muted-foreground z-10',
-            iconPosition === 'left' ? 'left-3' : 'right-3'
+            iconPosition === 'left' ? 'left-3' : 'right-3',
           )}
         >
           {local.icon}
@@ -214,11 +213,13 @@ export const FormControlWithIcon = (props: {
 
       {/* Form Control */}
       <FormControl validationState={local.validationState}>
-        <div class={cn(
-          getValidationClasses(),
-          getInputPaddingClasses(),
-          'relative w-full'
-        )}>
+        <div
+          class={cn(
+            getValidationClasses(),
+            getInputPaddingClasses(),
+            'relative w-full',
+          )}
+        >
           {local.children}
         </div>
       </FormControl>
@@ -322,19 +323,22 @@ export const FormControlWithValidation = (props: {
     }
   }
 
-  const shouldShowValidation = local.validationState &&
+  const shouldShowValidation =
+    local.validationState &&
     local.validationState !== 'none' &&
-    (local.validationMessage || local.showValidationIcon)
+    (local.validationMessage ?? local.showValidationIcon)
 
   return (
     <div class={cn('relative w-full', local.class)} {...others}>
       {/* Form Control */}
       <FormControl validationState={local.validationState}>
-        <div class={cn(
-          getValidationClasses(),
-          shouldShowValidation ? 'pr-10' : '',
-          'relative w-full'
-        )}>
+        <div
+          class={cn(
+            getValidationClasses(),
+            shouldShowValidation ? 'pr-10' : '',
+            'relative w-full',
+          )}
+        >
           {local.children}
         </div>
       </FormControl>
@@ -385,17 +389,19 @@ export const FormControlLoading = (props: {
             >
               <path d="M21 12a9 9 0 11-6.219-8.56" />
             </svg>
-            {local.loadingText || 'Loading...'}
+            {local.loadingText ?? 'Loading...'}
           </div>
         </div>
       </Show>
 
       {/* Form Control */}
       <FormControl>
-        <div class={cn(
-          'relative w-full',
-          local.loading && 'opacity-50 pointer-events-none'
-        )}>
+        <div
+          class={cn(
+            'relative w-full',
+            local.loading && 'opacity-50 pointer-events-none',
+          )}
+        >
           {local.children}
         </div>
       </FormControl>
@@ -430,12 +436,8 @@ export const FormControlHelper = (props: {
 
       {/* Helper and Action */}
       <div class="flex items-center justify-between gap-2">
-        <div class="text-sm text-muted-foreground">
-          {local.helper}
-        </div>
-        <div class="flex-shrink-0">
-          {local.action}
-        </div>
+        <div class="text-sm text-muted-foreground">{local.helper}</div>
+        <div class="flex-shrink-0">{local.action}</div>
       </div>
     </div>
   )

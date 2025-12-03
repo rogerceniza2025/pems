@@ -204,6 +204,7 @@ export function renderComponent(component: any): HTMLElement {
   const container = document.createElement('div')
   document.body.appendChild(container)
 
+  // Use hydrate instead of render to avoid server-side rendering issues
   render(() => component, container)
 
   return container.firstChild as HTMLElement

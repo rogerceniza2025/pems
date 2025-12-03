@@ -18,7 +18,7 @@
     "@kobalte/core": "^0.13.11",
     "@pems/config-tailwind": "workspace:*",
     "@pems/shared-utils": "workspace:*",
-    "@tanstack/solid-form": "^0.27.0",
+    "@tanstack/solid-form": "^1.27.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-solid": "^0.555.0",
@@ -26,15 +26,17 @@
     "tailwind-merge": "^3.4.0",
     "tailwindcss": "^4.1.17",
     "tailwindcss-animate": "^1.0.7",
-    "zod": "^3.22.0"
+    "zod": "^4.1.13"
   },
   "devDependencies": {
     "@tanstack/eslint-config": "^0.3.3",
     "@types/node": "^24.10.1",
+    "jest-axe": "^10.0.0",
     "jsdom": "^27.2.0",
+    "solid-testing-library": "^0.5.1",
     "typescript": "^5.9.3",
     "vite": "^7.2.6",
     "vite-plugin-solid": "^2.11.10",
-    "vitest": "^4.0.14"
+    "vitest": "^4.0.15"
   }
 }

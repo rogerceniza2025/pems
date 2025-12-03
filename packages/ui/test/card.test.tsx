@@ -8,19 +8,17 @@
  * - User experience under various conditions
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { render, screen, fireEvent, act } from '@testing-library/solid'
 import { axe, toHaveNoViolations } from 'jest-axe'
-import { createSignal } from 'solid-js'
+import { For } from 'solid-js'
+import { act, fireEvent, render, screen } from 'solid-testing-library'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   Card,
+  CardContent,
+  CardDescription,
   CardHeader,
   CardTitle,
-  CardDescription,
-  CardContent,
-  CardFooter,
 } from '../src/components/ui/card'
-import { SkeletonCard } from '../src/components/ui/skeleton-card'
 
 // Extend Jest matchers
 expect.extend(toHaveNoViolations)
@@ -168,7 +166,8 @@ describe('Card Component Security', () => {
     })
 
     it('should sanitize malicious content in description', () => {
-      const maliciousDesc = 'Description with <img src=x onerror=alert("xss")> malicious image'
+      const maliciousDesc =
+        'Description with <img src=x onerror=alert("xss")> malicious image'
 
       render(() => (
         <Card>
@@ -182,7 +181,8 @@ describe('Card Component Security', () => {
     })
 
     it('should prevent XSS through className props', () => {
-      const maliciousClass = 'bg-red-500"><script>alert("xss")</script><div class="'
+      const maliciousClass =
+        'bg-red-500"><script>alert("xss")</script><div class="'
 
       const { container } = render(() => (
         <Card class={maliciousClass}>
@@ -223,7 +223,7 @@ describe('Card Component Security', () => {
 
   describe('Security Event Handling', () => {
     it('should prevent event handler injection', () => {
-      const maliciousOnClick = 'javascript:alert("xss")'
+      const maliciousOnClick = 'data:text/html,<script>alert("xss")</script>'
 
       // Test that onClick cannot be set to malicious string
       expect(() => {
@@ -293,7 +293,9 @@ describe('Card Component Security', () => {
       ))
 
       // Should show skeleton when loading
-      expect(container.querySelector('[data-testid="skeleton"]')).toBeInTheDocument()
+      expect(
+        container.querySelector('[data-testid="skeleton"]'),
+      ).toBeInTheDocument()
       // Should not expose content when loading
       expect(screen.queryByText('Content')).not.toBeInTheDocument()
     })
@@ -307,7 +309,9 @@ describe('Card Component Security', () => {
         </Card>
       ))
 
-      expect(container.querySelector('[data-testid="custom-skeleton"]')).toBeInTheDocument()
+      expect(
+        container.querySelector('[data-testid="custom-skeleton"]'),
+      ).toBeInTheDocument()
       expect(screen.queryByText('Content')).not.toBeInTheDocument()
     })
 
@@ -415,10 +419,10 @@ describe('Card Component Security', () => {
     it('should handle invalid variant props gracefully', () => {
       const { container } = render(() => (
         <Card
-          variant="invalid" as any
-          shadow="invalid" as any
-          hover="invalid" as any
-          interactive="invalid" as any
+          variant={'invalid' as any}
+          shadow={'invalid' as any}
+          hover={'invalid' as any}
+          interactive={'invalid' as any}
         >
           <CardContent>Content</CardContent>
         </Card>
@@ -428,7 +432,7 @@ describe('Card Component Security', () => {
       expect(container.querySelector('div')).toHaveClass(
         'rounded-lg',
         'border',
-        'bg-card'
+        'bg-card',
       )
     })
   })
@@ -447,7 +451,8 @@ describe('Card Component Security', () => {
         render(() => (
           <Card loading={i % 2 === 0}>
             <CardContent>Content {i}</CardContent>
-          </Card>))
+          </Card>
+        ))
       }
 
       // Should complete without memory issues
@@ -459,15 +464,19 @@ describe('Card Component Security', () => {
 
       const { container } = render(() => (
         <div>
-          {items.map(item => (
-            <Card key={item}>
-              <CardContent>Item {item}</CardContent>
-            </Card>
-          ))}
+          <For each={items}>
+            {(item) => (
+              <Card key={item}>
+                <CardContent>Item {item}</CardContent>
+              </Card>
+            )}
+          </For>
         </div>
       ))
 
-      expect(container.querySelectorAll('[class*="rounded-lg"]').length).toBe(1000)
+      expect(container.querySelectorAll('[class*="rounded-lg"]').length).toBe(
+        1000,
+      )
       // Should render efficiently
     })
 
@@ -495,7 +504,7 @@ describe('Card Component Security', () => {
 
   describe('Input Validation and Edge Cases', () => {
     it('should handle null/undefined children safely', () => {
-      const { container } = render(() => (
+      render(() => (
         <Card>
           <CardTitle>{null as any}</CardTitle>
           <CardDescription>{undefined as any}</CardDescription>
@@ -555,7 +564,9 @@ describe('Card Component Security', () => {
     })
 
     it('should prevent data exfiltration through error messages', () => {
-      const mockError = new Error('Database connection failed: user_id=user-123, password=secret')
+      const mockError = new Error(
+        'Database connection failed: user_id=user-123, password=secret',
+      )
       const handleError = vi.fn()
 
       // Component should handle errors without exposing sensitive data
@@ -569,7 +580,7 @@ describe('Card Component Security', () => {
 
       expect(handleError).toHaveBeenCalledWith(
         expect.not.stringContaining('user-123'),
-        expect.not.stringContaining('secret')
+        expect.not.stringContaining('secret'),
       )
     })
   })
@@ -649,6 +660,16 @@ describe('Card Component Security', () => {
           </Card>
         ))
       }).not.toThrow()
+
+      expect(() => {
+        render(() => (
+          <Card>
+            <CardContent>
+              <ErrorComponent />
+            </CardContent>
+          </Card>
+        ))
+      }).toThrow()
 
       expect(screen.getByText('Safe Content')).toBeInTheDocument()
     })

@@ -6,7 +6,7 @@ export default defineConfig({
     globals: true,
     environment: 'node',
     setupFiles: ['./tests/setup/vitest.unit.setup.ts'],
-    
+
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
@@ -28,29 +28,31 @@ export default defineConfig({
         },
       },
     },
-    
+
     include: [
       'tests/unit/**/*.{test,spec}.{js,ts,jsx,tsx}',
       'src/**/*.{test,spec}.{js,ts,jsx,tsx}',
     ],
-    exclude: [
-      'node_modules/',
-      'dist/',
-      'tests/integration/',
-      'tests/e2e/',
-    ],
-    
+    exclude: ['node_modules/', 'dist/', 'tests/integration/', 'tests/e2e/'],
+
     testTimeout: 5000,
     hookTimeout: 5000,
-    isolate: true,
-    maxConcurrency: 6,
-    
+    isolate: false,
+    maxConcurrency: 12,
+    pool: 'threads',
+    poolOptions: {
+      threads: {
+        maxThreads: 6,
+        minThreads: 2,
+      },
+    },
+
     reporters: ['verbose', 'json'],
     outputFile: {
       json: './test-results/unit.json',
     },
   },
-  
+
   resolve: {
     alias: {
       '@': resolve(__dirname, './src'),

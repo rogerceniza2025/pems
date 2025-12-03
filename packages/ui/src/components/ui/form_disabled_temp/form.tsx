@@ -1,6 +1,5 @@
-import type { JSX, ValidComponent } from 'solid-js'
-import { Show, splitProps } from 'solid-js'
-import type { VariantProps } from 'class-variance-authority'
+import type { JSX } from 'solid-js'
+import { Show, splitProps, For } from 'solid-js'
 import { cva } from 'class-variance-authority'
 
 import { cn } from '../../../lib/utils'
@@ -10,27 +9,24 @@ import type { FormProps } from './form.types'
 /**
  * Form layout variants using Class Variance Authority
  */
-const formVariants = cva(
-  'space-y-6',
-  {
-    variants: {
-      layout: {
-        vertical: 'flex flex-col space-y-6',
-        horizontal: 'grid grid-cols-1 gap-6 md:grid-cols-2',
-        grid: 'grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3',
-      },
-      spacing: {
-        compact: 'space-y-4',
-        normal: 'space-y-6',
-        relaxed: 'space-y-8',
-      },
+const formVariants = cva('space-y-6', {
+  variants: {
+    layout: {
+      vertical: 'flex flex-col space-y-6',
+      horizontal: 'grid grid-cols-1 gap-6 md:grid-cols-2',
+      grid: 'grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3',
     },
-    defaultVariants: {
-      layout: 'vertical',
-      spacing: 'normal',
+    spacing: {
+      compact: 'space-y-4',
+      normal: 'space-y-6',
+      relaxed: 'space-y-8',
     },
   },
-)
+  defaultVariants: {
+    layout: 'vertical',
+    spacing: 'normal',
+  },
+})
 
 /**
  * Main Form component that wraps TanStack Form functionality
@@ -71,28 +67,30 @@ const Form = <T extends Record<string, any>>(props: FormProps<T>) => {
       if (local.onSubmitError && error instanceof Error) {
         await local.onSubmitError(error)
       } else if (local.onValidationError) {
-        const errors = Object.entries(local.form.state.errors).map(([field, messages]) => ({
-          field,
-          message: Array.isArray(messages) ? messages[0] : messages,
-        }))
+        const errors = Object.entries(local.form.state.errors).map(
+          ([field, messages]) => ({
+            field,
+            message: Array.isArray(messages) ? messages[0] : messages,
+          }),
+        )
         local.onValidationError(errors)
       }
     }
   }
 
   // Handle form submission through TanStack Form
-  const handleFormSubmit = async () => {
-    if (local.onSubmit) {
-      try {
-        const formData = local.form.state.values
-        await local.onSubmit(formData)
-      } catch (error) {
-        if (local.onSubmitError && error instanceof Error) {
-          local.onSubmitError(error)
-        }
-      }
-    }
-  }
+  // const handleFormSubmit = async () => {
+  //   if (local.onSubmit) {
+  //     try {
+  //       const formData = local.form.state.values
+  //       await local.onSubmit(formData)
+  //     } catch (error) {
+  //       if (local.onSubmitError && error instanceof Error) {
+  //         local.onSubmitError(error)
+  //       }
+  //     }
+  //   }
+  // }
 
   // Configure form validation behavior
   const configureForm = () => {
@@ -136,19 +134,17 @@ const Form = <T extends Record<string, any>>(props: FormProps<T>) => {
 /**
  * FormField wrapper component for consistent field layout
  */
-export const FormField = <T extends Record<string, any>>(
-  props: {
-    name: keyof T
-    class?: string
-    required?: boolean
-    disabled?: boolean
-    layout?: 'vertical' | 'horizontal'
-    label?: JSX.Element
-    description?: JSX.Element
-    error?: string
-    children: JSX.Element
-  }
-) => {
+export const FormField = <T extends Record<string, any>>(props: {
+  name: keyof T
+  class?: string
+  required?: boolean
+  disabled?: boolean
+  layout?: 'vertical' | 'horizontal'
+  label?: JSX.Element
+  description?: JSX.Element
+  error?: string
+  children: JSX.Element
+}) => {
   const [local, others] = splitProps(props, [
     'class',
     'name',
@@ -185,26 +181,28 @@ export const FormField = <T extends Record<string, any>>(
       )}
 
       {/* Input Section */}
-      <div class={cn(isHorizontal && 'md:col-span-2')}>
-        {local.children}
-      </div>
+      <div class={cn(isHorizontal && 'md:col-span-2')}>{local.children}</div>
 
       {/* Description Section */}
       {local.description && (
-        <div class={cn(
-          'text-sm text-muted-foreground',
-          isHorizontal && 'md:col-span-1'
-        )}>
+        <div
+          class={cn(
+            'text-sm text-muted-foreground',
+            isHorizontal && 'md:col-span-1',
+          )}
+        >
           {local.description}
         </div>
       )}
 
       {/* Error Section */}
       {local.error && (
-        <div class={cn(
-          'text-sm text-destructive flex items-center gap-2',
-          isHorizontal && 'md:col-span-2'
-        )}>
+        <div
+          class={cn(
+            'text-sm text-destructive flex items-center gap-2',
+            isHorizontal && 'md:col-span-2',
+          )}
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="12"
@@ -238,7 +236,9 @@ export const FormSection = (props: {
   children: JSX.Element
 }) => {
   return (
-    <div class={cn('space-y-4 p-4 border rounded-lg bg-background', props.class)}>
+    <div
+      class={cn('space-y-4 p-4 border rounded-lg bg-background', props.class)}
+    >
       {props.title && (
         <div class="space-y-2">
           <h3 class="text-lg font-semibold">{props.title}</h3>
@@ -247,9 +247,7 @@ export const FormSection = (props: {
           )}
         </div>
       )}
-      <div class="space-y-4">
-        {props.children}
-      </div>
+      <div class="space-y-4">{props.children}</div>
     </div>
   )
 }
@@ -273,7 +271,7 @@ export const FormActions = (props: {
     <div
       class={cn(
         'flex gap-3 mt-8',
-        alignmentClasses[props.align || 'right'],
+        alignmentClasses[props.align ?? 'right'],
         props.class,
       )}
     >
@@ -307,23 +305,24 @@ export const FormProgress = (props: {
       {/* Step Indicators */}
       {props.showLabels && props.steps && (
         <div class="flex justify-between text-xs text-muted-foreground">
-          {props.steps.map((step, index) => (
-            <div
-              key={index}
-              class={cn(
-                'flex items-center gap-2',
-                index + 1 <= props.current && 'text-primary font-medium'
-              )}
-            >
+          <For each={props.steps}>
+            {(step, index) => (
               <div
                 class={cn(
-                  'w-4 h-4 rounded-full border-2 border-current',
-                  index + 1 <= props.current && 'bg-current'
+                  'flex items-center gap-2',
+                  index() + 1 <= props.current && 'text-primary font-medium',
                 )}
-              />
-              <span>{step}</span>
-            </div>
-          ))}
+              >
+                <div
+                  class={cn(
+                    'w-4 h-4 rounded-full border-2 border-current',
+                    index() + 1 <= props.current && 'bg-current',
+                  )}
+                />
+                <span>{step}</span>
+              </div>
+            )}
+          </For>
         </div>
       )}
 
@@ -340,7 +339,7 @@ export const FormProgress = (props: {
 /**
  * FormErrorSummary component for displaying all form errors
  */
-export const FormErrorSummary = <T extends Record<string, any>>(props: {
+export const FormErrorSummary = (props: {
   form: any // TanStack Form instance
   class?: string
   title?: string
@@ -366,14 +365,16 @@ export const FormErrorSummary = <T extends Record<string, any>>(props: {
         aria-live="polite"
       >
         <h3 class="text-sm font-medium text-destructive">
-          {props.title || 'Please fix the following errors:'}
+          {props.title ?? 'Please fix the following errors:'}
         </h3>
         <ul class="text-sm text-destructive space-y-1">
-          {errors().map(({ field, message }) => (
-            <li key={field}>
-              <strong>{field}:</strong> {message}
-            </li>
-          ))}
+          <For each={errors()}>
+            {({ field, message }) => (
+              <li>
+                <strong>{field}:</strong> {message}
+              </li>
+            )}
+          </For>
         </ul>
       </div>
     </Show>
@@ -383,7 +384,7 @@ export const FormErrorSummary = <T extends Record<string, any>>(props: {
 /**
  * Helper component for conditional rendering based on form state
  */
-export const FormConditional = <T extends Record<string, any>>(props: {
+export const FormConditional = (props: {
   form: any // TanStack Form instance
   condition: (state: any) => boolean
   children: JSX.Element
