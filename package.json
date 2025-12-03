@@ -11,7 +11,7 @@
     "test:integration": "vitest run --config vitest.integration.config.ts",
     "test:e2e": "playwright test",
     "test:coverage": "vitest run --coverage",
-    "test:changed": "vitest run --changed --since=main",
+    "test:changed": "node scripts/test-changed.js",
     "test:tdd": "./scripts/tdd-watch.sh",
     "test:validate": "./scripts/tdd-validate.sh",
     "test:watch": "vitest --watch",
@@ -87,10 +87,8 @@
     "test:contracts:ci": "pnpm test:contracts:consumer && pnpm test:contracts:integration && pnpm test:contracts:schemas",
     "start": "node .output/server/index.mjs",
     "kill-ports": "powershell -ExecutionPolicy Bypass -File ./kill-ports.ps1",
-    
     "pre-commit": "node scripts/tdd-enforcement.js && node scripts/coverage-validation.js && node scripts/performance-budget.js --check-only && lint-staged && pnpm test:secrets:gitguardian",
     "pre-push": "pnpm test && pnpm build && pnpm test:performance:budget && pnpm test:security:dependencies && pnpm test:contracts:all",
-    
     "coverage:serve": "npx serve coverage",
     "coverage:clean": "rm -rf coverage test-results"
   },
