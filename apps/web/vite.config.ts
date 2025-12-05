@@ -1,15 +1,15 @@
+import tailwindcss from '@tailwindcss/vite'
 import { tanstackStart } from '@tanstack/solid-start/plugin/vite'
 import { defineConfig } from 'vite'
 import viteSolid from 'vite-plugin-solid'
 import tsConfigPaths from 'vite-tsconfig-paths'
-import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
   server: {
     port: 3000,
     hmr: {
-      overlay: false // Reduces startup overhead
-    }
+      overlay: false,
+    },
   },
   plugins: [
     tsConfigPaths(),
@@ -18,6 +18,10 @@ export default defineConfig({
     // solid's vite plugin must come after start's vite plugin
     viteSolid({ ssr: true }),
   ],
+  resolve: {
+    // Force all solid-js imports to use a single instance
+    dedupe: ['solid-js', 'solid-js/web', 'solid-js/store'],
+  },
   optimizeDeps: {
     include: [
       'solid-js',
@@ -26,9 +30,9 @@ export default defineConfig({
       'clsx',
       'tailwind-merge',
       'zod',
-      'axios'
+      'axios',
     ],
-    exclude: ['@tanstack/solid-router', '@kobalte/core', 'lucide-solid']
+    exclude: ['@tanstack/solid-router', '@kobalte/core', 'lucide-solid'],
   },
   build: {
     rollupOptions: {
@@ -36,9 +40,9 @@ export default defineConfig({
         manualChunks: {
           vendor: ['solid-js', '@tanstack/solid-router'],
           ui: ['@kobalte/core', 'lucide-solid'],
-          utils: ['class-variance-authority', 'clsx', 'tailwind-merge']
-        }
-      }
-    }
-  }
+          utils: ['class-variance-authority', 'clsx', 'tailwind-merge'],
+        },
+      },
+    },
+  },
 })

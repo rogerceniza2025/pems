@@ -258,7 +258,7 @@ json
 🚀 Action Items (Priority Order)
 Priority Task Impact
 ✅ P0 Consolidate ThemeProvider implementations (Completed: Centralized in @pems/ui, fixed hydration issues)
-✅ P0 Fix Hydration & CSS Flash (Completed: Renamed entry-client.tsx to client.tsx, used hydrate(), removed broken server.tsx to use defaults)
+✅ P0 Fix Hydration & CSS Flash (Completed: Renamed entry-client.tsx to client.tsx, used hydrate(), removed broken server.tsx, fixed ThemeToggleButton visibility)
 🟠 P1 Update turbo.json to v2 syntax Avoid deprecation warnings
 ✅ P1 Add dark mode flash prevention script (Completed: Added inline script in \*\*root.tsx)
 🟡 P2 Split large
