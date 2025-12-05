@@ -39,7 +39,7 @@ packages/ui/src/components/
 
 ```typescript
 import { createSignal, createEffect, onMount } from 'solid-js'
-import { useNavigate } from '@solidjs/router'
+import { useNavigate } from '@tanstack/solid-router'
 import { z } from 'zod'
 import { Button } from '../shared/ui/button'
 import { Input } from '../shared/ui/input'

@@ -1,8 +1,8 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest'
+import { createTestHeaders, createTestUser } from '@tests/helpers/auth'
+import { getTestPrisma, setupTestDatabase } from '@tests/helpers/database'
+import { TenantFactory, UserFactory } from '@tests/helpers/factories'
 import { Hono } from 'hono'
-import { setupTestDatabase, getTestPrisma } from '@tests/helpers/database'
-import { UserFactory, TenantFactory } from '@tests/helpers/factories'
-import { createTestUser, createTestHeaders } from '@tests/helpers/auth'
+import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { Password } from '../../../modules/user-management/src/domain/value-objects/password'
 
 // Mock Hono request/response patterns for Tanstack Start
@@ -78,10 +78,13 @@ describe('Authentication API Endpoints', () => {
 
         const passwordValidation = Password.validatePolicy(body.password)
         if (!passwordValidation.isValid) {
-          return c.json({
-            error: 'Invalid password',
-            details: passwordValidation.errors
-          }, 400)
+          return c.json(
+            {
+              error: 'Invalid password',
+              details: passwordValidation.errors,
+            },
+            400,
+          )
         }
 
         const tenant = await prisma.tenant.findUnique({
@@ -101,16 +104,19 @@ describe('Authentication API Endpoints', () => {
           passwordHash: hashedPassword.getValue(),
         })
 
-        return c.json({
-          success: true,
-          user: {
-            id: newUser.id,
-            email: newUser.email,
-            firstName: newUser.firstName,
-            lastName: newUser.lastName,
+        return c.json(
+          {
+            success: true,
+            user: {
+              id: newUser.id,
+              email: newUser.email,
+              firstName: newUser.firstName,
+              lastName: newUser.lastName,
+            },
+            message: 'User registered successfully',
           },
-          message: 'User registered successfully',
-        }, 201)
+          201,
+        )
       })
 
       // Test the endpoint
@@ -174,7 +180,6 @@ describe('Authentication API Endpoints', () => {
       expect(response.error).toBe('Invalid password')
       expect(response.details).toBeDefined()
       expect(Array.isArray(response.details)).toBe(true)
-
     })
 
     it('should reject registration with duplicate email', async () => {
@@ -241,7 +246,8 @@ describe('Authentication API Endpoints', () => {
       }
 
       // Generate session token (simplified)
-      const sessionToken = 'mock-session-token-' + Math.random().toString(36).substr(2, 9)
+      const sessionToken =
+        'mock-session-token-' + Math.random().toString(36).substr(2, 9)
 
       expect(isPasswordValid).toBe(true)
       expect(user.email).toBe(loginData.email)
@@ -391,12 +397,20 @@ describe('Authentication API Endpoints', () => {
         include: { tenant: true },
       })
 
-      if (!user || !user.tenant || user.tenant.code !== forgotPasswordData.tenantCode) {
-        return { error: 'If user exists, reset email will be sent', status: 200 }
+      if (
+        !user ||
+        !user.tenant ||
+        user.tenant.code !== forgotPasswordData.tenantCode
+      ) {
+        return {
+          error: 'If user exists, reset email will be sent',
+          status: 200,
+        }
       }
 
       // Generate reset token
-      const resetToken = 'reset-token-' + Math.random().toString(36).substr(2, 9)
+      const resetToken =
+        'reset-token-' + Math.random().toString(36).substr(2, 9)
       const expiresAt = new Date(Date.now() + 60 * 60 * 1000) // 1 hour
 
       await getTestPrisma().user.update({
@@ -481,12 +495,20 @@ describe('Authentication API Endpoints', () => {
         return { error: 'Invalid or expired reset token', status: 400 }
       }
 
-      const passwordValidation = Password.validatePolicy(resetPasswordData.newPassword)
+      const passwordValidation = Password.validatePolicy(
+        resetPasswordData.newPassword,
+      )
       if (!passwordValidation.isValid) {
-        return { error: 'Invalid password', details: passwordValidation.errors, status: 400 }
+        return {
+          error: 'Invalid password',
+          details: passwordValidation.errors,
+          status: 400,
+        }
       }
 
-      const newPasswordHash = await Password.create(resetPasswordData.newPassword)
+      const newPasswordHash = await Password.create(
+        resetPasswordData.newPassword,
+      )
 
       await getTestPrisma().user.update({
         where: { id: user.id },
@@ -541,7 +563,9 @@ describe('Authentication API Endpoints', () => {
         newPassword: 'weak',
       }
 
-      const passwordValidation = Password.validatePolicy(resetPasswordData.newPassword)
+      const passwordValidation = Password.validatePolicy(
+        resetPasswordData.newPassword,
+      )
 
       expect(passwordValidation.isValid).toBe(false)
 
@@ -552,7 +576,9 @@ describe('Authentication API Endpoints', () => {
       }
 
       expect(response.error).toBe('Invalid password')
-      expect(response.details).toContain('Password must be at least 8 characters long')
+      expect(response.details).toContain(
+        'Password must be at least 8 characters long',
+      )
     })
   })
 

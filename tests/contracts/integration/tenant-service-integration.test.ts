@@ -18,9 +18,9 @@ describe('Tenant Service Integration', () => {
   let testTenants: any[] = [];
 
   beforeAll(async () => {
-    authServiceUrl = process.env.AUTH_SERVICE_URL || 'http://localhost:3001';
-    tenantServiceUrl = process.env.TENANT_SERVICE_URL || 'http://localhost:3004';
-    userServiceUrl = process.env.USER_SERVICE_URL || 'http://localhost:3002';
+    authServiceUrl = process.env.AUTH_SERVICE_URL || 'http://localhost:3200';
+    tenantServiceUrl = process.env.TENANT_SERVICE_URL || 'http://localhost:3203';
+    userServiceUrl = process.env.USER_SERVICE_URL || 'http://localhost:3201';
 
     // Wait for services to be ready
     await Promise.all([
@@ -566,7 +566,7 @@ export class TenantIntegrationUtils {
       };
 
       const response = await axios.post(
-        `${process.env.AUTH_SERVICE_URL || 'http://localhost:3001'}/api/v1/auth/register`,
+        `${process.env.AUTH_SERVICE_URL || 'http://localhost:3200'}/api/v1/auth/register`,
         userData
       );
 
@@ -580,9 +580,9 @@ export class TenantIntegrationUtils {
   static async validateTenantDataConsistency(tenantId: string): Promise<boolean> {
     // Check that tenant data is consistent across all services
     const services = [
-      `${process.env.TENANT_SERVICE_URL || 'http://localhost:3004'}/api/v1/tenants/${tenantId}`,
-      `${process.env.AUTH_SERVICE_URL || 'http://localhost:3001'}/api/v1/tenants/${tenantId}`,
-      `${process.env.USER_SERVICE_URL || 'http://localhost:3002'}/api/v1/tenants/${tenantId}`,
+      `${process.env.TENANT_SERVICE_URL || 'http://localhost:3203'}/api/v1/tenants/${tenantId}`,
+      `${process.env.AUTH_SERVICE_URL || 'http://localhost:3200'}/api/v1/tenants/${tenantId}`,
+      `${process.env.USER_SERVICE_URL || 'http://localhost:3201'}/api/v1/tenants/${tenantId}`,
     ];
 
     try {
@@ -614,7 +614,7 @@ export class TenantIntegrationUtils {
     };
 
     const response = await axios.post(
-      `${process.env.AUTH_SERVICE_URL || 'http://localhost:3001'}/api/v1/auth/register`,
+      `${process.env.AUTH_SERVICE_URL || 'http://localhost:3200'}/api/v1/auth/register`,
       adminData
     );
 

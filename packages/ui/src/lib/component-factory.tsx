@@ -85,7 +85,7 @@ export const createInputVariant = <
 
   return createComponentFactory({
     ...baseConfig,
-    base: 'flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
+    base: 'flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
   })
 }
 
@@ -208,7 +208,7 @@ export const commonStates: Record<string, string> = {
   default: '',
   hover: 'hover:shadow-md',
   active: 'active:scale-95',
-  focus: 'focus:ring-2 focus:ring-ring focus:ring-offset-2',
+  focus: 'focus:ring-2 focus:ring-primary focus:ring-offset-2',
   disabled: 'disabled:opacity-50 disabled:cursor-not-allowed',
   loading: 'opacity-70 cursor-not-allowed',
 }

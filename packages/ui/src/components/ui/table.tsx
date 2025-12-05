@@ -4,7 +4,7 @@ import { For, splitProps } from 'solid-js'
 import type { VariantProps } from 'class-variance-authority'
 import { cva } from 'class-variance-authority'
 
-import { cn } from '../../lib/utils'
+import { classNames } from '../../lib/utils'
 
 const tableVariants = cva(
   'w-full caption-bottom text-sm',
@@ -57,7 +57,7 @@ export const Table = (props: TableProps) => {
   return (
     <div class="relative w-full overflow-auto">
       <table
-        class={cn(tableVariants({ variant: local.variant, size: local.size }), local.class)}
+        class={classNames(tableVariants({ variant: local.variant, size: local.size }), local.class)}
         {...others}
       >
         {local.children}
@@ -75,7 +75,7 @@ export const TableHeader = (props: TableHeaderProps) => {
   const [local, others] = splitProps(props, ['class', 'children'])
 
   return (
-    <thead class={cn('[&_tr]:border-b', local.class)} {...others}>
+    <thead class={classNames('[&_tr]:border-b', local.class)} {...others}>
       {local.children}
     </thead>
   )
@@ -91,7 +91,7 @@ export const TableBody = (props: TableBodyProps) => {
 
   return (
     <tbody
-      class={cn('[&_tr:last-child]:border-0', local.class)}
+      class={classNames('[&_tr:last-child]:border-0', local.class)}
       {...others}
     >
       {local.children}
@@ -109,7 +109,7 @@ export const TableFooter = (props: TableFooterProps) => {
 
   return (
     <tfoot
-      class={cn('border-t bg-muted/50 font-medium [&>tr]:last:border-b-0', local.class)}
+      class={classNames('border-t bg-muted/50 font-medium [&>tr]:last:border-b-0', local.class)}
       {...others}
     >
       {local.children}
@@ -128,7 +128,7 @@ export const TableRow = (props: TableRowProps) => {
 
   return (
     <tr
-      class={cn(
+      class={classNames(
         'border-b transition-colors hover:bg-muted/50',
         local.selected && 'bg-muted',
         local.class,
@@ -150,7 +150,7 @@ export const TableHead = (props: TableHeadProps) => {
 
   return (
     <th
-      class={cn(cellVariants({ variant: 'header' }), local.class)}
+      class={classNames(cellVariants({ variant: 'header' }), local.class)}
       {...others}
     >
       {local.children}
@@ -167,7 +167,7 @@ export const TableCell = (props: TableCellProps) => {
   const [local, others] = splitProps(props, ['class', 'children'])
 
   return (
-    <td class={cn(cellVariants(), local.class)} {...others}>
+    <td class={classNames(cellVariants(), local.class)} {...others}>
       {local.children}
     </td>
   )
@@ -183,7 +183,7 @@ export const TableCaption = (props: TableCaptionProps) => {
 
   return (
     <caption
-      class={cn('mt-4 text-sm text-muted-foreground', local.class)}
+      class={classNames('mt-4 text-sm text-muted-foreground', local.class)}
       {...others}
     >
       {local.children}
@@ -204,7 +204,7 @@ export const TableCheckbox = (props: TableCheckboxProps) => {
   const [local, others] = splitProps(props, ['checked', 'onChange', 'disabled', 'class'])
 
   return (
-    <div class={cn('flex items-center space-x-2', local.class)}>
+    <div class={classNames('flex items-center space-x-2', local.class)}>
       <input
         type="checkbox"
         checked={local.checked}
@@ -245,7 +245,7 @@ export const TableSort = (props: TableSortProps) => {
     <button
       type="button"
       onClick={handleSort}
-      class={cn(
+      class={classNames(
         'flex items-center space-x-1 font-medium hover:text-primary transition-colors',
         local.class,
       )}
@@ -263,7 +263,7 @@ export const TableSort = (props: TableSortProps) => {
           stroke-width="2"
           stroke-linecap="round"
           stroke-linejoin="round"
-          class={cn(
+          class={classNames(
             'transition-colors',
             local.direction === 'asc' ? 'text-primary' : 'text-muted-foreground',
           )}
@@ -280,7 +280,7 @@ export const TableSort = (props: TableSortProps) => {
           stroke-width="2"
           stroke-linecap="round"
           stroke-linejoin="round"
-          class={cn(
+          class={classNames(
             '-mt-1 transition-colors',
             local.direction === 'desc' ? 'text-primary' : 'text-muted-foreground',
           )}
@@ -343,7 +343,7 @@ export const TablePagination = (props: TablePaginationProps) => {
 
   return (
     <div
-      class={cn(
+      class={classNames(
         'flex items-center justify-between px-2 py-4 space-x-2',
         local.class,
       )}
@@ -374,7 +374,7 @@ export const TablePagination = (props: TablePaginationProps) => {
               <button
                 onClick={() => typeof page === 'number' && local.onPageChange?.(page)}
                 disabled={typeof page !== 'number'}
-                class={cn(
+                class={classNames(
                   'px-3 py-1 text-sm border rounded-md',
                   page === local.currentPage
                     ? 'bg-primary text-primary-foreground'
@@ -412,7 +412,7 @@ export const TableSearch = (props: TableSearchProps) => {
   const [local, others] = splitProps(props, ['value', 'onChange', 'placeholder', 'class'])
 
   return (
-    <div class={cn('relative', local.class)} {...others}>
+    <div class={classNames('relative', local.class)} {...others}>
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="16"

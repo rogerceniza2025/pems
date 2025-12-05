@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Theme Toggle Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body.light {
+            background-color: #ffffff;
+            color: #000000;
+        }
+
+        body.dark {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        .theme-toggle {
+            padding: 8px;
+            border-radius: 8px;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            cursor: pointer;
+            font-size: 20px;
+            transition: all 0.2s;
+        }
+
+        body.dark .theme-toggle {
+            background-color: #333;
+            border-color: #555;
+        }
+
+        .theme-toggle:hover {
+            background-color: #e0e0e0;
+            border-color: #999;
+        }
+
+        body.dark .theme-toggle:hover {
+            background-color: #444;
+            border-color: #777;
+        }
+
+        .status {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 4px;
+            background-color: #f5f5f5;
+        }
+
+        body.dark .status {
+            background-color: #2a2a2a;
+        }
+
+        .log {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            background-color: #e8e8e8;
+            font-family: monospace;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        body.dark .log {
+            background-color: #1a1a1a;
+        }
+    </style>
+</head>
+<body class="light">
+    <h1>Theme Toggle Behavior Test</h1>
+
+    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">
+        <span id="theme-icon">🌞</span>
+    </button>
+
+    <div class="status">
+        <p>Current Theme: <strong id="current-theme">light</strong></p>
+        <p>CSS Loaded: <strong id="css-loaded">checking...</strong></p>
+        <p>Time Elapsed: <strong id="time-elapsed">0s</strong></p>
+    </div>
+
+    <div class="log" id="log">
+        <strong>Test Log:</strong><br>
+    </div>
+
+    <script>
+        let isDark = false;
+        let startTime = Date.now();
+        let cssLoaded = false;
+
+        function log(message) {
+            const logDiv = document.getElementById('log');
+            const time = ((Date.now() - startTime) / 1000).toFixed(1);
+            logDiv.innerHTML += `[${time}s] ${message}<br>`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        function toggleTheme() {
+            isDark = !isDark;
+            const body = document.body;
+            const icon = document.getElementById('theme-icon');
+            const currentThemeSpan = document.getElementById('current-theme');
+
+            if (isDark) {
+                body.classList.add('dark');
+                body.classList.remove('light');
+                icon.textContent = '🌙';
+                currentThemeSpan.textContent = 'dark';
+                log('Theme switched to DARK');
+            } else {
+                body.classList.add('light');
+                body.classList.remove('dark');
+                icon.textContent = '🌞';
+                currentThemeSpan.textContent = 'light';
+                log('Theme switched to LIGHT');
+            }
+
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        }
+
+        // Check CSS loading
+        function checkCssLoaded() {
+            const testElement = document.createElement('div');
+            testElement.style.display = 'none';
+            testElement.className = 'theme-toggle';
+            document.body.appendChild(testElement);
+
+            const styles = window.getComputedStyle(testElement);
+            cssLoaded = styles.paddingTop === '8px';
+
+            document.body.removeChild(testElement);
+            document.getElementById('css-loaded').textContent = cssLoaded ? 'Yes' : 'No';
+
+            if (cssLoaded) {
+                log('✅ CSS has loaded successfully');
+            } else {
+                log('❌ CSS has NOT loaded properly');
+            }
+        }
+
+        // Initialize
+        log('Page loaded - checking initial state...');
+
+        // Check for saved theme preference
+        const savedTheme = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const shouldBeDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
+
+        if (shouldBeDark) {
+            isDark = true;
+            toggleTheme();
+            log('Restored dark theme from preference');
+        }
+
+        // Check CSS loading at different intervals
+        setTimeout(checkCssLoaded, 100);  // 100ms
+        setTimeout(checkCssLoaded, 500);  // 500ms
+        setTimeout(checkCssLoaded, 1000); // 1s
+        setTimeout(checkCssLoaded, 2000); // 2s
+        setTimeout(checkCssLoaded, 5000); // 5s
+
+        // Update timer
+        setInterval(() => {
+            const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+            document.getElementById('time-elapsed').textContent = `${elapsed}s`;
+        }, 100);
+
+        // Monitor theme toggle button visibility
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+                    const button = document.querySelector('.theme-toggle');
+                    const styles = window.getComputedStyle(button);
+                    if (styles.display === 'none') {
+                        log('⚠️ WARNING: Theme toggle button is now hidden!');
+                    }
+                }
+            });
+        });
+
+        observer.observe(document.querySelector('.theme-toggle'), {
+            attributes: true,
+            attributeFilter: ['style', 'class']
+        });
+
+        // Log button visibility at intervals
+        setInterval(() => {
+            const button = document.querySelector('.theme-toggle');
+            const styles = window.getComputedStyle(button);
+            const visible = styles.display !== 'none' && styles.visibility !== 'hidden';
+
+            if (!visible) {
+                log(`⚠️ Theme toggle button is INVISIBLE at ${((Date.now() - startTime) / 1000).toFixed(1)}s`);
+            }
+        }, 1000);
+    </script>
+</body>
+</html>

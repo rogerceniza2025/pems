@@ -5,7 +5,7 @@ import * as AccordionPrimitive from '@kobalte/core/accordion'
 import type { PolymorphicProps } from '@kobalte/core/polymorphic'
 
 import { useReducedMotion } from '../../lib/animations'
-import { cn } from '../../lib/utils'
+import { classNames } from '../../lib/utils'
 
 // Enhanced accordion with better animations and keyboard navigation
 const Accordion = AccordionPrimitive.Root
@@ -36,7 +36,7 @@ const AccordionItem = <T extends ValidComponent = 'div'>(
       ghost: '',
     }
 
-    return cn(
+    return classNames(
       variantClasses[local.variant ?? 'default'],
       local.animated &&
         !prefersReducedMotion() &&
@@ -141,7 +141,7 @@ const AccordionTrigger = <T extends ValidComponent = 'button'>(
   return (
     <AccordionPrimitive.Header class="flex">
       <AccordionPrimitive.Trigger
-        class={cn(
+        class={classNames(
           'flex flex-1 items-center justify-between font-medium transition-all duration-200',
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
           'hover:bg-accent/50',
@@ -200,7 +200,7 @@ const AccordionContent = <T extends ValidComponent = 'div'>(
       return 'overflow-hidden text-sm'
     }
 
-    return cn(
+    return classNames(
       'overflow-hidden text-sm',
       'transition-all',
       `duration-[${local.animationDuration ?? 300}ms]`,
@@ -212,7 +212,7 @@ const AccordionContent = <T extends ValidComponent = 'div'>(
 
   return (
     <AccordionPrimitive.Content
-      class={cn(getAnimationClasses(), local.class)}
+      class={classNames(getAnimationClasses(), local.class)}
       style={{
         'animation-duration': `${local.animationDuration ?? 300}ms`,
         'animation-timing-function': local.animationEasing ?? 'ease-in-out',

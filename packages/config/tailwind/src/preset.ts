@@ -1,74 +1,72 @@
 import type { Config } from 'tailwindcss'
-import '../modern-features.css'
-import './tokens.css'
-import './utilities.css'
 
 const config: Config = {
   content: [
-    // Core config package files
-    './src/**/*.{js,ts,jsx,tsx}',
-    // UI package components
-    './packages/ui/src/**/*.{js,ts,jsx,tsx}',
-    // Web application files
-    './apps/web/src/**/*.{js,ts,jsx,tsx}',
-    // Admin application files
-    './apps/admin/src/**/*.{js,ts,jsx,tsx}',
-    // Include any future packages that might use Tailwind
-    './packages/*/src/**/*.{js,ts,jsx,tsx}',
+    '../../apps/web/src/**/*.{js,ts,jsx,tsx}',
+    '../ui/src/**/*.{js,ts,jsx,tsx}'
   ],
+  presets: [], // Ensure default Tailwind utilities are loaded
+  darkMode: 'class', // Enable class-based dark mode
   theme: {
     extend: {
-      // Use OKLCH CSS variables for better theming support
+      screens: {
+        sm: '40rem',
+        md: '48rem',
+        lg: '64rem',
+        xl: '80rem',
+        '2xl': '96rem',
+      },
+      // Use OKLCH CSS variables directly (they're already full OKLCH values)
       colors: {
-        background: 'oklch(var(--color-background))',
-        foreground: 'oklch(var(--color-foreground))',
-        card: 'oklch(var(--color-card))',
-        'card-foreground': 'oklch(var(--color-card-foreground))',
-        popover: 'oklch(var(--color-popover))',
-        'popover-foreground': 'oklch(var(--color-popover-foreground))',
+        background: 'var(--color-background)',
+        foreground: 'var(--color-foreground)',
+        card: 'var(--color-card)',
+        'card-foreground': 'var(--color-card-foreground)',
+        popover: 'var(--color-popover)',
+        'popover-foreground': 'var(--color-popover-foreground)',
         primary: {
-          DEFAULT: 'oklch(var(--color-primary))',
-          foreground: 'oklch(var(--color-primary-foreground))',
+          DEFAULT: 'var(--color-primary)',
+          foreground: 'var(--color-primary-foreground)',
         },
         secondary: {
-          DEFAULT: 'oklch(var(--color-secondary))',
-          foreground: 'oklch(var(--color-secondary-foreground))',
+          DEFAULT: 'var(--color-secondary)',
+          foreground: 'var(--color-secondary-foreground)',
         },
         muted: {
-          DEFAULT: 'oklch(var(--color-muted))',
-          foreground: 'oklch(var(--color-muted-foreground))',
+          DEFAULT: 'var(--color-muted)',
+          foreground: 'var(--color-muted-foreground)',
         },
         accent: {
-          DEFAULT: 'oklch(var(--color-accent))',
-          foreground: 'oklch(var(--color-accent-foreground))',
+          DEFAULT: 'var(--color-accent)',
+          foreground: 'var(--color-accent-foreground)',
         },
         destructive: {
-          DEFAULT: 'oklch(var(--color-destructive))',
-          foreground: 'oklch(var(--color-destructive-foreground))',
+          DEFAULT: 'var(--color-destructive)',
+          foreground: 'var(--color-destructive-foreground)',
         },
-        border: 'oklch(var(--color-border))',
-        input: 'oklch(var(--color-input))',
-        ring: 'oklch(var(--color-ring))',
+        border: 'var(--color-border)',
+        input: 'var(--color-input)',
+        ring: 'var(--color-ring)',
         // Semantic colors
-        success: 'oklch(var(--color-success))',
-        warning: 'oklch(var(--color-warning))',
-        error: 'oklch(var(--color-error))',
-        info: 'oklch(var(--color-info))',
+        success: 'var(--color-success)',
+        warning: 'var(--color-warning)',
+        error: 'var(--color-error)',
+        info: 'var(--color-info)',
         // Chart colors
-        'chart-1': 'oklch(var(--color-chart-1))',
-        'chart-2': 'oklch(var(--color-chart-2))',
-        'chart-3': 'oklch(var(--color-chart-3))',
-        'chart-4': 'oklch(var(--color-chart-4))',
-        'chart-5': 'oklch(var(--color-chart-5))',
+        'chart-1': 'var(--color-chart-1)',
+        'chart-2': 'var(--color-chart-2)',
+        'chart-3': 'var(--color-chart-3)',
+        'chart-4': 'var(--color-chart-4)',
+        'chart-5': 'var(--color-chart-5)',
         // Sidebar colors
-        sidebar: 'oklch(var(--color-sidebar))',
-        'sidebar-foreground': 'oklch(var(--color-sidebar-foreground))',
-        'sidebar-primary': 'oklch(var(--color-sidebar-primary))',
-        'sidebar-primary-foreground': 'oklch(var(--color-sidebar-primary-foreground))',
-        'sidebar-accent': 'oklch(var(--color-sidebar-accent))',
-        'sidebar-accent-foreground': 'oklch(var(--color-sidebar-accent-foreground))',
-        'sidebar-border': 'oklch(var(--color-sidebar-border))',
-        'sidebar-ring': 'oklch(var(--color-sidebar-ring))',
+        sidebar: 'var(--color-sidebar)',
+        'sidebar-foreground': 'var(--color-sidebar-foreground)',
+        'sidebar-primary': 'var(--color-sidebar-primary)',
+        'sidebar-primary-foreground': 'var(--color-sidebar-primary-foreground)',
+        'sidebar-accent': 'var(--color-sidebar-accent)',
+        'sidebar-accent-foreground': 'var(--color-sidebar-accent-foreground)',
+        'sidebar-border': 'var(--color-sidebar-border)',
+        'sidebar-ring': 'var(--color-sidebar-ring)',
       },
       borderRadius: {
         lg: 'var(--radius-lg)',
@@ -87,7 +85,7 @@ const config: Config = {
       },
       spacing: {
         '0': 'var(--spacing-0)',
-        'px': 'var(--spacing-px)',
+        px: 'var(--spacing-px)',
         '0.5': 'var(--spacing-0_5)',
         '1': 'var(--spacing-1)',
         '1.5': 'var(--spacing-1_5)',
@@ -123,13 +121,13 @@ const config: Config = {
         '96': 'var(--spacing-96)',
       },
       boxShadow: {
-        'sm': 'var(--shadow-sm)',
-        'base': 'var(--shadow-base)',
-        'md': 'var(--shadow-md)',
-        'lg': 'var(--shadow-lg)',
-        'xl': 'var(--shadow-xl)',
+        sm: 'var(--shadow-sm)',
+        base: 'var(--shadow-base)',
+        md: 'var(--shadow-md)',
+        lg: 'var(--shadow-lg)',
+        xl: 'var(--shadow-xl)',
         '2xl': 'var(--shadow-2xl)',
-        'inner': 'var(--shadow-inner)',
+        inner: 'var(--shadow-inner)',
       },
       zIndex: {
         '0': 'var(--z-0)',
@@ -138,14 +136,14 @@ const config: Config = {
         '30': 'var(--z-30)',
         '40': 'var(--z-40)',
         '50': 'var(--z-50)',
-        'auto': 'var(--z-auto)',
-        'dropdown': 'var(--z-dropdown)',
-        'sticky': 'var(--z-sticky)',
-        'fixed': 'var(--z-fixed)',
+        auto: 'var(--z-auto)',
+        dropdown: 'var(--z-dropdown)',
+        sticky: 'var(--z-sticky)',
+        fixed: 'var(--z-fixed)',
         'modal-backdrop': 'var(--z-modal-backdrop)',
-        'modal': 'var(--z-modal)',
-        'popover': 'var(--z-popover)',
-        'tooltip': 'var(--z-tooltip)',
+        modal: 'var(--z-modal)',
+        popover: 'var(--z-popover)',
+        tooltip: 'var(--z-tooltip)',
       },
       animationDuration: {
         '75': 'var(--duration-75)',
@@ -158,20 +156,20 @@ const config: Config = {
         '1000': 'var(--duration-1000)',
       },
       transitionTimingFunction: {
-        'linear': 'var(--ease-linear)',
-        'in': 'var(--ease-in)',
-        'out': 'var(--ease-out)',
+        linear: 'var(--ease-linear)',
+        in: 'var(--ease-in)',
+        out: 'var(--ease-out)',
         'in-out': 'var(--ease-in-out)',
-        'fluid': 'var(--ease-fluid)',
-        'snappy': 'var(--ease-snappy)',
-        'bounce': 'var(--ease-bounce)',
+        fluid: 'var(--ease-fluid)',
+        snappy: 'var(--ease-snappy)',
+        bounce: 'var(--ease-bounce)',
       },
       fontSize: {
-        'xs': 'var(--text-xs)',
-        'sm': 'var(--text-sm)',
-        'base': 'var(--text-base)',
-        'lg': 'var(--text-lg)',
-        'xl': 'var(--text-xl)',
+        xs: 'var(--text-xs)',
+        sm: 'var(--text-sm)',
+        base: 'var(--text-base)',
+        lg: 'var(--text-lg)',
+        xl: 'var(--text-xl)',
         '2xl': 'var(--text-2xl)',
         '3xl': 'var(--text-3xl)',
         '4xl': 'var(--text-4xl)',
@@ -182,39 +180,39 @@ const config: Config = {
         '9xl': 'var(--text-9xl)',
       },
       fontWeight: {
-        'thin': 'var(--font-weight-thin)',
-        'extralight': 'var(--font-weight-extralight)',
-        'light': 'var(--font-weight-light)',
-        'normal': 'var(--font-weight-normal)',
-        'medium': 'var(--font-weight-medium)',
-        'semibold': 'var(--font-weight-semibold)',
-        'bold': 'var(--font-weight-bold)',
-        'extrabold': 'var(--font-weight-extrabold)',
-        'black': 'var(--font-weight-black)',
+        thin: 'var(--font-weight-thin)',
+        extralight: 'var(--font-weight-extralight)',
+        light: 'var(--font-weight-light)',
+        normal: 'var(--font-weight-normal)',
+        medium: 'var(--font-weight-medium)',
+        semibold: 'var(--font-weight-semibold)',
+        bold: 'var(--font-weight-bold)',
+        extrabold: 'var(--font-weight-extrabold)',
+        black: 'var(--font-weight-black)',
       },
       lineHeight: {
-        'none': 'var(--leading-none)',
-        'tight': 'var(--leading-tight)',
-        'snug': 'var(--leading-snug)',
-        'normal': 'var(--leading-normal)',
-        'relaxed': 'var(--leading-relaxed)',
-        'loose': 'var(--leading-loose)',
+        none: 'var(--leading-none)',
+        tight: 'var(--leading-tight)',
+        snug: 'var(--leading-snug)',
+        normal: 'var(--leading-normal)',
+        relaxed: 'var(--leading-relaxed)',
+        loose: 'var(--leading-loose)',
       },
       letterSpacing: {
-        'tighter': 'var(--tracking-tighter)',
-        'tight': 'var(--tracking-tight)',
-        'normal': 'var(--tracking-normal)',
-        'wide': 'var(--tracking-wide)',
-        'wider': 'var(--tracking-wider)',
-        'widest': 'var(--tracking-widest)',
+        tighter: 'var(--tracking-tighter)',
+        tight: 'var(--tracking-tight)',
+        normal: 'var(--tracking-normal)',
+        wide: 'var(--tracking-wide)',
+        wider: 'var(--tracking-wider)',
+        widest: 'var(--tracking-widest)',
       },
       backdropBlur: {
-        'none': 'var(--blur-none)',
-        'sm': 'var(--blur-sm)',
-        'base': 'var(--blur-base)',
-        'md': 'var(--blur-md)',
-        'lg': 'var(--blur-lg)',
-        'xl': 'var(--blur-xl)',
+        none: 'var(--blur-none)',
+        sm: 'var(--blur-sm)',
+        base: 'var(--blur-base)',
+        md: 'var(--blur-md)',
+        lg: 'var(--blur-lg)',
+        xl: 'var(--blur-xl)',
         '2xl': 'var(--blur-2xl)',
         '3xl': 'var(--blur-3xl)',
       },
@@ -251,6 +249,10 @@ const config: Config = {
           '0%': { transform: 'translateX(100%)' },
           '100%': { transform: 'translateX(0)' },
         },
+        'fade-in-up': {
+          '0%': { opacity: '0', transform: 'translateY(10px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
@@ -261,23 +263,28 @@ const config: Config = {
         'slide-in-from-bottom': 'slide-in-from-bottom 0.3s ease-out',
         'slide-in-from-left': 'slide-in-from-left 0.3s ease-out',
         'slide-in-from-right': 'slide-in-from-right 0.3s ease-out',
+        'fade-in-up': 'fade-in-up 0.5s ease-out',
       },
     },
   },
   plugins: [
     // Advanced CSS-atomics and performance support
-    function({ addUtilities }: { addUtilities: (utilities: Record<string, Record<string, string>>) => void }) {
+    function ({
+      addUtilities,
+    }: {
+      addUtilities: (utilities: Record<string, Record<string, string>>) => void
+    }) {
       addUtilities({
         // CSS-atomics for optimal performance
         '.atomic-will-change': {
           'will-change': 'transform, opacity',
         },
         '.atomic-gpu': {
-          'transform': 'translateZ(0)',
+          transform: 'translateZ(0)',
           'backface-visibility': 'hidden',
         },
         '.atomic-composite': {
-          'isolation': 'isolate',
+          isolation: 'isolate',
         },
         // Performance utilities
         '.content-visibility-auto': {
@@ -289,16 +296,16 @@ const config: Config = {
           'contain-intrinsic-size': '0 500px',
         },
         '.contain-strict': {
-          'contain': 'strict',
+          contain: 'strict',
         },
         '.contain-layout': {
-          'contain': 'layout',
+          contain: 'layout',
         },
         '.contain-style': {
-          'contain': 'style',
+          contain: 'style',
         },
         '.contain-paint': {
-          'contain': 'paint',
+          contain: 'paint',
         },
         // Modern field sizing
         '.field-sizing-content': {
@@ -307,7 +314,7 @@ const config: Config = {
         '.field-sizing-fixed': {
           'field-sizing': 'fixed',
         },
-      });
+      })
     },
   ],
 }

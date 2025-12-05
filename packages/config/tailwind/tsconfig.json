@@ -2,6 +2,7 @@
   "extends": "@pems/config-typescript/base.json",
   "compilerOptions": {
     "baseUrl": ".",
+    "ignoreDeprecations": "6.0",
     "outDir": "./dist",
     "exactOptionalPropertyTypes": false,
     "strictPropertyInitialization": false,

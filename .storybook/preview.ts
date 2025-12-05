@@ -1,6 +1,6 @@
 import type { Preview } from '@storybook/html';
-import '../packages/config/tailwind/utilities.css';
-import '../packages/ui/src/index.css';
+// Note: CSS imports removed to prevent conflicts with main web app
+// The main web app uses Tailwind v4 with CSS-native configuration
 
 const preview: Preview = {
   parameters: {

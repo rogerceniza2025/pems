@@ -20,7 +20,22 @@
       "Bash(pnpm list:*)",
       "mcp__filesystem__directory_tree",
       "mcp__filesystem__list_allowed_directories",
-      "mcp__filesystem__write_file"
+      "mcp__filesystem__write_file",
+      "mcp__filesystem__read_text_file",
+      "mcp__filesystem__read_multiple_files",
+      "mcp__filesystem__edit_file",
+      "Bash(pnpm add:*)",
+      "mcp__playwright__browser_take_screenshot",
+      "mcp__playwright__browser_navigate",
+      "mcp__playwright__browser_click",
+      "mcp__playwright__browser_snapshot",
+      "mcp__playwright__browser_evaluate",
+      "mcp__playwright__browser_close",
+      "mcp__playwright__browser_wait_for",
+      "mcp__playwright__browser_console_messages",
+      "mcp__playwright__browser_run_code",
+      "Bash(ls:*)",
+      "mcp__filesystem__search_files"
     ],
     "deny": [],
     "ask": []

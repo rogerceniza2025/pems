@@ -9,6 +9,7 @@
     "composite": true,
     "incremental": true,
     "baseUrl": "./src",
+    "ignoreDeprecations": "6.0",
     "paths": {
       "@/*": ["./*"],
       "@/domain/*": ["./domain/*"],
@@ -17,12 +18,6 @@
       "@/presentation/*": ["./presentation/*"]
     }
   },
-  "include": [
-    "src/**/*"
-  ],
-  "exclude": [
-    "dist",
-    "node_modules",
-    "tests"
-  ]
+  "include": ["src/**/*"],
+  "exclude": ["dist", "node_modules", "tests"]
 }

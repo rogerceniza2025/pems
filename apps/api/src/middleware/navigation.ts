@@ -1,6 +1,9 @@
-import type { Context, Next } from 'hono'
-import type { NavigationService, NavigationRepository } from '@pems/navigation-management'
 import { DomainEventBus } from '@pems/infrastructure-events'
+import type {
+  NavigationRepository,
+  NavigationService,
+} from '@pems/navigation-management'
+import type { Context, Next } from 'hono'
 
 /**
  * Navigation middleware for API routes
@@ -33,7 +36,7 @@ export const injectNavigationServices = async (c: Context, next: Next) => {
       handlerTimeout: 30000,
       enableEventOrdering: false,
       enableDeadLetterQueue: true,
-      deadLetterQueueSize: 100
+      deadLetterQueueSize: 100,
     })
 
     // Initialize navigation repository
@@ -43,14 +46,14 @@ export const injectNavigationServices = async (c: Context, next: Next) => {
       enableEventPublishing: true,
       enablePersistence: false,
       batchSize: 100,
-      enableMetrics: true
+      enableMetrics: true,
     })
 
     // Initialize navigation service
     const navigationService = new NavigationService({
       enableCaching: true,
       enableAnalytics: true,
-      enableSecurityAuditing: true
+      enableSecurityAuditing: true,
     })
 
     // Set up event subscriptions for navigation repository
@@ -84,7 +87,6 @@ export const injectNavigationServices = async (c: Context, next: Next) => {
     })
 
     await next()
-
   } catch (error) {
     console.error('Error initializing navigation services:', error)
     return c.json({ error: 'Failed to initialize navigation services' }, 500)
@@ -121,43 +123,61 @@ export const navigationErrorHandler = async (c: Context, next: Next) => {
     if (error instanceof Error) {
       switch (error.name) {
         case 'ValidationError':
-          return c.json({
-            error: 'Validation error',
-            message: error.message,
-            details: error.stack
-          }, 400)
+          return c.json(
+            {
+              error: 'Validation error',
+              message: error.message,
+              details: error.stack,
+            },
+            400,
+          )
 
         case 'PermissionError':
-          return c.json({
-            error: 'Permission denied',
-            message: error.message
-          }, 403)
+          return c.json(
+            {
+              error: 'Permission denied',
+              message: error.message,
+            },
+            403,
+          )
 
         case 'NotFoundError':
-          return c.json({
-            error: 'Resource not found',
-            message: error.message
-          }, 404)
+          return c.json(
+            {
+              error: 'Resource not found',
+              message: error.message,
+            },
+            404,
+          )
 
         case 'ConflictError':
-          return c.json({
-            error: 'Resource conflict',
-            message: error.message
-          }, 409)
+          return c.json(
+            {
+              error: 'Resource conflict',
+              message: error.message,
+            },
+            409,
+          )
 
         default:
-          return c.json({
-            error: 'Internal server error',
-            message: 'An unexpected error occurred',
-            requestId: c.get('requestId')
-          }, 500)
+          return c.json(
+            {
+              error: 'Internal server error',
+              message: 'An unexpected error occurred',
+              requestId: c.get('requestId'),
+            },
+            500,
+          )
       }
     } else {
-      return c.json({
-        error: 'Internal server error',
-        message: 'An unexpected error occurred',
-        requestId: c.get('requestId')
-      }, 500)
+      return c.json(
+        {
+          error: 'Internal server error',
+          message: 'An unexpected error occurred',
+          requestId: c.get('requestId'),
+        },
+        500,
+      )
     }
   }
 }
@@ -166,9 +186,10 @@ export const navigationErrorHandler = async (c: Context, next: Next) => {
  * Request ID middleware for tracking
  */
 export const requestId = async (c: Context, next: Next) => {
-  const requestId = c.req.header('x-request-id') ||
-                     crypto.randomUUID() ||
-                     Math.random().toString(36).substr(2, 9)
+  const requestId =
+    c.req.header('x-request-id') ||
+    crypto.randomUUID() ||
+    Math.random().toString(36).substr(2, 9)
 
   c.set('requestId', requestId)
   c.header('x-request-id', requestId)
@@ -179,19 +200,22 @@ export const requestId = async (c: Context, next: Next) => {
 /**
  * Rate limiting middleware for navigation endpoints
  */
-export const rateLimit = (options: {
-  requests: number
-  window: number // in milliseconds
-  identifier?: (c: Context) => string
-} = { requests: 100, window: 60 * 1000 }) => {
+export const rateLimit = (
+  options: {
+    requests: number
+    window: number // in milliseconds
+    identifier?: (c: Context) => string
+  } = { requests: 100, window: 60 * 1000 },
+) => {
   const store = new Map<string, { count: number; resetTime: number }>()
 
   return async (c: Context, next: Next) => {
-    const identifier = options.identifier?.(c) ||
-                      c.req.header('x-forwarded-for') ||
-                      c.req.header('x-real-ip') ||
-                      c.req.ip ||
-                      'unknown'
+    const identifier =
+      options.identifier?.(c) ||
+      c.req.header('x-forwarded-for') ||
+      c.req.header('x-real-ip') ||
+      c.req.ip ||
+      'unknown'
 
     const now = Date.now()
     const windowStart = now - options.window
@@ -205,16 +229,22 @@ export const rateLimit = (options: {
     record.count++
 
     if (record.count > options.requests) {
-      return c.json({
-        error: 'Rate limit exceeded',
-        message: `Too many requests. Try again in ${Math.ceil((record.resetTime - now) / 1000)} seconds.`,
-        retryAfter: Math.ceil((record.resetTime - now) / 1000)
-      }, 429)
+      return c.json(
+        {
+          error: 'Rate limit exceeded',
+          message: `Too many requests. Try again in ${Math.ceil((record.resetTime - now) / 1000)} seconds.`,
+          retryAfter: Math.ceil((record.resetTime - now) / 1000),
+        },
+        429,
+      )
     }
 
     // Set rate limit headers
     c.header('X-RateLimit-Limit', options.requests.toString())
-    c.header('X-RateLimit-Remaining', Math.max(0, options.requests - record.count).toString())
+    c.header(
+      'X-RateLimit-Remaining',
+      Math.max(0, options.requests - record.count).toString(),
+    )
     c.header('X-RateLimit-Reset', new Date(record.resetTime).toISOString())
 
     await next()
@@ -224,17 +254,19 @@ export const rateLimit = (options: {
 /**
  * CORS middleware for navigation API
  */
-export const cors = (options: {
-  origin?: string | string[]
-  methods?: string[]
-  headers?: string[]
-  credentials?: boolean
-} = {}) => {
+export const cors = (
+  options: {
+    origin?: string | string[]
+    methods?: string[]
+    headers?: string[]
+    credentials?: boolean
+  } = {},
+) => {
   const {
     origin = '*',
     methods = ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     headers = ['Content-Type', 'Authorization', 'X-Request-ID'],
-    credentials = true
+    credentials = true,
   } = options
 
   return async (c: Context, next: Next) => {
@@ -269,18 +301,24 @@ export const requestLogger = () => {
     const userAgent = c.req.header('user-agent')
     const ip = c.req.ip
 
-    console.log(`[${new Date().toISOString()}] ${method} ${path} - Request ${requestId} from ${ip} (${userAgent})`)
+    console.log(
+      `[${new Date().toISOString()}] ${method} ${path} - Request ${requestId} from ${ip} (${userAgent})`,
+    )
 
     await next()
 
     const duration = Date.now() - start
     const status = c.res.status
 
-    console.log(`[${new Date().toISOString()}] ${method} ${path} - Response ${requestId} - ${status} (${duration}ms)`)
+    console.log(
+      `[${new Date().toISOString()}] ${method} ${path} - Response ${requestId} - ${status} (${duration}ms)`,
+    )
 
     // Log slow requests
     if (duration > 1000) {
-      console.warn(`Slow request detected: ${method} ${path} took ${duration}ms`)
+      console.warn(
+        `Slow request detected: ${method} ${path} took ${duration}ms`,
+      )
     }
   }
 }
@@ -309,14 +347,15 @@ export const navigationMiddleware = [
   requestId,
   requestLogger(),
   cors({
-    origin: process.env.NODE_ENV === 'production'
-      ? ['https://yourdomain.com']
-      : ['http://localhost:3000', 'http://localhost:5173'],
-    credentials: true
+    origin:
+      process.env.NODE_ENV === 'production'
+        ? ['https://yourdomain.com']
+        : ['http://localhost:3000', 'http://localhost:3000'],
+    credentials: true,
   }),
   securityHeaders,
   rateLimit({ requests: 200, window: 60 * 1000 }), // 200 requests per minute
   navigationErrorHandler,
   injectNavigationServices,
-  cleanupNavigationServices
+  cleanupNavigationServices,
 ]

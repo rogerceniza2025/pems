@@ -1,5 +1,5 @@
 import { For, Show, splitProps } from 'solid-js'
-import { cn } from '../../lib/utils'
+import { classNames } from '../../lib/utils'
 import { Skeleton } from './skeleton'
 
 export interface SkeletonCardProps {
@@ -46,7 +46,7 @@ export const SkeletonCard = (props: SkeletonCardProps) => {
   }
 
   return (
-    <div class={cn('rounded-lg border bg-card p-6', local.class)} {...others}>
+    <div class={classNames('rounded-lg border bg-card p-6', local.class)} {...others}>
       {/* Avatar and Title Section */}
       <Show when={(local.showAvatar ?? false) || (local.showTitle ?? false)}>
         <div class="flex items-center space-x-4 mb-4">

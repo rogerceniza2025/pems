@@ -173,7 +173,7 @@ export default defineConfig({
       use: {
         ...devices['Desktop Chrome'],
         // Storybook specific settings
-        baseURL: process.env.STORYBOOK_URL || 'http://localhost:6006',
+        baseURL: process.env.STORYBOOK_URL || 'http://localhost:3106',
         extraHTTPHeaders: {
           'X-Visual-Testing': 'true',
           'X-Test-Environment': 'playwright-storybook',

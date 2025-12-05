@@ -1,15 +1,9 @@
 import {
-  createSignal,
-  For,
-  Show,
-  createEffect,
-  createMemo
-} from 'solid-js'
-import {
-  NavigationService,
   NavigationRepository,
-  type NavigationStatistics
+  NavigationService,
+  type NavigationStatistics,
 } from '@pems/navigation-management'
+import { createEffect, createMemo, createSignal, For, Show } from 'solid-js'
 
 /**
  * Navigation Analytics Dashboard
@@ -65,12 +59,17 @@ export function NavigationAnalytics(props: NavigationAnalyticsProps) {
   // UI State
   const [loading, setLoading] = createSignal(true)
   const [error, setError] = createSignal<string>()
-  const [selectedTimeRange, setSelectedTimeRange] = createSignal<'24h' | '7d' | '30d' | '90d'>('7d')
-  const [selectedMetric, setSelectedMetric] = createSignal<'usage' | 'performance' | 'items' | 'users'>('usage')
+  const [selectedTimeRange, setSelectedTimeRange] = createSignal<
+    '24h' | '7d' | '30d' | '90d'
+  >('7d')
+  const [selectedMetric, setSelectedMetric] = createSignal<
+    'usage' | 'performance' | 'items' | 'users'
+  >('usage')
 
   // Analytics data
   const [analyticsData, setAnalyticsData] = createSignal<AnalyticsData>()
-  const [navigationStats, setNavigationStats] = createSignal<NavigationStatistics>()
+  const [navigationStats, setNavigationStats] =
+    createSignal<NavigationStatistics>()
 
   // Refresh timer
   let refreshTimer: number | undefined
@@ -118,7 +117,7 @@ export function NavigationAnalytics(props: NavigationAnalyticsProps) {
             clicks: Math.floor(Math.random() * 2000) + 500,
             views: Math.floor(Math.random() * 5000) + 1000,
             clickRate: Math.random() * 0.5 + 0.3,
-            averageTimeToClick: Math.random() * 5000 + 1000
+            averageTimeToClick: Math.random() * 5000 + 1000,
           },
           {
             itemId: 'users',
@@ -127,7 +126,7 @@ export function NavigationAnalytics(props: NavigationAnalyticsProps) {
             clicks: Math.floor(Math.random() * 1500) + 300,
             views: Math.floor(Math.random() * 3000) + 500,
             clickRate: Math.random() * 0.4 + 0.2,
-            averageTimeToClick: Math.random() * 4000 + 1500
+            averageTimeToClick: Math.random() * 4000 + 1500,
           },
           {
             itemId: 'transactions',
@@ -136,8 +135,8 @@ export function NavigationAnalytics(props: NavigationAnalyticsProps) {
             clicks: Math.floor(Math.random() * 1800) + 400,
             views: Math.floor(Math.random() * 4000) + 800,
             clickRate: Math.random() * 0.6 + 0.3,
-            averageTimeToClick: Math.random() * 3500 + 1200
-          }
+            averageTimeToClick: Math.random() * 3500 + 1200,
+          },
         ],
 
         averageLoadTime: Math.random() * 100 + 20,
@@ -149,18 +148,17 @@ export function NavigationAnalytics(props: NavigationAnalyticsProps) {
           { role: 'clerk', userCount: 200, averageItemsViewed: 12 },
           { role: 'manager', userCount: 80, averageItemsViewed: 15 },
           { role: 'tenant_admin', userCount: 25, averageItemsViewed: 20 },
-          { role: 'super_admin', userCount: 5, averageItemsViewed: 25 }
+          { role: 'super_admin', userCount: 5, averageItemsViewed: 25 },
         ],
 
         hourlyActivity: Array.from({ length: 24 }, (_, hour) => ({
           hour,
           clicks: Math.floor(Math.random() * 100) + 10,
-          views: Math.floor(Math.random() * 500) + 50
-        }))
+          views: Math.floor(Math.random() * 500) + 50,
+        })),
       }
 
       setAnalyticsData(mockData)
-
     } catch (err) {
       setError('Failed to load analytics data')
       console.error('Error loading analytics:', err)
@@ -200,14 +198,22 @@ export function NavigationAnalytics(props: NavigationAnalyticsProps) {
                   class={`range-btn ${selectedTimeRange() === range ? 'range-btn--active' : ''}`}
                   onClick={() => setSelectedTimeRange(range)}
                 >
-                  {range === '24h' ? 'Last 24 Hours' :
-                   range === '7d' ? 'Last 7 Days' :
-                   range === '30d' ? 'Last 30 Days' : 'Last 90 Days'}
+                  {range === '24h'
+                    ? 'Last 24 Hours'
+                    : range === '7d'
+                      ? 'Last 7 Days'
+                      : range === '30d'
+                        ? 'Last 30 Days'
+                        : 'Last 90 Days'}
                 </button>
               )}
             </For>
           </div>
-          <button class="refresh-btn" onClick={loadAnalytics} disabled={loading()}>
+          <button
+            class="refresh-btn"
+            onClick={loadAnalytics}
+            disabled={loading()}
+          >
             🔄 Refresh
           </button>
         </div>
@@ -224,7 +230,7 @@ export function NavigationAnalytics(props: NavigationAnalyticsProps) {
       {/* Loading State */}
       <Show when={loading() && !analyticsData()}>
         <div class="loading-state">
-          <div class="spinner"></div>
+          <div class="spinner" />
           <p>Loading analytics data...</p>
         </div>
       </Show>
@@ -238,7 +244,9 @@ export function NavigationAnalytics(props: NavigationAnalyticsProps) {
               <h3>Total Clicks</h3>
               <span class="metric-icon">👆</span>
             </div>
-            <div class="metric-value">{analyticsData()!.totalClicks.toLocaleString()}</div>
+            <div class="metric-value">
+              {analyticsData()!.totalClicks.toLocaleString()}
+            </div>
             <div class="metric-change positive">+12.5% from last period</div>
           </div>
 
@@ -247,7 +255,9 @@ export function NavigationAnalytics(props: NavigationAnalyticsProps) {
               <h3>Unique Users</h3>
               <span class="metric-icon">👥</span>
             </div>
-            <div class="metric-value">{analyticsData()!.uniqueUsers.toLocaleString()}</div>
+            <div class="metric-value">
+              {analyticsData()!.uniqueUsers.toLocaleString()}
+            </div>
             <div class="metric-change positive">+8.2% from last period</div>
           </div>
 
@@ -256,7 +266,9 @@ export function NavigationAnalytics(props: NavigationAnalyticsProps) {
               <h3>Click Rate</h3>
               <span class="metric-icon">📊</span>
             </div>
-            <div class="metric-value">{(overallClickRate() * 100).toFixed(1)}%</div>
+            <div class="metric-value">
+              {(overallClickRate() * 100).toFixed(1)}%
+            </div>
             <div class="metric-change positive">+2.1% from last period</div>
           </div>
 
@@ -279,9 +291,13 @@ export function NavigationAnalytics(props: NavigationAnalyticsProps) {
                   class={`tab-btn ${selectedMetric() === metric ? 'tab-btn--active' : ''}`}
                   onClick={() => setSelectedMetric(metric)}
                 >
-                  {metric === 'usage' ? 'Usage' :
-                   metric === 'performance' ? 'Performance' :
-                   metric === 'items' ? 'Top Items' : 'User Analytics'}
+                  {metric === 'usage'
+                    ? 'Usage'
+                    : metric === 'performance'
+                      ? 'Performance'
+                      : metric === 'items'
+                        ? 'Top Items'
+                        : 'User Analytics'}
                 </button>
               )}
             </For>
@@ -300,7 +316,7 @@ export function NavigationAnalytics(props: NavigationAnalyticsProps) {
                           class="activity-bar"
                           style={{
                             height: `${(hourData.clicks / 100) * 100}%`,
-                            opacity: hourData.clicks > 50 ? 1 : 0.6
+                            opacity: hourData.clicks > 50 ? 1 : 0.6,
                           }}
                           title={`${hourData.hour}:00 - ${hourData.clicks} clicks`}
                         >
@@ -315,12 +331,15 @@ export function NavigationAnalytics(props: NavigationAnalyticsProps) {
                   <div class="usage-stat">
                     <h4>Average Session Duration</h4>
                     <div class="usage-value">
-                      {Math.floor(analyticsData()!.averageSessionDuration / 60)}m {analyticsData()!.averageSessionDuration % 60}s
+                      {Math.floor(analyticsData()!.averageSessionDuration / 60)}
+                      m {analyticsData()!.averageSessionDuration % 60}s
                     </div>
                   </div>
                   <div class="usage-stat">
                     <h4>Total Views</h4>
-                    <div class="usage-value">{analyticsData()!.totalViews.toLocaleString()}</div>
+                    <div class="usage-value">
+                      {analyticsData()!.totalViews.toLocaleString()}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -332,33 +351,45 @@ export function NavigationAnalytics(props: NavigationAnalyticsProps) {
                 <div class="performance-grid">
                   <div class="performance-metric">
                     <h4>Average Load Time</h4>
-                    <div class="performance-value">{analyticsData()!.averageLoadTime.toFixed(1)}ms</div>
+                    <div class="performance-value">
+                      {analyticsData()!.averageLoadTime.toFixed(1)}ms
+                    </div>
                     <div class="performance-bar">
                       <div
                         class="performance-fill"
-                        style={{ width: `${Math.min(100, analyticsData()!.averageLoadTime / 2)}%` }}
+                        style={{
+                          width: `${Math.min(100, analyticsData()!.averageLoadTime / 2)}%`,
+                        }}
                       />
                     </div>
                   </div>
 
                   <div class="performance-metric">
                     <h4>Cache Hit Ratio</h4>
-                    <div class="performance-value">{(analyticsData()!.cacheHitRatio * 100).toFixed(1)}%</div>
+                    <div class="performance-value">
+                      {(analyticsData()!.cacheHitRatio * 100).toFixed(1)}%
+                    </div>
                     <div class="performance-bar">
                       <div
                         class="performance-fill performance-fill--success"
-                        style={{ width: `${analyticsData()!.cacheHitRatio * 100}%` }}
+                        style={{
+                          width: `${analyticsData()!.cacheHitRatio * 100}%`,
+                        }}
                       />
                     </div>
                   </div>
 
                   <div class="performance-metric">
                     <h4>Error Rate</h4>
-                    <div class="performance-value">{(analyticsData()!.errorRate * 100).toFixed(2)}%</div>
+                    <div class="performance-value">
+                      {(analyticsData()!.errorRate * 100).toFixed(2)}%
+                    </div>
                     <div class="performance-bar">
                       <div
                         class="performance-fill performance-fill--danger"
-                        style={{ width: `${Math.min(100, analyticsData()!.errorRate * 1000)}%` }}
+                        style={{
+                          width: `${Math.min(100, analyticsData()!.errorRate * 1000)}%`,
+                        }}
                       />
                     </div>
                   </div>
@@ -366,7 +397,9 @@ export function NavigationAnalytics(props: NavigationAnalyticsProps) {
                   <Show when={navigationStats()}>
                     <div class="performance-metric">
                       <h4>Navigation Items</h4>
-                      <div class="performance-value">{navigationStats()!.totalItems}</div>
+                      <div class="performance-value">
+                        {navigationStats()!.totalItems}
+                      </div>
                     </div>
                   </Show>
                 </div>
@@ -392,14 +425,22 @@ export function NavigationAnalytics(props: NavigationAnalyticsProps) {
                           <strong>{item.label}</strong>
                         </div>
                         <div class="table-cell">{item.path}</div>
-                        <div class="table-cell">{item.clicks.toLocaleString()}</div>
-                        <div class="table-cell">{item.views.toLocaleString()}</div>
                         <div class="table-cell">
-                          <span class={`click-rate ${item.clickRate > 0.4 ? 'click-rate--high' : item.clickRate > 0.2 ? 'click-rate--medium' : 'click-rate--low'}`}>
+                          {item.clicks.toLocaleString()}
+                        </div>
+                        <div class="table-cell">
+                          {item.views.toLocaleString()}
+                        </div>
+                        <div class="table-cell">
+                          <span
+                            class={`click-rate ${item.clickRate > 0.4 ? 'click-rate--high' : item.clickRate > 0.2 ? 'click-rate--medium' : 'click-rate--low'}`}
+                          >
                             {(item.clickRate * 100).toFixed(1)}%
                           </span>
                         </div>
-                        <div class="table-cell">{(item.averageTimeToClick / 1000).toFixed(1)}s</div>
+                        <div class="table-cell">
+                          {(item.averageTimeToClick / 1000).toFixed(1)}s
+                        </div>
                       </div>
                     )}
                   </For>
@@ -418,12 +459,16 @@ export function NavigationAnalytics(props: NavigationAnalyticsProps) {
                         <div class="role-item">
                           <div class="role-info">
                             <span class="role-name">{roleData.role}</span>
-                            <span class="role-count">{roleData.userCount} users</span>
+                            <span class="role-count">
+                              {roleData.userCount} users
+                            </span>
                           </div>
                           <div class="role-metrics">
                             <div class="role-stat">
                               <span class="stat-label">Avg Items Viewed</span>
-                              <span class="stat-value">{roleData.averageItemsViewed}</span>
+                              <span class="stat-value">
+                                {roleData.averageItemsViewed}
+                              </span>
                             </div>
                           </div>
                         </div>

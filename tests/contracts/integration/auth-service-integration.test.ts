@@ -27,9 +27,9 @@ describe('Authentication Service Integration', () => {
       .start();
 
     // Mock service URLs for integration testing
-    authServiceUrl = process.env.AUTH_SERVICE_URL || 'http://localhost:3001';
-    userServiceUrl = process.env.USER_SERVICE_URL || 'http://localhost:3002';
-    notificationServiceUrl = process.env.NOTIFICATION_SERVICE_URL || 'http://localhost:3003';
+    authServiceUrl = process.env.AUTH_SERVICE_URL || 'http://localhost:3200';
+    userServiceUrl = process.env.USER_SERVICE_URL || 'http://localhost:3201';
+    notificationServiceUrl = process.env.NOTIFICATION_SERVICE_URL || 'http://localhost:3202';
 
     // Wait for services to be ready
     await Promise.all([
@@ -428,7 +428,7 @@ export class IntegrationTestUtils {
     const finalUserData = { ...defaultUserData, ...userData };
 
     const response = await axios.post(
-      `${process.env.AUTH_SERVICE_URL || 'http://localhost:3001'}/api/v1/auth/register`,
+      `${process.env.AUTH_SERVICE_URL || 'http://localhost:3200'}/api/v1/auth/register`,
       finalUserData
     );
 

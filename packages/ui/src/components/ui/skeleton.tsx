@@ -1,5 +1,5 @@
 import { splitProps } from 'solid-js'
-import { cn } from '../../lib/utils'
+import { classNames } from '../../lib/utils'
 
 export interface SkeletonProps {
   variant?: 'text' | 'circular' | 'rectangular' | 'rounded'
@@ -58,7 +58,7 @@ export const Skeleton = (props: SkeletonProps) => {
 
   return (
     <div
-      class={cn(
+      class={classNames(
         'bg-muted',
         animationClass(),
         speedClass(),

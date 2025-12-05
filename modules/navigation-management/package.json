@@ -16,6 +16,8 @@
     "@pems/database": "workspace:*",
     "@pems/shared-types": "workspace:*",
     "@pems/shared-utils": "workspace:*",
+    "@pems/infrastructure-events": "workspace:*",
+    "@pems/infrastructure-cache": "workspace:*",
     "zod": "^3.22.4",
     "nanoid": "^5.0.4"
   },

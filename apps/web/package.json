@@ -23,7 +23,6 @@
     "@tailwindcss/vite": "^4.1.17",
     "@tanstack/router-plugin": "^1.139.13",
     "@tanstack/solid-router": "^1.139.13",
-    "@tanstack/solid-router-devtools": "^1.139.13",
     "@tanstack/solid-start": "^1.139.13",
     "axios": "^1.13.2",
     "class-variance-authority": "^0.7.1",
@@ -38,6 +37,7 @@
   "devDependencies": {
     "@tanstack/devtools-vite": "^0.3.11",
     "@tanstack/eslint-config": "^0.3.3",
+    "@tanstack/solid-router-devtools": "^1.139.13",
     "@types/node": "^24.10.1",
     "playwright": "^1.57.0",
     "typescript": "^5.9.3",

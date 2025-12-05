@@ -5,7 +5,7 @@ import * as CheckboxPrimitive from '@kobalte/core/checkbox'
 import type { VariantProps } from 'class-variance-authority'
 import { cva } from 'class-variance-authority'
 
-import { cn } from '../../lib/utils'
+import { classNames } from '../../lib/utils'
 
 const checkboxVariants = cva(
   'peer h-4 w-4 shrink-0 rounded-sm border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground',
@@ -58,7 +58,7 @@ export const Checkbox = (props: CheckboxProps) => {
     <div class="space-y-2">
       <div class="flex items-start space-x-2">
         <CheckboxPrimitive.Root
-          class={cn(
+          class={classNames(
             checkboxVariants({ variant: local.variant, size: local.size }),
             local.class,
           )}
@@ -153,7 +153,7 @@ export const CheckboxGroup = (props: CheckboxGroupProps) => {
   }
 
   return (
-    <div class={cn('space-y-3', local.class)} {...others}>
+    <div class={classNames('space-y-3', local.class)} {...others}>
       {(local.label ?? local.required) && (
         <div class="space-y-1">
           <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
@@ -167,7 +167,7 @@ export const CheckboxGroup = (props: CheckboxGroupProps) => {
       )}
       
       <div
-        class={cn(
+        class={classNames(
           'space-y-2',
           local.orientation === 'horizontal' && 'flex flex-wrap gap-4 space-y-0',
         )}
@@ -216,7 +216,7 @@ export const CheckboxCard = (props: CheckboxCardProps) => {
 
   return (
     <div
-      class={cn(
+      class={classNames(
         'relative rounded-lg border p-4 cursor-pointer transition-colors hover:bg-muted/50',
         local.checked
           ? 'border-primary bg-primary/5'

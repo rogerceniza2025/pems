@@ -1,71 +1,44 @@
-import tailwindcssVite from '@tailwindcss/vite'
+import { tanstackStart } from '@tanstack/solid-start/plugin/vite'
 import { defineConfig } from 'vite'
-import solidPlugin from 'vite-plugin-solid'
-import viteTsConfigPaths from 'vite-tsconfig-paths'
+import viteSolid from 'vite-plugin-solid'
+import tsConfigPaths from 'vite-tsconfig-paths'
+import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
-  root: '.',
-  publicDir: '../public',
-  plugins: [
-    // devtools(), // Temporarily disabled due to port conflict
-    viteTsConfigPaths({
-      projects: ['./tsconfig.json'],
-      ignoreConfigErrors: true,
-    }),
-    solidPlugin(),
-    tailwindcssVite(),
-  ],
   server: {
     port: 3000,
-    open: true,
+    hmr: {
+      overlay: false // Reduces startup overhead
+    }
+  },
+  plugins: [
+    tsConfigPaths(),
+    tanstackStart(),
+    tailwindcss(),
+    // solid's vite plugin must come after start's vite plugin
+    viteSolid({ ssr: true }),
+  ],
+  optimizeDeps: {
+    include: [
+      'solid-js',
+      '@tanstack/solid-start',
+      'class-variance-authority',
+      'clsx',
+      'tailwind-merge',
+      'zod',
+      'axios'
+    ],
+    exclude: ['@tanstack/solid-router', '@kobalte/core', 'lucide-solid']
   },
   build: {
-    target: 'esnext',
-    // Enable CSS code splitting for better caching
-    cssCodeSplit: true,
-    // Optimize bundle size
     rollupOptions: {
       output: {
         manualChunks: {
-          // Vendor chunk for better caching
-          vendor: ['solid-js'],
-          // UI components chunk
-          ui: ['@pems/ui'],
-        },
-      },
-    },
-    // Enable minification
-    minify: 'esbuild',
-    // Report compressed size for more realistic bundle analysis
-    reportCompressedSize: true,
-    // Generate source maps for production debugging
-    sourcemap: false,
-  },
-  css: {
-    // Enable CSS modules for component-scoped styles
-    modules: false,
-    // PostCSS configuration is handled by Tailwind CSS 4
-    postcss: {},
-    // Enable CSS optimization
-    devSourcemap: true,
-    preprocessorOptions: {},
-  },
-  optimizeDeps: {
-    include: ['solid-js', '@solidjs/router', '@pems/ui'],
-  },
-  resolve: {
-    alias: {
-      '@': './src',
-    },
-  },
-  // Enable experimental features for better performance
-  experimental: {
-    renderBuiltUrl: (filename, { hostType }) => {
-      if (hostType === 'js') {
-        return { js: `/${filename}` }
-      } else {
-        return { relative: true }
+          vendor: ['solid-js', '@tanstack/solid-router'],
+          ui: ['@kobalte/core', 'lucide-solid'],
+          utils: ['class-variance-authority', 'clsx', 'tailwind-merge']
+        }
       }
-    },
-  },
+    }
+  }
 })

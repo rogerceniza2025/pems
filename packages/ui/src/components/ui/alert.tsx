@@ -1,6 +1,6 @@
 import type { JSX } from 'solid-js'
 import { splitProps } from 'solid-js'
-import { cn } from '../../lib/utils'
+import { classNames } from '../../lib/utils'
 
 export interface AlertProps {
   variant?: 'default' | 'destructive' | 'warning'
@@ -24,7 +24,7 @@ export const Alert = (props: AlertProps) => {
 
   return (
     <div
-      class={cn(
+      class={classNames(
         'relative w-full rounded-lg border p-3 text-sm',
         variantClasses(),
         local.class
