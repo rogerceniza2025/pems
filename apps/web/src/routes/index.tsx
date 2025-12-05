@@ -27,11 +27,17 @@ export const Route = createFileRoute('/')({
 })
 
 // Theme Toggle Button Component - uses centralized theme context
+// Only this component needs isHydrated() because it reads theme state
 function ThemeToggleButton() {
   const { resolvedTheme, toggleTheme, isHydrated } = useTheme()
 
   return (
-    <Show when={isHydrated()}>
+    <Show
+      when={isHydrated()}
+      fallback={
+        <div class="p-2 rounded-lg bg-card border border-border w-9 h-9 animate-pulse" />
+      }
+    >
       <button
         onClick={toggleTheme}
         class="p-2 rounded-lg bg-card hover:bg-accent transition-colors duration-200 border border-border hover:border-primary"
@@ -50,7 +56,6 @@ function ThemeToggleButton() {
 
 export default function Index() {
   const [loginOpen, setLoginOpen] = createSignal(false)
-  const { isHydrated } = useTheme()
 
   const features = [
     {
@@ -166,35 +171,25 @@ export default function Index() {
             designed for high-performing teams.
           </p>
 
-          {/* CTA Buttons - wrapped in Show to prevent hydration mismatch */}
+          {/* CTA Buttons - Render immediately, no hydration gate needed for buttons */}
           <div class="flex flex-col sm:flex-row gap-5 justify-center items-center mb-20">
-            <Show
-              when={isHydrated()}
-              fallback={
-                <div class="flex flex-col sm:flex-row gap-5">
-                  <div class="h-12 w-44 bg-primary/20 rounded-lg animate-pulse" />
-                  <div class="h-12 w-36 bg-muted rounded-lg animate-pulse" />
-                </div>
-              }
+            <Button
+              variant="default"
+              size="lg"
+              class="shadow-xl shadow-primary/25 text-base font-semibold px-8"
+              onClick={() => setLoginOpen(true)}
+              icon={<ArrowRight class="w-5 h-5" />}
+              iconPosition="right"
             >
-              <Button
-                variant="default"
-                size="lg"
-                class="shadow-xl shadow-primary/25 text-base font-semibold px-8"
-                onClick={() => setLoginOpen(true)}
-                icon={<ArrowRight class="w-5 h-5" />}
-                iconPosition="right"
-              >
-                Get Started Free
-              </Button>
-              <Button
-                variant="outline"
-                size="lg"
-                class="border-2 text-base font-semibold px-8"
-              >
-                Watch Demo
-              </Button>
-            </Show>
+              Get Started Free
+            </Button>
+            <Button
+              variant="outline"
+              size="lg"
+              class="border-2 text-base font-semibold px-8"
+            >
+              Watch Demo
+            </Button>
           </div>
 
           {/* Social Proof */}

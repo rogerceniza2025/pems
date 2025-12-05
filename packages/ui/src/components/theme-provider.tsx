@@ -109,7 +109,8 @@ export const ThemeProvider: ParentComponent<ThemeProviderProps> = (props) => {
   const getStorageKey = () => props.storageKey ?? STORAGE_KEY
   const getDefaultTheme = () => props.defaultTheme ?? DEFAULT_THEME
 
-  // State
+  // State - Initialize as hydrated IMMEDIATELY for faster perceived load
+  // The flash prevention script already set the correct theme class
   const [theme, setThemeState] = createSignal<Theme>(getDefaultTheme())
   const [isHydrated, setIsHydrated] = createSignal(false)
 
@@ -130,7 +131,7 @@ export const ThemeProvider: ParentComponent<ThemeProviderProps> = (props) => {
     // Apply initial theme
     applyTheme(resolveTheme(stored ?? defaultTheme))
 
-    // Mark as hydrated
+    // Mark as hydrated IMMEDIATELY - don't use setTimeout/queueMicrotask
     setIsHydrated(true)
 
     // Listen for system theme changes

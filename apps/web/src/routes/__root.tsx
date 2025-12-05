@@ -128,10 +128,10 @@ function RootDocument(props: Readonly<{ children: Solid.JSX.Element }>) {
   return (
     <html>
       <head>
+        <HeadContent />
         <HydrationScript />
       </head>
       <body>
-        <HeadContent />
         <Solid.Suspense>{props.children}</Solid.Suspense>
         <Scripts />
       </body>

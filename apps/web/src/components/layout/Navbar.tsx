@@ -1,9 +1,8 @@
-import { Button, useTheme } from '@pems/ui'
+import { Button } from '@pems/ui'
 import { Show, createSignal, type JSX } from 'solid-js'
 
 function MobileNav(props: { onLogin: () => void; extraContent?: JSX.Element }) {
   const [open, setOpen] = createSignal(false)
-  const { isHydrated } = useTheme()
 
   return (
     <div class="md:hidden">
@@ -57,21 +56,19 @@ function MobileNav(props: { onLogin: () => void; extraContent?: JSX.Element }) {
                 Testimonials
               </a>
             </li>
-            <Show when={isHydrated() && props.extraContent}>
+            <Show when={props.extraContent}>
               <li>
                 <div class="px-3 py-2">{props.extraContent}</div>
               </li>
             </Show>
-            <Show when={isHydrated()}>
-              <li>
-                <button
-                  onClick={props.onLogin}
-                  class="w-full text-left px-3 py-2 rounded bg-primary text-primary-foreground"
-                >
-                  Login
-                </button>
-              </li>
-            </Show>
+            <li>
+              <button
+                onClick={props.onLogin}
+                class="w-full text-left px-3 py-2 rounded bg-primary text-primary-foreground"
+              >
+                Login
+              </button>
+            </li>
           </ul>
         </nav>
       </Show>
@@ -83,8 +80,6 @@ export function Navbar(props: {
   onLogin: () => void
   extraContent?: JSX.Element
 }) {
-  const { isHydrated } = useTheme()
-
   return (
     <header class="w-full py-4 border-b border-border sticky top-0 backdrop-blur bg-background/70 z-50">
       <div class="max-w-7xl mx-auto px-6 flex justify-between items-center">
@@ -125,24 +120,17 @@ export function Navbar(props: {
 
         <div class="flex items-center gap-3">
           <div class="hidden md:flex items-center gap-3">
-            {/* Only render extra content after hydration */}
-            <Show when={isHydrated() && props.extraContent}>
+            {/* Extra content (theme toggle) - handles its own hydration */}
+            <Show when={props.extraContent}>
               <div class="flex items-center">{props.extraContent}</div>
             </Show>
-            {/* Only render login button after hydration */}
-            <Show
-              when={isHydrated()}
-              fallback={
-                <div class="h-10 w-20 bg-primary/20 rounded-lg animate-pulse" />
-              }
+            {/* Login button - render immediately, no hydration gate needed */}
+            <Button
+              onClick={props.onLogin}
+              class="rounded-lg px-5 py-2 bg-primary text-primary-foreground hover:bg-primary/90 transition-all font-semibold shadow-md hover:shadow-lg"
             >
-              <Button
-                onClick={props.onLogin}
-                class="rounded-lg px-5 py-2 bg-primary text-primary-foreground hover:bg-primary/90 transition-all font-semibold shadow-md hover:shadow-lg"
-              >
-                Login
-              </Button>
-            </Show>
+              Login
+            </Button>
           </div>
 
           <div class="md:hidden">
