@@ -18,18 +18,18 @@ export const auth = betterAuth({
   // Social providers with enhanced configuration
   socialProviders: {
     google: {
-      clientId: process.env.GOOGLE_CLIENT_ID || '',
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
+      clientId: process.env.GOOGLE_CLIENT_ID ?? '',
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? '',
       enabled: !!process.env.GOOGLE_CLIENT_ID,
     },
     github: {
-      clientId: process.env.GITHUB_CLIENT_ID || '',
-      clientSecret: process.env.GITHUB_CLIENT_SECRET || '',
+      clientId: process.env.GITHUB_CLIENT_ID ?? '',
+      clientSecret: process.env.GITHUB_CLIENT_SECRET ?? '',
       enabled: !!process.env.GITHUB_CLIENT_ID,
     },
     microsoft: {
-      clientId: process.env.MICROSOFT_CLIENT_ID || '',
-      clientSecret: process.env.MICROSOFT_CLIENT_SECRET || '',
+      clientId: process.env.MICROSOFT_CLIENT_ID ?? '',
+      clientSecret: process.env.MICROSOFT_CLIENT_SECRET ?? '',
       enabled: !!process.env.MICROSOFT_CLIENT_ID,
     },
   },
@@ -79,8 +79,8 @@ export const auth = betterAuth({
 
   // CORS and security configuration
   trustedOrigins: [
-    process.env.FRONTEND_URL || 'http://localhost:3000',
-    ...(process.env.ALLOWED_ORIGINS?.split(',') || []),
+    process.env.FRONTEND_URL ?? 'http://localhost:3000',
+    ...(process.env.ALLOWED_ORIGINS?.split(',') ?? []),
   ],
 })
 

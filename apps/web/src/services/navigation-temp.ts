@@ -2,7 +2,7 @@
 // This will be replaced once the navigation-management module is fixed
 
 import { createSignal } from 'solid-js'
-import type { Permission, Role, UserRole } from '../../../../packages/infrastructure/auth/src/rbac'
+import type { Permission, UserRole } from '../../../../packages/infrastructure/auth/src/rbac'
 import type { User } from 'better-auth/types'
 
 /**
@@ -118,7 +118,7 @@ export class TempNavigationService {
       }
 
       // Get user permissions
-      const userPermissions = user.roles?.flatMap(role => role.permissions) || []
+      const userPermissions = user.roles?.flatMap(role => role.permissions) ?? []
 
       // Filter navigation items based on permissions
       const filteredItems = defaultNavigationItems.filter(item => {
