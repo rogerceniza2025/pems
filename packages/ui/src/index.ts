@@ -1,8 +1,9 @@
 // Core utilities
-export { cn } from './lib/utils'
+export { classNames } from './lib/utils'
 
 // CSS imports for Tailwind CSS 4
-import './index.css'
+// Note: CSS is now handled by the web app with Tailwind v4 configuration
+// import './index.css'
 
 // UI Components
 export {

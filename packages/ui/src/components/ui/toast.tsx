@@ -10,7 +10,7 @@ import {
 import { Portal } from 'solid-js/web'
 
 import { useReducedMotion } from '../../lib/animations'
-import { cn } from '../../lib/utils'
+import { classNames } from '../../lib/utils'
 import { Button } from './button'
 
 // Toast types and variants
@@ -175,7 +175,7 @@ const ToastComponent = (props: ToastComponentProps) => {
   }
 
   const getToastClasses = () => {
-    return cn(
+    return classNames(
       toastVariants.base,
       toastVariants.variants[local.toast.type ?? 'info'],
       !prefersReducedMotion() &&

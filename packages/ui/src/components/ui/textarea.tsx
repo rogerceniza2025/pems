@@ -3,7 +3,7 @@ import { createSignal, onMount, splitProps } from 'solid-js'
 import type { VariantProps } from 'class-variance-authority'
 import { cva } from 'class-variance-authority'
 
-import { cn } from '../../lib/utils'
+import { classNames } from '../../lib/utils'
 
 const textareaVariants = cva(
   'flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
@@ -126,7 +126,7 @@ export const Textarea = (props: TextareaProps) => {
         <textarea
           ref={setTextareaElement}
           id={local.id}
-          class={cn(
+          class={classNames(
             textareaVariants({ 
               variant: local.variant, 
               size: local.size, 
@@ -255,7 +255,7 @@ export const RichTextarea = (props: RichTextareaProps) => {
         <div class="flex items-center gap-1 p-2 border rounded-t-md bg-muted">
           <button
             type="button"
-            class={cn(
+            class={classNames(
               'p-2 rounded hover:bg-accent',
               isBold() && 'bg-accent text-accent-foreground'
             )}
@@ -281,7 +281,7 @@ export const RichTextarea = (props: RichTextareaProps) => {
           
           <button
             type="button"
-            class={cn(
+            class={classNames(
               'p-2 rounded hover:bg-accent',
               isItalic() && 'bg-accent text-accent-foreground'
             )}
@@ -308,7 +308,7 @@ export const RichTextarea = (props: RichTextareaProps) => {
           
           <button
             type="button"
-            class={cn(
+            class={classNames(
               'p-2 rounded hover:bg-accent',
               isUnderline() && 'bg-accent text-accent-foreground'
             )}
@@ -335,7 +335,7 @@ export const RichTextarea = (props: RichTextareaProps) => {
       )}
       
       <Textarea
-        class={cn(
+        class={classNames(
           local.toolbar && 'rounded-t-none',
           local.class,
         )}

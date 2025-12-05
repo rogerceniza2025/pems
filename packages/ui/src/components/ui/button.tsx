@@ -8,10 +8,10 @@ import type { VariantProps } from 'class-variance-authority'
 import { cva } from 'class-variance-authority'
 
 import { useReducedMotion } from '../../lib/animations'
-import { cn } from '../../lib/utils'
+import { classNames } from '../../lib/utils'
 
 const buttonVariants = cva(
-  'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-all duration-200 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 relative overflow-hidden',
+  'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-all duration-200 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 relative overflow-hidden',
   {
     variants: {
       variant: {
@@ -59,7 +59,7 @@ const LoadingSpinner = (props: {
 
   return (
     <svg
-      class={cn('animate-spin', sizeClasses[props.size ?? 'md'], props.class)}
+      class={classNames('animate-spin', sizeClasses[props.size ?? 'md'], props.class)}
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
       viewBox="0 0 24 24"
@@ -85,7 +85,7 @@ const LoadingSpinner = (props: {
 // Loading dots component
 const LoadingDots = (props: { class?: string }) => {
   return (
-    <div class={cn('flex space-x-1', props.class)}>
+    <div class={classNames('flex space-x-1', props.class)}>
       <div
         class="w-1 h-1 bg-current rounded-full animate-bounce"
         style={{ 'animation-delay': '0ms' }}
@@ -106,7 +106,7 @@ const LoadingDots = (props: { class?: string }) => {
 const LoadingPulse = (props: { class?: string }) => {
   return (
     <div
-      class={cn('w-4 h-4 bg-current rounded-full animate-pulse', props.class)}
+      class={classNames('w-4 h-4 bg-current rounded-full animate-pulse', props.class)}
     />
   )
 }
@@ -119,7 +119,7 @@ const LoadingSkeleton = (props: {
 }) => {
   return (
     <div
-      class={cn('bg-current opacity-20 animate-pulse rounded', props.class)}
+      class={classNames('bg-current opacity-20 animate-pulse rounded', props.class)}
       style={{
         width: props.width ?? '1rem',
         height: props.height ?? '1rem',
@@ -272,7 +272,7 @@ const Button = <T extends ValidComponent = 'button'>(
   return (
     <ButtonPrimitive.Root
       ref={setButtonElement}
-      class={cn(
+      class={classNames(
         buttonVariants({
           variant: local.variant,
           size: local.size,

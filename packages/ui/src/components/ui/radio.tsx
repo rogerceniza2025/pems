@@ -5,7 +5,7 @@ import * as RadioGroupPrimitive from '@kobalte/core/radio-group'
 import type { VariantProps } from 'class-variance-authority'
 import { cva } from 'class-variance-authority'
 
-import { cn } from '../../lib/utils'
+import { classNames } from '../../lib/utils'
 
 const radioVariants = cva(
   'aspect-square h-4 w-4 rounded-full border border-primary text-primary ring-offset-background focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
@@ -57,7 +57,7 @@ export const RadioGroup = (props: RadioGroupProps) => {
   ])
 
   return (
-    <div class={cn('space-y-3', local.class)}>
+    <div class={classNames('space-y-3', local.class)}>
       {(local.label ?? local.required) && (
         <div class="space-y-1">
           <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
@@ -71,7 +71,7 @@ export const RadioGroup = (props: RadioGroupProps) => {
       )}
       
       <RadioGroupPrimitive.Root
-        class={cn(
+        class={classNames(
           local.orientation === 'horizontal' && 'flex flex-wrap gap-4 space-y-0',
         )}
         {...others}
@@ -110,7 +110,7 @@ export const RadioGroupItem = (props: RadioGroupItemProps) => {
   return (
     <div class="flex items-start space-x-2">
       <RadioGroupPrimitive.Item
-        class={cn(
+        class={classNames(
           radioVariants({ variant: local.variant, size: local.size }),
           local.class,
         )}
@@ -173,7 +173,7 @@ export const RadioCard = (props: RadioCardProps) => {
 
   return (
     <div
-      class={cn(
+      class={classNames(
         'relative rounded-lg border p-4 cursor-pointer transition-colors hover:bg-muted/50',
         local.checked
           ? 'border-primary bg-primary/5'
@@ -252,7 +252,7 @@ export const RadioField = (props: RadioFieldProps) => {
   ])
 
   return (
-    <div class={cn('space-y-3', local.class)} {...others}>
+    <div class={classNames('space-y-3', local.class)} {...others}>
       {(local.label ?? local.required) && (
         <div class="space-y-1">
           <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
@@ -266,7 +266,7 @@ export const RadioField = (props: RadioFieldProps) => {
       )}
       
       <div
-        class={cn(
+        class={classNames(
           local.layout === 'card' && 'grid gap-3',
           local.layout === 'card' && local.orientation === 'horizontal' && 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3',
         )}
@@ -275,7 +275,7 @@ export const RadioField = (props: RadioFieldProps) => {
           value={local.value}
           onChange={local.onChange}
           orientation={local.orientation}
-          class={cn(
+          class={classNames(
             local.layout !== 'card' && 'space-y-3',
             local.orientation === 'horizontal' && 'flex flex-wrap gap-4 space-y-0',
           )}

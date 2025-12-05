@@ -13,7 +13,7 @@ const percy = new PercyService({
   authToken: process.env.PERCY_TOKEN,
 });
 
-const STORYBOOK_URL = process.env.STORYBOOK_URL || 'http://localhost:6006';
+const STORYBOOK_URL = process.env.STORYBOOK_URL || 'http://localhost:3106';
 
 // Component categories to test
 const componentCategories = [

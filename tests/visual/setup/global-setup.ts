@@ -47,7 +47,7 @@ async function globalSetup(config: FullConfig) {
       const page = await context.newPage();
 
       const baseUrl = process.env.TEST_BASE_URL || 'http://localhost:3000';
-      const storybookUrl = process.env.STORYBOOK_URL || 'http://localhost:6006';
+      const storybookUrl = process.env.STORYBOOK_URL || 'http://localhost:3106';
 
       // Check if main application is running
       try {

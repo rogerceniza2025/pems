@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Theme Toggle Test</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            padding: 20px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .light {
+            background-color: white;
+            color: black;
+        }
+
+        .dark {
+            background-color: #1a1a1a;
+            color: white;
+        }
+
+        .theme-toggle {
+            padding: 10px 20px;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            background: #f0f0f0;
+            cursor: pointer;
+            font-size: 24px;
+            transition: all 0.2s;
+            margin: 20px 0;
+        }
+
+        .theme-toggle:hover {
+            background: #e0e0e0;
+            border-color: #999;
+        }
+
+        .dark .theme-toggle {
+            background: #333;
+            border-color: #666;
+            color: white;
+        }
+
+        .dark .theme-toggle:hover {
+            background: #444;
+            border-color: #888;
+        }
+
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            background: #f0f0f0;
+        }
+
+        .dark .status {
+            background: #333;
+        }
+    </style>
+</head>
+<body class="light">
+    <h1>Theme Toggle Test</h1>
+
+    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">
+        <span id="theme-icon">🌞</span>
+    </button>
+
+    <div class="status">
+        <p>Current theme: <strong id="current-theme">Light</strong></p>
+        <p>Icon should stay visible after toggle</p>
+        <p>Theme should persist after page reload</p>
+    </div>
+
+    <script>
+        // Check for saved theme preference
+        const savedTheme = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const shouldBeDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
+
+        if (shouldBeDark) {
+            document.body.classList.remove('light');
+            document.body.classList.add('dark');
+            document.getElementById('theme-icon').textContent = '🌙';
+            document.getElementById('current-theme').textContent = 'Dark';
+        }
+
+        function toggleTheme() {
+            const isDark = document.body.classList.contains('dark');
+            const newTheme = !isDark;
+
+            if (newTheme) {
+                document.body.classList.remove('light');
+                document.body.classList.add('dark');
+                document.getElementById('theme-icon').textContent = '🌙';
+                document.getElementById('current-theme').textContent = 'Dark';
+                localStorage.setItem('theme', 'dark');
+            } else {
+                document.body.classList.remove('dark');
+                document.body.classList.add('light');
+                document.getElementById('theme-icon').textContent = '🌞';
+                document.getElementById('current-theme').textContent = 'Light';
+                localStorage.setItem('theme', 'light');
+            }
+        }
+
+        // Log theme changes
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.attributeName === 'class') {
+                    console.log('Theme changed to:', document.body.classList.contains('dark') ? 'dark' : 'light');
+                }
+            });
+        });
+
+        observer.observe(document.body, {
+            attributes: true,
+            attributeFilter: ['class']
+        });
+    </script>
+</body>
+</html>

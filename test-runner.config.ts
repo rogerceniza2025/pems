@@ -8,7 +8,7 @@ const config: TestRunnerConfig = {
   maxConcurrency: 4,
 
   // Directory to store visual regression screenshots
-  storybookUrl: 'http://localhost:6006',
+  storybookUrl: 'http://localhost:3106',
 
   // Options for the test runner
   options: {

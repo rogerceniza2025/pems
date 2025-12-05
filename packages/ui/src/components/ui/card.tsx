@@ -4,7 +4,7 @@ import { createSignal, Show, splitProps } from 'solid-js'
 import type { PolymorphicProps } from '@kobalte/core/polymorphic'
 
 import { useReducedMotion } from '../../lib/animations'
-import { cn } from '../../lib/utils'
+import { classNames } from '../../lib/utils'
 import { SkeletonCard } from './skeleton-card'
 
 // Card variants for different styles
@@ -95,7 +95,7 @@ const Card = <T extends ValidComponent = 'div'>(
       filled: 'border-0 bg-muted',
     }
 
-    return cn(
+    return classNames(
       cardVariants.base,
       variantClasses[local.variant ?? 'default'],
       cardVariants.shadow[local.shadow ?? 'sm'],
@@ -149,7 +149,7 @@ const CardHeader = <T extends ValidComponent = 'div'>(
 
   return (
     <div
-      class={cn(
+      class={classNames(
         'flex flex-col space-y-1.5 p-6',
         local.animated &&
           !prefersReducedMotion() &&
@@ -187,7 +187,7 @@ const CardTitle = <T extends ValidComponent = 'h3'>(
 
   return (
     <h3
-      class={cn(
+      class={classNames(
         'text-2xl font-semibold leading-none tracking-tight',
         local.gradient &&
           'bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent',
@@ -225,7 +225,7 @@ const CardDescription = <T extends ValidComponent = 'p'>(
 
   return (
     <p
-      class={cn(
+      class={classNames(
         'text-sm text-muted-foreground',
         local.animated &&
           !prefersReducedMotion() &&
@@ -261,7 +261,7 @@ const CardContent = <T extends ValidComponent = 'div'>(
 
   return (
     <div
-      class={cn(
+      class={classNames(
         'p-6 pt-0',
         local.animated &&
           !prefersReducedMotion() &&
@@ -314,7 +314,7 @@ const CardFooter = <T extends ValidComponent = 'div'>(
 
   return (
     <div
-      class={cn(
+      class={classNames(
         'flex p-6 pt-0',
         getPositionClasses(),
         local.animated &&

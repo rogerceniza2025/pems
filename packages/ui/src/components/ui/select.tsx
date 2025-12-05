@@ -5,10 +5,10 @@ import { Portal } from 'solid-js/web'
 import type { VariantProps } from 'class-variance-authority'
 import { cva } from 'class-variance-authority'
 
-import { cn } from '../../lib/utils'
+import { classNames } from '../../lib/utils'
 
 const selectVariants = cva(
-  'flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
+  'flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
   {
     variants: {
       variant: {
@@ -138,7 +138,7 @@ export const Select = (props: SelectProps) => {
       <div class="relative">
         <button
           type="button"
-          class={cn(
+          class={classNames(
             selectVariants({ variant: local.variant, size: local.size }),
             local.class,
           )}
@@ -147,7 +147,7 @@ export const Select = (props: SelectProps) => {
           aria-expanded={isOpen()}
           aria-haspopup="listbox"
         >
-          <span class={cn(!selectedOption() && 'text-muted-foreground')}>
+          <span class={classNames(!selectedOption() && 'text-muted-foreground')}>
             {selectedOption()?.label ?? local.placeholder ?? 'Select an option...'}
           </span>
           <svg
@@ -160,7 +160,7 @@ export const Select = (props: SelectProps) => {
             stroke-width="2"
             stroke-linecap="round"
             stroke-linejoin="round"
-            class={cn('h-4 w-4 transition-transform', isOpen() && 'rotate-180')}
+            class={classNames('h-4 w-4 transition-transform', isOpen() && 'rotate-180')}
           >
             <path d="m6 9 6 6 6-6" />
           </svg>
@@ -181,7 +181,7 @@ export const Select = (props: SelectProps) => {
                   <For each={local.options}>
                     {(option, index) => (
                       <div
-                        class={cn(
+                        class={classNames(
                           'relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none focus:bg-accent focus:text-accent-foreground',
                           option.disabled && 'pointer-events-none opacity-50',
                           highlightedIndex() === index() && 'bg-accent',

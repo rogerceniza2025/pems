@@ -19,7 +19,7 @@
   "tailwindCSS.experimental.classRegex": [
     ["clsx\\(([^)]*)\\)", "'([^']*)'"],
     ["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"],
-    ["cn\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"]
+    ["classNames\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"]
   ],
   "tailwindCSS.classAttributes": ["class", "className", "ngClass"],
   "tailwindCSS.files.exclude": [
@@ -87,5 +87,6 @@
     "package.json": "package-lock.json, yarn.lock, pnpm-lock.yaml",
     "*.css": "${capture}.min.css, ${capture}.map.css"
   },
-  "editor.defaultFormatter": "esbenp.prettier-vscode"
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "vitest.disableWorkspaceWarning": true
 }

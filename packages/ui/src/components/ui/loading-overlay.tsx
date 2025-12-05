@@ -3,7 +3,7 @@ import { Show, splitProps } from 'solid-js'
 import { Portal } from 'solid-js/web'
 
 import { useReducedMotion } from '../../lib/animations'
-import { cn } from '../../lib/utils'
+import { classNames } from '../../lib/utils'
 import { Skeleton } from './skeleton'
 // Loading spinner component defined locally since it's not exported from button
 const LoadingSpinner = (props: {
@@ -18,7 +18,7 @@ const LoadingSpinner = (props: {
 
   return (
     <svg
-      class={cn('animate-spin', sizeClasses[props.size ?? 'md'], props.class)}
+      class={classNames('animate-spin', sizeClasses[props.size ?? 'md'], props.class)}
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
       viewBox="0 0 24 24"
@@ -183,7 +183,7 @@ const LoadingOverlay = (props: LoadingOverlayProps) => {
     <Portal>
       <Show when={local.loading}>
         <div
-          class={cn(
+          class={classNames(
             'fixed inset-0 z-50 flex',
             getPositionClasses(),
             local.backdrop && 'bg-black/20',
@@ -198,7 +198,7 @@ const LoadingOverlay = (props: LoadingOverlayProps) => {
           {...others}
         >
           <div
-            class={cn(
+            class={classNames(
               'bg-white dark:bg-gray-900 rounded-lg shadow-xl p-6',
               getSizeClasses(),
             )}

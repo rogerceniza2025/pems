@@ -1,7 +1,7 @@
 import type { JSX } from 'solid-js'
 import { splitProps } from 'solid-js'
 
-import { cn } from '../../lib/utils'
+import { classNames } from '../../lib/utils'
 
 type LabelProps = {
   class?: string | undefined
@@ -13,7 +13,7 @@ const Label = (props: LabelProps) => {
   const [local, others] = splitProps(props, ['class', 'children'])
   return (
     <label
-      class={cn(
+      class={classNames(
         'text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70',
         local.class,
       )}

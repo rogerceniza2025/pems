@@ -4,7 +4,7 @@ import { createEffect, createSignal, Show, splitProps } from 'solid-js'
 import type { PolymorphicProps } from '@kobalte/core/polymorphic'
 import * as TextFieldPrimitive from '@kobalte/core/text-field'
 
-import { cn } from '../../lib/utils'
+import { classNames } from '../../lib/utils'
 import { Button } from './button'
 
 // Validation state types
@@ -43,11 +43,11 @@ const PasswordStrengthIndicator = (props: {
 
   const cfg = config()
   return (
-    <div class={cn('mt-2 space-y-1', props.class)}>
+    <div class={classNames('mt-2 space-y-1', props.class)}>
       <div class="flex space-x-1">
         <div class="h-1 flex-1 bg-gray-200 rounded-full overflow-hidden">
           <div
-            class={cn(
+            class={classNames(
               'h-full transition-all duration-300',
               cfg.color,
               cfg.width,
@@ -71,10 +71,10 @@ const CharacterCount = (props: {
 
   return (
     <div
-      class={cn('text-xs text-muted-foreground mt-1 text-right', props.class)}
+      class={classNames('text-xs text-muted-foreground mt-1 text-right', props.class)}
     >
       <span
-        class={cn(
+        class={classNames(
           isOverLimit() && 'text-red-500',
           isNearLimit() && !isOverLimit() && 'text-yellow-500',
         )}
@@ -226,7 +226,7 @@ const Input = <T extends ValidComponent = 'input'>(
       Boolean(local.copyable)
     const hasBothAddons = hasLeftAddon && hasRightAddon
 
-    return cn(
+    return classNames(
       inputVariants.base,
       inputVariants.validation[currentValidationState()],
       hasLeftAddon && !hasBothAddons && inputVariants.withLeftAddon,
@@ -366,7 +366,7 @@ const Input = <T extends ValidComponent = 'input'>(
       {/* Validation Message */}
       <Show when={validationMessage()}>
         <div
-          class={cn(
+          class={classNames(
             'text-xs mt-1',
             currentValidationState() === 'error' && 'text-red-500',
             currentValidationState() === 'warning' && 'text-yellow-500',

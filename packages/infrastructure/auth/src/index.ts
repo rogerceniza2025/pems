@@ -92,6 +92,21 @@ export const authHandler = auth.handler
 // Export types
 export type { User, Account, Session, Verification } from 'better-auth/types'
 
+// Export RBAC types and utilities
+export type { Permission, Role, UserRole } from './rbac'
+export {
+  RoleSchema,
+  PermissionSchema,
+  ROLE_PERMISSIONS,
+  hasPermission,
+  hasAnyPermission,
+  hasAllPermissions,
+  getUserPermissions,
+  canAccessRoute,
+  isSystemAdmin,
+  userRole
+} from './rbac'
+
 // Export auth services - Temporarily disabled due to missing dependencies
 // export { mfaService } from './services/mfa.service'
 // export { emailService } from './services/email.service'

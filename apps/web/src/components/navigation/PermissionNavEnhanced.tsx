@@ -9,41 +9,25 @@ import {
   createEffect,
   batch
 } from 'solid-js'
-import { A } from '@tanstack/solid-router'
+import { Link } from '@tanstack/solid-router'
 import { usePermissionContext } from '../../contexts/PermissionContext'
 import type { Permission } from '../../../../packages/infrastructure/auth/src/rbac'
 
-/**
- * Enhanced Navigation Item Interface
- */
-export interface NavigationItemEnhanced {
-  id: string
-  path: string
-  permission?: Permission
-  permissions?: Permission[]
-  requireAll?: boolean
-  label: string
-  icon?: string
-  iconType?: 'emoji' | 'svg' | 'font' | 'image'
-  description?: string
-  children?: NavigationItemEnhanced[]
-  systemOnly?: boolean
-  tenantOnly?: boolean
-  badge?: string | number
-  badgeType?: 'notification' | 'count' | 'status' | 'label'
-  badgeColor?: string
-  external?: boolean
-  disabled?: boolean
-  visible?: boolean
-  target?: '_self' | '_blank' | '_parent' | '_top'
-  order?: number
-  metadata?: Record<string, any>
-  analytics?: {
-    clickCount?: number
-    impressionCount?: number
-    lastAccessed?: Date
-  }
+// Try to import the real NavigationItem, fall back to temporary type
+let NavigationItem: any = null
+try {
+  const navModule = require('@pems/navigation-management')
+  NavigationItem = navModule.NavigationItem
+} catch (error) {
+  // Fall back to temporary navigation item type
+  console.warn('NavigationItem not available, using temporary type')
 }
+
+// Import temporary navigation item type for fallback
+import type { TempNavigationItem } from '../../services/navigation-temp'
+
+// Create a unified navigation item type for compatibility
+export type UnifiedNavigationItem = NavigationItem | TempNavigationItem
 
 /**
  * Performance Metrics
@@ -60,7 +44,7 @@ interface PerformanceMetrics {
  * Enhanced PermissionNav Props
  */
 interface PermissionNavEnhancedProps {
-  items: NavigationItemEnhanced[]
+  items: UnifiedNavigationItem[]
   mobile?: boolean
   horizontal?: boolean
   showIcons?: boolean
@@ -76,7 +60,7 @@ interface PermissionNavEnhancedProps {
   debounceMs?: number
   cacheKey?: string
   className?: string
-  onItemClick?: (item: NavigationItemEnhanced, event: MouseEvent) => void
+  onItemClick?: (item: UnifiedNavigationItem, event: MouseEvent) => void
   onSearch?: (query: string) => void
   onPerformanceMetrics?: (metrics: PerformanceMetrics) => void
 }
@@ -86,7 +70,7 @@ interface PermissionNavEnhancedProps {
  */
 interface PermissionCacheEntry {
   visible: boolean
-  filteredChildren?: NavigationItemEnhanced[]
+  filteredChildren?: UnifiedNavigationItem[]
   lastChecked: number
   hash: string
 }
@@ -96,7 +80,7 @@ interface PermissionCacheEntry {
  */
 interface VirtualScrollItem {
   index: number
-  item: NavigationItemEnhanced
+  item: UnifiedNavigationItem
   top: number
   height: number
 }
@@ -158,7 +142,7 @@ export const PermissionNavEnhanced: ParentComponent<PermissionNavEnhancedProps> 
 
   // Permission cache
   const permissionCache = new Map<string, PermissionCacheEntry>()
-  const searchCache = new Map<string, NavigationItemEnhanced[]>()
+  const searchCache = new Map<string, UnifiedNavigationItem[]>()
 
   // Debounced search
   let searchTimeoutId: number | undefined
@@ -189,9 +173,9 @@ export const PermissionNavEnhanced: ParentComponent<PermissionNavEnhancedProps> 
 
   // Generate cache key for permission checks
   const generatePermissionCacheKey = createMemo(() => {
-    const userId = user()?.id || 'anonymous'
-    const currentTenantId = tenantId() || 'global'
-    const userPermissions = user()?.permissions || []
+    const userId = user?.id || 'anonymous'
+    const currentTenantId = tenantId || 'global'
+    const userPermissions = user?.permissions || []
     const permissionHash = userPermissions.sort().join(',')
     return `${cacheKey}:${userId}:${currentTenantId}:${permissionHash}`
   })
@@ -219,21 +203,20 @@ export const PermissionNavEnhanced: ParentComponent<PermissionNavEnhancedProps> 
   }
 
   // Generate hash for item comparison
-  const generateItemHash = (item: NavigationItemEnhanced): string => {
+  const generateItemHash = (item: UnifiedNavigationItem): string => {
     const relevantProps = [
-      item.permission,
       item.permissions?.join(','),
       item.requireAll,
-      item.systemOnly,
-      item.tenantOnly,
+      item.scope,
       item.disabled,
-      item.visible
+      item.visible,
+      tenantId
     ]
     return relevantProps.join('|')
   }
 
   // Check if item should be visible with caching
-  const isItemVisible = (item: NavigationItemEnhanced): boolean => {
+  const isItemVisible = (item: UnifiedNavigationItem): boolean => {
     const cacheKey = `${item.id}:${generateItemHash(item)}`
     const cached = permissionCache.get(cacheKey)
     const now = Date.now()
@@ -250,20 +233,10 @@ export const PermissionNavEnhanced: ParentComponent<PermissionNavEnhancedProps> 
 
     // Cache miss - compute visibility
     let visible = true
-    const currentTenantId = tenantId()
-
-    // Check system-only items
-    if (item.systemOnly && !isSystemAdmin()) {
-      visible = false
-    }
-
-    // Check tenant-only items
-    if (visible && item.tenantOnly && !currentTenantId) {
-      visible = false
-    }
+    const currentTenantId = tenantId
 
     // Check explicit visibility
-    if (visible && item.visible === false) {
+    if (visible && !item.visible) {
       visible = false
     }
 
@@ -272,15 +245,30 @@ export const PermissionNavEnhanced: ParentComponent<PermissionNavEnhancedProps> 
       // Keep visible but will be styled as disabled
     }
 
-    // Check permissions
+    // Check permissions using NavigationItem's built-in method
     if (visible) {
-      if (item.permission) {
-        visible = hasPermission(item.permission, currentTenantId)
-      } else if (item.permissions && item.permissions.length > 0) {
-        if (item.requireAll) {
-          visible = hasAllPermissions(item.permissions, currentTenantId)
-        } else {
-          visible = hasAnyPermission(item.permissions, currentTenantId)
+      try {
+        const currentUser = user
+        const userPermissions = currentUser?.permissions || []
+        const userRole = currentUser?.roles?.[0]?.role
+
+        visible = item.hasPermission(
+          userPermissions,
+          userRole,
+          currentUser?.isSystemAdmin,
+          currentTenantId
+        )
+      } catch (error) {
+        // Fallback to manual permission checking if the method fails
+        console.warn('Permission checking failed, using fallback:', error)
+        if (item.permission) {
+          visible = hasPermission(item.permission, currentTenantId)
+        } else if (item.permissions && item.permissions.length > 0) {
+          if (item.requireAll) {
+            visible = hasAllPermissions(item.permissions, currentTenantId)
+          } else {
+            visible = hasAnyPermission(item.permissions, currentTenantId)
+          }
         }
       }
     }
@@ -302,7 +290,7 @@ export const PermissionNavEnhanced: ParentComponent<PermissionNavEnhancedProps> 
   }
 
   // Filter items with search
-  const searchItems = (items: NavigationItemEnhanced[], query: string): NavigationItemEnhanced[] => {
+  const searchItems = (items: UnifiedNavigationItem[], query: string): UnifiedNavigationItem[] => {
     if (!query.trim()) {
       return items
     }
@@ -313,7 +301,7 @@ export const PermissionNavEnhanced: ParentComponent<PermissionNavEnhancedProps> 
       return cached
     }
 
-    const searchResults: NavigationItemEnhanced[] = []
+    const searchResults: UnifiedNavigationItem[] = []
     const searchTerms = query.toLowerCase().split(' ').filter(term => term.length > 0)
 
     for (const item of items) {
@@ -445,7 +433,7 @@ export const PermissionNavEnhanced: ParentComponent<PermissionNavEnhancedProps> 
   }
 
   // Check if item is active
-  const isItemActive = (item: NavigationItemEnhanced): boolean => {
+  const isItemActive = (item: UnifiedNavigationItem): boolean => {
     const currentPath = activePath()
     if (currentPath === item.path) {
       return true
@@ -460,22 +448,20 @@ export const PermissionNavEnhanced: ParentComponent<PermissionNavEnhancedProps> 
   }
 
   // Check if item is expanded
-  const isItemExpanded = (item: NavigationItemEnhanced): boolean => {
+  const isItemExpanded = (item: UnifiedNavigationItem): boolean => {
     return expandedItems().has(item.path) || isItemActive(item) // Auto-expand active items
   }
 
   // Handle item click with analytics
-  const handleItemClick = (item: NavigationItemEnhanced, event: MouseEvent) => {
+  const handleItemClick = (item: UnifiedNavigationItem, event: MouseEvent) => {
     event.preventDefault()
 
-    // Analytics
+    // Analytics (handled externally since NavigationItem is immutable)
     if (enableAnalytics) {
-      const analytics = item.analytics || {}
-      analytics.clickCount = (analytics.clickCount || 0) + 1
-      analytics.lastAccessed = new Date()
-      item.analytics = analytics
+      console.log('Navigation item clicked:', item.path, 'Label:', item.label)
 
-      console.log('Navigation item clicked:', item.path, 'Click count:', analytics.clickCount)
+      // Note: Analytics should be handled by the navigation service bridge
+      // since NavigationItem objects are immutable value objects
     }
 
     // Handle nested navigation
@@ -662,8 +648,8 @@ export const PermissionNavEnhanced: ParentComponent<PermissionNavEnhancedProps> 
                   }}
                   role="none"
                 >
-                  <A
-                    href={item.path}
+                  <Link
+                    to={item.path}
                     class={`navigation__link ${isActive() ? 'navigation__link--active' : ''} ${item.disabled ? 'navigation__link--disabled' : ''}`}
                     onClick={(e) => handleItemClick(item, e)}
                     disabled={item.disabled}
@@ -710,7 +696,7 @@ export const PermissionNavEnhanced: ParentComponent<PermissionNavEnhancedProps> 
                         </span>
                       </span>
                     )}
-                  </A>
+                  </Link>
 
                   {/* Nested navigation */}
                   <Show when={hasChildren() && isExpanded()}>
@@ -724,8 +710,8 @@ export const PermissionNavEnhanced: ParentComponent<PermissionNavEnhancedProps> 
                               class="navigation__item navigation__item--child"
                               role="none"
                             >
-                              <A
-                                href={child.path}
+                              <Link
+                                to={child.path}
                                 class={`navigation__link navigation__link--child ${isChildActive() ? 'navigation__link--active' : ''} ${child.disabled ? 'navigation__link--disabled' : ''}`}
                                 onClick={(e) => handleItemClick(child, e)}
                                 disabled={child.disabled}
@@ -759,7 +745,7 @@ export const PermissionNavEnhanced: ParentComponent<PermissionNavEnhancedProps> 
                                     {child.description}
                                   </span>
                                 )}
-                              </A>
+                              </Link>
                             </li>
                           )
                         }}

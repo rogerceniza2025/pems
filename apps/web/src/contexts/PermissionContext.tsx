@@ -1,4 +1,4 @@
-import { createContext, createSignal, useContext, ParentComponent, onCleanup } from 'solid-js'
+import { createContext, createSignal, useContext, ParentComponent, onCleanup, createEffect } from 'solid-js'
 import type { User } from 'better-auth/types'
 import type { Permission, Role, UserRole } from '../../../../packages/infrastructure/auth/src/rbac'
 
@@ -218,7 +218,6 @@ export const PermissionProvider: ParentComponent<PermissionProviderProps> = (pro
 
       // In a real implementation, this would re-fetch user data from the API
       // For now, we'll just recalculate permissions
-      const currentUser = user()
       const currentTenantId = tenantId()
       const calculatedPermissions = calculatePermissions(currentUser, currentTenantId)
       setPermissions(calculatedPermissions)
@@ -353,10 +352,10 @@ export const usePermissions = () => {
  */
 export const useCurrentUser = () => {
   const { user, tenantId, setUser, setTenantId } = usePermissionContext()
-  
+
   return {
-    user: user(),
-    tenantId: tenantId(),
+    user,
+    tenantId,
     setUser,
     setTenantId,
   }

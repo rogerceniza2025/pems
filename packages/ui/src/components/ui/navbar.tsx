@@ -1,7 +1,7 @@
 import type { JSX } from 'solid-js'
 import { For, Show, splitProps } from 'solid-js'
 
-import { cn } from '../../lib/utils'
+import { classNames } from '../../lib/utils'
 
 export type NavItem = {
   label: string
@@ -49,7 +49,7 @@ export const Navbar = (props: NavbarProps) => {
 
   return (
     <nav
-      class={cn(
+      class={classNames(
         'flex items-center justify-between border-b bg-background px-4 py-3',
         local.position === 'fixed' && 'fixed top-0 left-0 right-0 z-50',
         local.position === 'sticky' && 'sticky top-0 z-40',
@@ -73,7 +73,7 @@ export const Navbar = (props: NavbarProps) => {
       {/* Navigation Items */}
       <Show when={local.items && local.items.length > 0}>
         <div
-          class={cn(
+          class={classNames(
             'flex items-center space-x-6',
             local.collapsible && local.collapsed && 'hidden md:flex',
           )}
@@ -141,7 +141,7 @@ export const NavbarItem = (props: NavbarItemProps) => {
     'variant',
   ])
 
-  const baseClasses = cn(
+  const baseClasses = classNames(
     'flex items-center space-x-2 text-sm font-medium transition-colors hover:text-primary',
     local.active && 'text-primary',
     local.disabled && 'opacity-50 cursor-not-allowed',
@@ -217,7 +217,7 @@ export const MobileNav = (props: MobileNavProps) => {
           onClick={local.onClose}
         />
         <div
-          class={cn(
+          class={classNames(
             'fixed left-0 top-0 h-full w-64 bg-background p-4 shadow-lg',
             local.class,
           )}
@@ -310,7 +310,7 @@ export const Breadcrumb = (props: BreadcrumbProps) => {
 
   return (
     <nav
-      class={cn('flex items-center space-x-2 text-sm', local.class)}
+      class={classNames('flex items-center space-x-2 text-sm', local.class)}
       aria-label="Breadcrumb"
       {...others}
     >
@@ -357,14 +357,14 @@ export const Breadcrumb = (props: BreadcrumbProps) => {
             <Show
               when={item.href}
               fallback={
-                <span class={cn('font-medium', item.active && 'text-primary')}>
+                <span class={classNames('font-medium', item.active && 'text-primary')}>
                   {item.label}
                 </span>
               }
             >
               <a
                 href={item.href}
-                class={cn(
+                class={classNames(
                   'flex items-center space-x-2 hover:text-primary',
                   item.active && 'text-primary font-medium',
                 )}

@@ -147,7 +147,7 @@ visual-comparison:
 # Storybook integration
 storybook:
   # Storybook URL
-  url: http://localhost:6006
+  url: http://localhost:3106
 
   # Stories to test
   include:

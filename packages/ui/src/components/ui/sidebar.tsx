@@ -1,7 +1,7 @@
 import type { JSX } from 'solid-js'
 import { For, Show, splitProps } from 'solid-js'
 
-import { cn } from '../../lib/utils'
+import { classNames } from '../../lib/utils'
 
 export type SidebarItem = {
   label: string
@@ -43,7 +43,7 @@ export const Sidebar = (props: SidebarProps) => {
 
   return (
     <aside
-      class={cn(
+      class={classNames(
         'flex flex-col border-r bg-background',
         local.position === 'right' && 'border-r-0 border-l',
         local.variant === 'floating' && 'rounded-lg border shadow-lg',
@@ -139,7 +139,7 @@ export const SidebarItem = (props: SidebarItemProps) => {
   const hasChildren = local.items && local.items.length > 0
   const level = local.level ?? 0
 
-  const baseClasses = cn(
+  const baseClasses = classNames(
     'flex items-center space-x-3 text-sm font-medium transition-colors rounded-md px-3 py-2',
     local.active && 'bg-primary text-primary-foreground',
     !local.active && 'hover:bg-accent hover:text-accent-foreground',
@@ -158,7 +158,7 @@ export const SidebarItem = (props: SidebarItemProps) => {
       <Show when={!local.collapsed} fallback={local.icon && (
         <span class="h-4 w-4">{local.icon}</span>
       )}>
-        <span class={cn('truncate', local.collapsed && 'sr-only')}>
+        <span class={classNames('truncate', local.collapsed && 'sr-only')}>
           {local.label}
         </span>
       </Show>
@@ -185,7 +185,7 @@ export const SidebarItem = (props: SidebarItemProps) => {
       
       {/* Sub-items */}
       <Show when={hasChildren && !local.collapsed}>
-        <div class={cn('ml-4 mt-1 space-y-1', level > 0 && 'ml-8')}>
+        <div class={classNames('ml-4 mt-1 space-y-1', level > 0 && 'ml-8')}>
           <For each={local.items}>
             {(subItem) => (
               <SidebarItem
@@ -227,7 +227,7 @@ export const SidebarGroup = (props: SidebarGroupProps) => {
   }
 
   return (
-    <div class={cn('space-y-2', local.class)} {...others}>
+    <div class={classNames('space-y-2', local.class)} {...others}>
       <Show when={local.title}>
         <div class="flex items-center justify-between px-3 py-2">
           <h3 class="text-sm font-semibold text-muted-foreground">
@@ -250,7 +250,7 @@ export const SidebarGroup = (props: SidebarGroupProps) => {
                 stroke-width="2"
                 stroke-linecap="round"
                 stroke-linejoin="round"
-                class={cn(
+                class={classNames(
                   'transition-transform',
                   !local.collapsed && 'rotate-90',
                 )}
@@ -297,7 +297,7 @@ export const SidebarProfile = (props: SidebarProfileProps) => {
   }
 
   return (
-    <div class={cn('p-4 border-b', local.class)} {...others}>
+    <div class={classNames('p-4 border-b', local.class)} {...others}>
       <div class="flex items-center space-x-3">
         <div class="relative">
           <img
@@ -306,7 +306,7 @@ export const SidebarProfile = (props: SidebarProfileProps) => {
             class="h-10 w-10 rounded-full object-cover"
           />
           <div
-            class={cn(
+            class={classNames(
               'absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-background',
               statusColors[local.status ?? 'offline'],
             )}

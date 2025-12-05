@@ -1,5 +1,5 @@
 import { createSignal, Show, For, onMount, ParentComponent } from 'solid-js'
-import { A } from '@tanstack/solid-router'
+import { Link } from '@tanstack/solid-router'
 import { usePermissionContext, useCurrentUser } from '../../contexts/PermissionContext'
 import { PermissionNav, defaultNavigationItems, type NavigationItem } from './PermissionNav'
 
@@ -31,12 +31,11 @@ export const Navbar: ParentComponent<NavbarProps> = (props) => {
     className = '',
   } = props
 
-  const { user: contextUser, tenantId: contextTenantId } = usePermissionContext()
-  const { setUser, setTenantId } = useCurrentUser()
-  
+  const { user: contextUser, tenantId: contextTenantId, setUser, setTenantId } = usePermissionContext()
+
   // Use props if provided, otherwise use context
-  const user = () => userProp || contextUser()
-  const tenantId = () => tenantIdProp || contextTenantId()
+  const user = () => userProp || contextUser
+  const tenantId = () => tenantIdProp || contextTenantId
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = createSignal(false)
   const [isUserMenuOpen, setIsUserMenuOpen] = createSignal(false)
@@ -110,14 +109,14 @@ export const Navbar: ParentComponent<NavbarProps> = (props) => {
         {/* Brand/Logo */}
         <Show when={showBrand}>
           <div class="navbar__brand">
-            <A href="/" class="navbar__brand-link">
+            <Link to="/" class="navbar__brand-link">
               <span class="navbar__brand-icon" aria-hidden="true">
                 🏫
               </span>
               <span class="navbar__brand-text" data-testid="navbar-brand">
                 PEMS
               </span>
-            </A>
+            </Link>
           </div>
         </Show>
 
@@ -218,27 +217,27 @@ export const Navbar: ParentComponent<NavbarProps> = (props) => {
                   <div class="user-menu__divider" />
 
                   <div class="user-menu__section">
-                    <A href="/profile" class="user-menu__item">
+                    <Link to="/profile" class="user-menu__item">
                       <span class="user-menu__item-icon">👤</span>
                       Profile
-                    </A>
-                    <A href="/settings" class="user-menu__item">
+                    </Link>
+                    <Link to="/settings" class="user-menu__item">
                       <span class="user-menu__item-icon">⚙️</span>
                       Settings
-                    </A>
+                    </Link>
                   </div>
 
                   <Show when={user()?.roles?.[0]?.role === 'super_admin'}>
                     <div class="user-menu__divider" />
                     <div class="user-menu__section">
-                      <A href="/admin" class="user-menu__item">
+                      <Link to="/admin" class="user-menu__item">
                         <span class="user-menu__item-icon">🔧</span>
                         Admin Panel
-                      </A>
-                      <A href="/system" class="user-menu__item">
+                      </Link>
+                      <Link to="/system" class="user-menu__item">
                         <span class="user-menu__item-icon">⚡</span>
                         System
-                      </A>
+                      </Link>
                     </div>
                   </Show>
 
@@ -259,9 +258,9 @@ export const Navbar: ParentComponent<NavbarProps> = (props) => {
         {/* Login Button (when not authenticated) */}
         <Show when={showUserMenu && !user()}>
           <div class="navbar__auth">
-            <A href="/login" class="btn btn-primary">
+            <Link to="/login" class="btn btn-primary">
               Login
-            </A>
+            </Link>
           </div>
         </Show>
       </div>
@@ -309,9 +308,9 @@ export const Navbar: ParentComponent<NavbarProps> = (props) => {
                 </div>
               </div>
               <div class="mobile-menu__user-actions">
-                <A href="/profile" class="mobile-menu__action">
+                <Link to="/profile" class="mobile-menu__action">
                   Profile
-                </A>
+                </Link>
                 <button class="mobile-menu__action mobile-menu__action--logout" onClick={handleLogout}>
                   Logout
                 </button>
@@ -321,9 +320,9 @@ export const Navbar: ParentComponent<NavbarProps> = (props) => {
 
           <Show when={!user()}>
             <div class="mobile-menu__auth">
-              <A href="/login" class="btn btn-primary w-full">
+              <Link to="/login" class="btn btn-primary w-full">
                 Login
-              </A>
+              </Link>
             </div>
           </Show>
         </div>
@@ -352,7 +351,7 @@ export const Breadcrumb: ParentComponent<BreadcrumbProps> = (props) => {
   const { hasPermission } = usePermissionContext()
 
   // Filter items based on permissions
-  const visibleItems = () => items.filter(item => 
+  const visibleItems = () => items.filter(item =>
     !item.permission || hasPermission(item.permission as any)
   )
 
@@ -363,9 +362,9 @@ export const Breadcrumb: ParentComponent<BreadcrumbProps> = (props) => {
           {(item, index) => (
             <li class="breadcrumb__item">
               <Show when={item.path}>
-                <A href={item.path} class="breadcrumb__link">
+                <Link to={item.path} class="breadcrumb__link">
                   {item.label}
-                </A>
+                </Link>
               </Show>
               <Show when={!item.path}>
                 <span class="breadcrumb__current" aria-current="page">

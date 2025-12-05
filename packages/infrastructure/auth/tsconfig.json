@@ -5,10 +5,10 @@
     "module": "ESNext",
     "moduleResolution": "bundler",
     "baseUrl": ".",
+    "ignoreDeprecations": "6.",
     "paths": {
       "@pems/*": ["../../packages/*"]
-    },
-    "ignoreDeprecations": "5.0"
+    }
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]

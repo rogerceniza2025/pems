@@ -1,23 +1,20 @@
-import {
-  createSignal,
-  For,
-  Show,
-  createEffect,
-  createMemo,
-  onMount
-} from 'solid-js'
-import { A } from '@tanstack/solid-router'
-import { usePermissionContext } from '../../contexts/PermissionContext'
-import type { Permission, Role } from '../../../../../packages/infrastructure/auth/src/rbac'
-import {
-  NavigationService,
-  NavigationRepository,
-  MenuBuilderFactory,
-  type NavigationMenu,
-  type NavigationItem,
-  type NavigationMenuConfig
-} from '@pems/navigation-management'
 import { DomainEventBus } from '@pems/infrastructure-events'
+import {
+  MenuBuilderFactory,
+  NavigationRepository,
+  NavigationService,
+  type NavigationItem,
+  type NavigationMenu,
+  type NavigationMenuConfig,
+} from '@pems/navigation-management'
+import { Link } from '@tanstack/solid-router'
+import { createEffect, createSignal, For, Show } from 'solid-js'
+import type {
+  Permission,
+  Role,
+} from '../../../../../packages/infrastructure/auth/src/rbac'
+import { usePermissionContext } from '../../contexts/PermissionContext'
+import { getNavigationServiceBridge } from '../../services/navigation-service-bridge'
 
 /**
  * Navigation Management Admin Interface
@@ -36,17 +33,27 @@ export default function NavigationManagement() {
   const { hasPermission, user, tenantId } = usePermissionContext()
 
   // Check admin permissions
-  const canManageNavigation = () => hasPermission('navigation:manage') || hasPermission('system:config')
-  const canViewAnalytics = () => hasPermission('navigation:analytics') || hasPermission('system:audit')
+  const canManageNavigation = () =>
+    hasPermission('navigation:manage') || hasPermission('system:config')
+  const canViewAnalytics = () =>
+    hasPermission('navigation:analytics') || hasPermission('system:audit')
 
-  // Services
+  // Services - Use NavigationServiceBridge for consistency
+  const navigationServiceBridge = getNavigationServiceBridge({
+    enableCaching: true,
+    enableAnalytics: true,
+    enableRealTimeUpdates: true,
+    fallbackToStatic: false, // Admin should have full functionality
+  })
+
+  // Direct services for advanced admin operations
   const [eventBus] = createSignal(() => new DomainEventBus())
   const [navigationService] = createSignal(() => {
     const bus = eventBus()
     return new NavigationService({
       enableCaching: true,
       enableAnalytics: true,
-      enableSecurityAuditing: true
+      enableSecurityAuditing: true,
     })
   })
   const [navigationRepository] = createSignal(() => {
@@ -55,7 +62,9 @@ export default function NavigationManagement() {
   })
 
   // UI State
-  const [activeTab, setActiveTab] = createSignal<'menus' | 'items' | 'analytics' | 'settings'>('menus')
+  const [activeTab, setActiveTab] = createSignal<
+    'menus' | 'items' | 'analytics' | 'settings'
+  >('menus')
   const [loading, setLoading] = createSignal(true)
   const [error, setError] = createSignal<string>()
   const [successMessage, setSuccessMessage] = createSignal<string>()
@@ -63,16 +72,20 @@ export default function NavigationManagement() {
   // Data State
   const [menus, setMenus] = createSignal<NavigationMenu[]>([])
   const [selectedMenu, setSelectedMenu] = createSignal<NavigationMenu>()
-  const [editingItem, setEditingItem] = createSignal<NavigationItem | null>(null)
+  const [editingItem, setEditingItem] = createSignal<NavigationItem | null>(
+    null,
+  )
   const [isCreatingMenu, setIsCreatingMenu] = createSignal(false)
 
   // Form State
-  const [menuFormData, setMenuFormData] = createSignal<Partial<NavigationMenuConfig>>({
+  const [menuFormData, setMenuFormData] = createSignal<
+    Partial<NavigationMenuConfig>
+  >({
     name: '',
     description: '',
     scope: 'global',
     isDefault: false,
-    isActive: true
+    isActive: true,
   })
 
   const [itemFormData, setItemFormData] = createSignal({
@@ -87,22 +100,43 @@ export default function NavigationManagement() {
     visible: true,
     disabled: false,
     external: false,
-    target: '_self' as const
+    target: '_self' as const,
   })
 
   // Available permissions and roles
   const [availablePermissions] = createSignal<Permission[]>([
-    'users:read', 'users:create', 'users:update', 'users:delete', 'users:manage_roles',
-    'transactions:read', 'transactions:create', 'transactions:update', 'transactions:delete',
-    'transactions:approve', 'transactions:cancel',
-    'reports:read', 'reports:export', 'reports:audit',
-    'tenants:read', 'tenants:create', 'tenants:update', 'tenants:delete',
-    'system:config', 'system:audit', 'system:backup'
+    'users:read',
+    'users:create',
+    'users:update',
+    'users:delete',
+    'users:manage_roles',
+    'transactions:read',
+    'transactions:create',
+    'transactions:update',
+    'transactions:delete',
+    'transactions:approve',
+    'transactions:cancel',
+    'reports:read',
+    'reports:export',
+    'reports:audit',
+    'tenants:read',
+    'tenants:create',
+    'tenants:update',
+    'tenants:delete',
+    'system:config',
+    'system:audit',
+    'system:backup',
   ])
 
   const [availableRoles] = createSignal<Role[]>([
-    'super_admin', 'tenant_admin', 'manager', 'supervisor',
-    'cashier', 'clerk', 'auditor', 'viewer'
+    'super_admin',
+    'tenant_admin',
+    'manager',
+    'supervisor',
+    'cashier',
+    'clerk',
+    'auditor',
+    'viewer',
   ])
 
   // Initialize data
@@ -113,7 +147,19 @@ export default function NavigationManagement() {
       return
     }
 
-    await loadMenus()
+    try {
+      // Initialize navigation service bridge
+      const currentUser = user()
+      if (currentUser) {
+        await navigationServiceBridge.initialize(currentUser)
+      }
+
+      await loadMenus()
+    } catch (error) {
+      console.error('Failed to initialize navigation services:', error)
+      setError('Failed to initialize navigation services')
+      setLoading(false)
+    }
   })
 
   // Load navigation menus
@@ -124,7 +170,7 @@ export default function NavigationManagement() {
 
       const repo = navigationRepository()
       const menuList = await repo.getNavigationMenus({
-        isActive: true
+        isActive: true,
       })
 
       setMenus(menuList)
@@ -132,7 +178,6 @@ export default function NavigationManagement() {
       if (menuList.length > 0 && !selectedMenu()) {
         setSelectedMenu(menuList[0])
       }
-
     } catch (err) {
       setError('Failed to load navigation menus')
       console.error('Error loading menus:', err)
@@ -157,20 +202,29 @@ export default function NavigationManagement() {
         scope: formData.scope || 'global',
         tenantId: formData.scope === 'tenant' ? tenantId() : undefined,
         isDefault: formData.isDefault,
-        isActive: formData.isActive ?? true
+        isActive: formData.isActive ?? true,
       })
 
       // Add default items for new menu
       const defaultItems = MenuBuilderFactory.createGlobalMenu().allItems
-      for (const item of defaultItems.slice(0, 5)) { // Add first 5 default items
+      for (const item of defaultItems.slice(0, 5)) {
+        // Add first 5 default items
         await repo.addNavigationItem(newMenu.id, item)
       }
 
       setSuccessMessage(`Menu "${newMenu.name}" created successfully`)
       setIsCreatingMenu(false)
-      setMenuFormData({ name: '', description: '', scope: 'global', isDefault: false, isActive: true })
-      await loadMenus()
+      setMenuFormData({
+        name: '',
+        description: '',
+        scope: 'global',
+        isDefault: false,
+        isActive: true,
+      })
 
+      // Refresh navigation bridge to reflect changes
+      await navigationServiceBridge.refreshNavigation()
+      await loadMenus()
     } catch (err) {
       setError('Failed to create menu')
       console.error('Error creating menu:', err)
@@ -178,18 +232,23 @@ export default function NavigationManagement() {
   }
 
   // Update menu
-  const updateMenu = async (menuId: string, updates: Partial<NavigationMenuConfig>) => {
+  const updateMenu = async (
+    menuId: string,
+    updates: Partial<NavigationMenuConfig>,
+  ) => {
     try {
       const repo = navigationRepository()
       const success = await repo.updateNavigationMenu(menuId, updates)
 
       if (success) {
         setSuccessMessage('Menu updated successfully')
+
+        // Refresh navigation bridge to reflect changes
+        await navigationServiceBridge.refreshNavigation()
         await loadMenus()
       } else {
         setError('Failed to update menu')
       }
-
     } catch (err) {
       setError('Failed to update menu')
       console.error('Error updating menu:', err)
@@ -198,7 +257,11 @@ export default function NavigationManagement() {
 
   // Delete menu
   const deleteMenu = async (menuId: string) => {
-    if (!confirm('Are you sure you want to delete this menu? This action cannot be undone.')) {
+    if (
+      !confirm(
+        'Are you sure you want to delete this menu? This action cannot be undone.',
+      )
+    ) {
       return
     }
 
@@ -209,11 +272,13 @@ export default function NavigationManagement() {
       if (success) {
         setSuccessMessage('Menu deleted successfully')
         setSelectedMenu(undefined)
+
+        // Refresh navigation bridge to reflect changes
+        await navigationServiceBridge.refreshNavigation()
         await loadMenus()
       } else {
         setError('Failed to delete menu')
       }
-
     } catch (err) {
       setError('Failed to delete menu')
       console.error('Error deleting menu:', err)
@@ -235,17 +300,20 @@ export default function NavigationManagement() {
       // Create navigation item
       const newItem = {
         label: formData.label,
-        path: formData.path || `#${formData.label.toLowerCase().replace(/\s+/g, '-')}`,
+        path:
+          formData.path ||
+          `#${formData.label.toLowerCase().replace(/\s+/g, '-')}`,
         description: formData.description,
         icon: formData.icon,
-        permissions: formData.permissions.length > 0 ? formData.permissions : undefined,
+        permissions:
+          formData.permissions.length > 0 ? formData.permissions : undefined,
         requireAll: formData.requireAll,
         scope: formData.scope,
         order: formData.order,
         visible: formData.visible,
         disabled: formData.disabled,
         external: formData.external,
-        target: formData.target
+        target: formData.target,
       }
 
       // Add to repository
@@ -267,13 +335,15 @@ export default function NavigationManagement() {
           visible: true,
           disabled: false,
           external: false,
-          target: '_self'
+          target: '_self',
         })
+
+        // Refresh navigation bridge to reflect changes
+        await navigationServiceBridge.refreshNavigation()
         await loadMenus()
       } else {
         setError('Failed to add navigation item')
       }
-
     } catch (err) {
       setError('Failed to add navigation item')
       console.error('Error adding navigation item:', err)
@@ -281,7 +351,10 @@ export default function NavigationManagement() {
   }
 
   // Update navigation item
-  const updateNavigationItem = async (itemId: string, updates: Partial<any>) => {
+  const updateNavigationItem = async (
+    itemId: string,
+    updates: Partial<any>,
+  ) => {
     try {
       const selected = selectedMenu()
       if (!selected) return
@@ -307,11 +380,13 @@ export default function NavigationManagement() {
         setSuccessMessage('Navigation item updated successfully')
         setEditingItem(null)
         // Note: In a real implementation, you'd update the item in the repository
+
+        // Refresh navigation bridge to reflect changes
+        await navigationServiceBridge.refreshNavigation()
         await loadMenus()
       } else {
         setError('Navigation item not found')
       }
-
     } catch (err) {
       setError('Failed to update navigation item')
       console.error('Error updating navigation item:', err)
@@ -320,7 +395,11 @@ export default function NavigationManagement() {
 
   // Delete navigation item
   const deleteNavigationItem = async (itemId: string) => {
-    if (!confirm('Are you sure you want to delete this navigation item? This action cannot be undone.')) {
+    if (
+      !confirm(
+        'Are you sure you want to delete this navigation item? This action cannot be undone.',
+      )
+    ) {
       return
     }
 
@@ -333,11 +412,13 @@ export default function NavigationManagement() {
 
       if (success) {
         setSuccessMessage('Navigation item deleted successfully')
+
+        // Refresh navigation bridge to reflect changes
+        await navigationServiceBridge.refreshNavigation()
         await loadMenus()
       } else {
         setError('Failed to delete navigation item')
       }
-
     } catch (err) {
       setError('Failed to delete navigation item')
       console.error('Error deleting navigation item:', err)
@@ -364,9 +445,9 @@ export default function NavigationManagement() {
           <p>Configure navigation menus, permissions, and structure</p>
         </div>
         <div class="admin-header__actions">
-          <A href="/admin" class="btn btn-secondary">
+          <Link to="/admin" class="btn btn-secondary">
             Back to Admin
-          </A>
+          </Link>
         </div>
       </div>
 
@@ -466,10 +547,12 @@ export default function NavigationManagement() {
                         id="menu-name"
                         type="text"
                         value={menuFormData().name}
-                        onInput={(e) => setMenuFormData({
-                          ...menuFormData(),
-                          name: e.currentTarget.value
-                        })}
+                        onInput={(e) =>
+                          setMenuFormData({
+                            ...menuFormData(),
+                            name: e.currentTarget.value,
+                          })
+                        }
                         placeholder="e.g., Main Navigation"
                       />
                     </div>
@@ -479,10 +562,12 @@ export default function NavigationManagement() {
                       <select
                         id="menu-scope"
                         value={menuFormData().scope}
-                        onChange={(e) => setMenuFormData({
-                          ...menuFormData(),
-                          scope: e.currentTarget.value as any
-                        })}
+                        onChange={(e) =>
+                          setMenuFormData({
+                            ...menuFormData(),
+                            scope: e.currentTarget.value as any,
+                          })
+                        }
                       >
                         <option value="global">Global</option>
                         <option value="tenant">Tenant</option>
@@ -496,10 +581,12 @@ export default function NavigationManagement() {
                       <textarea
                         id="menu-description"
                         value={menuFormData().description || ''}
-                        onInput={(e) => setMenuFormData({
-                          ...menuFormData(),
-                          description: e.currentTarget.value
-                        })}
+                        onInput={(e) =>
+                          setMenuFormData({
+                            ...menuFormData(),
+                            description: e.currentTarget.value,
+                          })
+                        }
                         placeholder="Optional description"
                       />
                     </div>
@@ -509,10 +596,12 @@ export default function NavigationManagement() {
                         <input
                           type="checkbox"
                           checked={menuFormData().isDefault}
-                          onChange={(e) => setMenuFormData({
-                            ...menuFormData(),
-                            isDefault: e.currentTarget.checked
-                          })}
+                          onChange={(e) =>
+                            setMenuFormData({
+                              ...menuFormData(),
+                              isDefault: e.currentTarget.checked,
+                            })
+                          }
                         />
                         Default Menu
                       </label>
@@ -523,10 +612,12 @@ export default function NavigationManagement() {
                         <input
                           type="checkbox"
                           checked={menuFormData().isActive}
-                          onChange={(e) => setMenuFormData({
-                            ...menuFormData(),
-                            isActive: e.currentTarget.checked
-                          })}
+                          onChange={(e) =>
+                            setMenuFormData({
+                              ...menuFormData(),
+                              isActive: e.currentTarget.checked,
+                            })
+                          }
                         />
                         Active
                       </label>
@@ -534,10 +625,7 @@ export default function NavigationManagement() {
                   </div>
 
                   <div class="form-actions">
-                    <button
-                      class="btn btn-primary"
-                      onClick={createMenu}
-                    >
+                    <button class="btn btn-primary" onClick={createMenu}>
                       Create Menu
                     </button>
                     <button
@@ -555,14 +643,21 @@ export default function NavigationManagement() {
             <div class="menu-list">
               <For each={menus()}>
                 {(menu) => (
-                  <div class={`menu-item ${selectedMenu()?.id === menu.id ? 'menu-item--selected' : ''}`}>
-                    <div class="menu-item__header" onClick={() => setSelectedMenu(menu)}>
+                  <div
+                    class={`menu-item ${selectedMenu()?.id === menu.id ? 'menu-item--selected' : ''}`}
+                  >
+                    <div
+                      class="menu-item__header"
+                      onClick={() => setSelectedMenu(menu)}
+                    >
                       <div class="menu-item__info">
                         <h3>{menu.name}</h3>
                         <p>{menu.description}</p>
                         <div class="menu-item__meta">
                           <span class="badge badge--scope">{menu.scope}</span>
-                          <span class="badge badge--count">{menu.allItems.length} items</span>
+                          <span class="badge badge--count">
+                            {menu.allItems.length} items
+                          </span>
                           <Show when={menu.isActive}>
                             <span class="badge badge--success">Active</span>
                           </Show>
@@ -767,7 +862,7 @@ function NavigationItemEditor(props: NavigationItemEditorProps) {
     visible: props.item?.visible !== false,
     disabled: props.item?.disabled || false,
     external: props.item?.external || false,
-    target: props.item?.target || '_self'
+    target: props.item?.target || '_self',
   })
 
   const handleSave = () => {
@@ -783,7 +878,7 @@ function NavigationItemEditor(props: NavigationItemEditorProps) {
   const togglePermission = (permission: Permission) => {
     const currentPermissions = formData().permissions
     const newPermissions = currentPermissions.includes(permission)
-      ? currentPermissions.filter(p => p !== permission)
+      ? currentPermissions.filter((p) => p !== permission)
       : [...currentPermissions, permission]
 
     setFormData({ ...formData(), permissions: newPermissions })
@@ -792,7 +887,9 @@ function NavigationItemEditor(props: NavigationItemEditorProps) {
   return (
     <div class="card">
       <div class="card__header">
-        <h3>{props.item?.id ? 'Edit Navigation Item' : 'Add Navigation Item'}</h3>
+        <h3>
+          {props.item?.id ? 'Edit Navigation Item' : 'Add Navigation Item'}
+        </h3>
         <button class="btn btn-secondary" onClick={props.onCancel}>
           Cancel
         </button>
@@ -805,7 +902,9 @@ function NavigationItemEditor(props: NavigationItemEditorProps) {
               id="item-label"
               type="text"
               value={formData().label}
-              onInput={(e) => setFormData({ ...formData(), label: e.currentTarget.value })}
+              onInput={(e) =>
+                setFormData({ ...formData(), label: e.currentTarget.value })
+              }
               placeholder="e.g., Dashboard"
             />
           </div>
@@ -816,7 +915,9 @@ function NavigationItemEditor(props: NavigationItemEditorProps) {
               id="item-path"
               type="text"
               value={formData().path}
-              onInput={(e) => setFormData({ ...formData(), path: e.currentTarget.value })}
+              onInput={(e) =>
+                setFormData({ ...formData(), path: e.currentTarget.value })
+              }
               placeholder="/dashboard or https://external.com"
             />
           </div>
@@ -826,7 +927,12 @@ function NavigationItemEditor(props: NavigationItemEditorProps) {
             <textarea
               id="item-description"
               value={formData().description}
-              onInput={(e) => setFormData({ ...formData(), description: e.currentTarget.value })}
+              onInput={(e) =>
+                setFormData({
+                  ...formData(),
+                  description: e.currentTarget.value,
+                })
+              }
               placeholder="Optional description"
             />
           </div>
@@ -837,7 +943,9 @@ function NavigationItemEditor(props: NavigationItemEditorProps) {
               id="item-icon"
               type="text"
               value={formData().icon}
-              onInput={(e) => setFormData({ ...formData(), icon: e.currentTarget.value })}
+              onInput={(e) =>
+                setFormData({ ...formData(), icon: e.currentTarget.value })
+              }
               placeholder="📊 or dashboard-icon"
             />
           </div>
@@ -847,7 +955,12 @@ function NavigationItemEditor(props: NavigationItemEditorProps) {
             <select
               id="item-scope"
               value={formData().scope}
-              onChange={(e) => setFormData({ ...formData(), scope: e.currentTarget.value as any })}
+              onChange={(e) =>
+                setFormData({
+                  ...formData(),
+                  scope: e.currentTarget.value as any,
+                })
+              }
             >
               <option value="global">Global</option>
               <option value="tenant">Tenant</option>
@@ -861,7 +974,12 @@ function NavigationItemEditor(props: NavigationItemEditorProps) {
             <select
               id="item-target"
               value={formData().target}
-              onChange={(e) => setFormData({ ...formData(), target: e.currentTarget.value as any })}
+              onChange={(e) =>
+                setFormData({
+                  ...formData(),
+                  target: e.currentTarget.value as any,
+                })
+              }
             >
               <option value="_self">Same Window</option>
               <option value="_blank">New Window</option>
@@ -876,7 +994,12 @@ function NavigationItemEditor(props: NavigationItemEditorProps) {
               id="item-order"
               type="number"
               value={formData().order}
-              onInput={(e) => setFormData({ ...formData(), order: parseInt(e.currentTarget.value) || 0 })}
+              onInput={(e) =>
+                setFormData({
+                  ...formData(),
+                  order: parseInt(e.currentTarget.value) || 0,
+                })
+              }
             />
           </div>
 
@@ -903,7 +1026,12 @@ function NavigationItemEditor(props: NavigationItemEditorProps) {
               <input
                 type="checkbox"
                 checked={formData().requireAll}
-                onChange={(e) => setFormData({ ...formData(), requireAll: e.currentTarget.checked })}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData(),
+                    requireAll: e.currentTarget.checked,
+                  })
+                }
               />
               Require all permissions (AND logic)
             </label>
@@ -914,7 +1042,12 @@ function NavigationItemEditor(props: NavigationItemEditorProps) {
               <input
                 type="checkbox"
                 checked={formData().visible}
-                onChange={(e) => setFormData({ ...formData(), visible: e.currentTarget.checked })}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData(),
+                    visible: e.currentTarget.checked,
+                  })
+                }
               />
               Visible
             </label>
@@ -925,7 +1058,12 @@ function NavigationItemEditor(props: NavigationItemEditorProps) {
               <input
                 type="checkbox"
                 checked={formData().disabled}
-                onChange={(e) => setFormData({ ...formData(), disabled: e.currentTarget.checked })}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData(),
+                    disabled: e.currentTarget.checked,
+                  })
+                }
               />
               Disabled
             </label>
@@ -936,7 +1074,12 @@ function NavigationItemEditor(props: NavigationItemEditorProps) {
               <input
                 type="checkbox"
                 checked={formData().external}
-                onChange={(e) => setFormData({ ...formData(), external: e.currentTarget.checked })}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData(),
+                    external: e.currentTarget.checked,
+                  })
+                }
               />
               External Link
             </label>
@@ -957,7 +1100,10 @@ function NavigationItemEditor(props: NavigationItemEditorProps) {
 }
 
 // Placeholder components for analytics and settings
-function NavigationAnalytics(props: { navigationService: any; navigationRepository: any }) {
+function NavigationAnalytics(props: {
+  navigationService: any
+  navigationRepository: any
+}) {
   return (
     <div class="analytics-dashboard">
       <div class="analytics-grid">

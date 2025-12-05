@@ -1,7 +1,9 @@
-import { render } from 'solid-js/web'
-import './index.css'
 import { RouterProvider } from '@tanstack/solid-router'
-import { router } from './router'
+import { render } from 'solid-js/web'
+import { getRouter } from './router'
+// CSS is now loaded via __root.tsx for faster loading
+
+const router = getRouter()
 
 const root = document.getElementById('root')
 
