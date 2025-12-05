@@ -5,6 +5,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
+  useTheme,
 } from '@pems/ui'
 import { createFileRoute } from '@tanstack/solid-router'
 import {
@@ -17,73 +18,39 @@ import {
   Users,
   Zap,
 } from 'lucide-solid'
-import { Accessor, For, Show, createSignal, onMount } from 'solid-js'
+import { For, Show, createSignal } from 'solid-js'
 import { LoginModal } from '../components/auth/LoginModal'
-// import { UIComponentsShowcase } from '../ui/UIComponentsShowcase'
 import { Navbar } from '../components/layout/Navbar'
-// import { DashboardPreview } from '../components/ui/DashboardPreview'
-// import { OnboardingFlow } from '../components/ui/OnboardingFlow'
 
 export const Route = createFileRoute('/')({
   component: Index,
 })
 
-// Theme Toggle Button Component - moved outside to avoid closure issues
-function ThemeToggleButton(props: {
-  isDark: Accessor<boolean>
-  onToggle: () => void
-}) {
+// Theme Toggle Button Component - uses centralized theme context
+function ThemeToggleButton() {
+  const { resolvedTheme, toggleTheme, isHydrated } = useTheme()
+
   return (
-    <button
-      onClick={props.onToggle}
-      class="p-2 rounded-lg bg-card hover:bg-accent transition-colors duration-200 border border-border hover:border-primary"
-      title="Toggle theme"
-    >
-      <Show
-        when={props.isDark()}
-        fallback={<Sun class="w-5 h-5 text-amber-500" />}
+    <Show when={isHydrated()}>
+      <button
+        onClick={toggleTheme}
+        class="p-2 rounded-lg bg-card hover:bg-accent transition-colors duration-200 border border-border hover:border-primary"
+        title="Toggle theme"
       >
-        <Moon class="w-5 h-5 text-indigo-400" />
-      </Show>
-    </button>
+        <Show
+          when={resolvedTheme() === 'dark'}
+          fallback={<Sun class="w-5 h-5 text-amber-500" />}
+        >
+          <Moon class="w-5 h-5 text-indigo-400" />
+        </Show>
+      </button>
+    </Show>
   )
 }
 
 export default function Index() {
   const [loginOpen, setLoginOpen] = createSignal(false)
-  const [isDark, setIsDark] = createSignal(false)
-  const [mounted, setMounted] = createSignal(false)
-
-  const toggleTheme = () => {
-    const newTheme = !isDark()
-    setIsDark(newTheme)
-    if (newTheme) {
-      document.documentElement.classList.add('dark')
-      localStorage.setItem('theme', 'dark')
-    } else {
-      document.documentElement.classList.remove('dark')
-      localStorage.setItem('theme', 'light')
-    }
-  }
-
-  onMount(() => {
-    // Check for saved theme preference or default to light mode
-    const savedTheme = localStorage.getItem('theme')
-    const prefersDark = window.matchMedia(
-      '(prefers-color-scheme: dark)',
-    ).matches
-    const shouldBeDark = savedTheme === 'dark' || (!savedTheme && prefersDark)
-
-    setIsDark(shouldBeDark)
-    if (shouldBeDark) {
-      document.documentElement.classList.add('dark')
-    } else {
-      document.documentElement.classList.remove('dark')
-    }
-
-    // Mark as mounted after hydration is complete
-    setMounted(true)
-  })
+  const { isHydrated } = useTheme()
 
   const features = [
     {
@@ -157,13 +124,6 @@ export default function Index() {
     },
   ]
 
-  // Client-only theme toggle - only renders after hydration
-  const ClientThemeToggle = () => (
-    <Show when={mounted()}>
-      <ThemeToggleButton isDark={isDark} onToggle={toggleTheme} />
-    </Show>
-  )
-
   return (
     <div class="min-h-screen bg-background text-foreground transition-colors duration-300">
       {/* Background Effects */}
@@ -173,7 +133,7 @@ export default function Index() {
 
       <Navbar
         onLogin={() => setLoginOpen(true)}
-        extraContent={<ClientThemeToggle />}
+        extraContent={<ThemeToggleButton />}
       />
 
       <main class="relative">
@@ -209,7 +169,7 @@ export default function Index() {
           {/* CTA Buttons - wrapped in Show to prevent hydration mismatch */}
           <div class="flex flex-col sm:flex-row gap-5 justify-center items-center mb-20">
             <Show
-              when={mounted()}
+              when={isHydrated()}
               fallback={
                 <div class="flex flex-col sm:flex-row gap-5">
                   <div class="h-12 w-44 bg-primary/20 rounded-lg animate-pulse" />
@@ -271,7 +231,6 @@ export default function Index() {
         <section class="max-w-7xl mx-auto px-6 pb-32">
           <div class="relative rounded-3xl border border-border/50 bg-card/50 backdrop-blur-xl shadow-2xl overflow-hidden p-3">
             <div class="absolute inset-0 bg-primary/5 opacity-50" />
-            {/* <DashboardPreview /> */}
             <div class="p-8 text-center text-muted-foreground">
               <p class="text-lg">Dashboard Preview</p>
               <p class="text-sm mt-2">Component temporarily disabled</p>
@@ -317,18 +276,6 @@ export default function Index() {
             </For>
           </div>
         </section>
-
-        {/* UI Components Showcase Section */}
-        {/*
-          <section
-            id="ui-components"
-            class="max-w-7xl mx-auto px-6 py-32 relative overflow-hidden"
-          >
-            <div class="bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 rounded-3xl p-8 md:p-12">
-              <UIComponentsShowcase />
-            </div>
-          </section>
-          */}
 
         {/* Pricing Section */}
         <section id="pricing" class="max-w-7xl mx-auto px-6 py-32 relative">
@@ -454,7 +401,6 @@ export default function Index() {
                 Join thousands of teams already using PEMS to drive performance
                 and engagement.
               </p>
-              {/* <OnboardingFlow /> */}
               <div class="flex gap-4 justify-center">
                 <Button
                   variant="default"

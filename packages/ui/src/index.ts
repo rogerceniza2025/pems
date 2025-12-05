@@ -74,7 +74,7 @@ export {
   TableSort,
 } from './components/ui/table'
 export { RichTextarea, Textarea } from './components/ui/textarea'
-export { createToast, ToastProvider } from './components/ui/toast'
+export { ToastProvider, createToast } from './components/ui/toast'
 
 // Modal components - Temporarily disabled
 // export {
@@ -88,8 +88,8 @@ export { createToast, ToastProvider } from './components/ui/toast'
 // Animation utilities
 export {
   ANIMATION_CONFIG,
-  createMotion,
   MOTION_PRESETS,
+  createMotion,
   useReducedMotion,
 } from './lib/animations'
 export {
@@ -101,15 +101,23 @@ export {
 } from './lib/debounce'
 export { createRipple } from './lib/ripple'
 export {
+  TRANSITIONS,
+  TRANSITION_PRESETS,
   applyPresetTransition,
   createExitTransition,
   createTransition,
-  TRANSITION_PRESETS,
-  TRANSITIONS,
 } from './lib/transitions'
 
 // Theme provider
-export { ThemeProvider, useTheme } from './components/theme-provider'
+export {
+  ThemeProvider,
+  getThemeScript,
+  useTheme,
+  type ResolvedTheme,
+  type Theme,
+  type ThemeContextValue,
+  type ThemeProviderProps,
+} from './components/theme-provider'
 
 // Form components - Temporarily disabled due to missing dependencies
 // export * from './components/ui/form'
@@ -209,8 +217,8 @@ export type {
   TableCellProps,
   TableCheckboxProps,
   TableFooterProps,
-  TableHeaderProps,
   TableHeadProps,
+  TableHeaderProps,
   TablePaginationProps,
   TableProps,
   TableRowProps,

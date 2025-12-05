@@ -1,12 +1,9 @@
-import { Button } from '@pems/ui'
-import { Show, createSignal, onMount, type JSX } from 'solid-js'
+import { Button, useTheme } from '@pems/ui'
+import { Show, createSignal, type JSX } from 'solid-js'
 
-function MobileNav(props: {
-  onLogin: () => void
-  extraContent?: JSX.Element
-  mounted: boolean
-}) {
+function MobileNav(props: { onLogin: () => void; extraContent?: JSX.Element }) {
   const [open, setOpen] = createSignal(false)
+  const { isHydrated } = useTheme()
 
   return (
     <div class="md:hidden">
@@ -60,12 +57,12 @@ function MobileNav(props: {
                 Testimonials
               </a>
             </li>
-            <Show when={props.mounted && props.extraContent}>
+            <Show when={isHydrated() && props.extraContent}>
               <li>
                 <div class="px-3 py-2">{props.extraContent}</div>
               </li>
             </Show>
-            <Show when={props.mounted}>
+            <Show when={isHydrated()}>
               <li>
                 <button
                   onClick={props.onLogin}
@@ -86,11 +83,7 @@ export function Navbar(props: {
   onLogin: () => void
   extraContent?: JSX.Element
 }) {
-  const [mounted, setMounted] = createSignal(false)
-
-  onMount(() => {
-    setMounted(true)
-  })
+  const { isHydrated } = useTheme()
 
   return (
     <header class="w-full py-4 border-b border-border sticky top-0 backdrop-blur bg-background/70 z-50">
@@ -133,12 +126,12 @@ export function Navbar(props: {
         <div class="flex items-center gap-3">
           <div class="hidden md:flex items-center gap-3">
             {/* Only render extra content after hydration */}
-            <Show when={mounted() && props.extraContent}>
+            <Show when={isHydrated() && props.extraContent}>
               <div class="flex items-center">{props.extraContent}</div>
             </Show>
             {/* Only render login button after hydration */}
             <Show
-              when={mounted()}
+              when={isHydrated()}
               fallback={
                 <div class="h-10 w-20 bg-primary/20 rounded-lg animate-pulse" />
               }
@@ -156,7 +149,6 @@ export function Navbar(props: {
             <MobileNav
               onLogin={props.onLogin}
               extraContent={props.extraContent}
-              mounted={mounted()}
             />
           </div>
         </div>

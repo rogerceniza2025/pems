@@ -1,14 +1,14 @@
 /// <reference types="vite/client" />
-import * as Solid from 'solid-js'
+import { ThemeProvider, getThemeScript } from '@pems/ui'
 import {
-  Outlet,
-  createRootRoute,
   HeadContent,
+  Outlet,
   Scripts,
+  createRootRoute,
 } from '@tanstack/solid-router'
+import * as Solid from 'solid-js'
 import { HydrationScript } from 'solid-js/web'
 import { PermissionProvider } from '../contexts/PermissionContext'
-import type { User } from 'better-auth/types'
 import indexCss from '../index.css?url'
 
 export const Route = createRootRoute({
@@ -51,6 +51,12 @@ export const Route = createRootRoute({
       { rel: 'icon', href: '/favicon.ico' },
       { rel: 'stylesheet', href: indexCss },
     ],
+    scripts: [
+      // Inline script to prevent flash of incorrect theme
+      {
+        children: getThemeScript(),
+      },
+    ],
   }),
   errorComponent: ErrorComponent,
   notFoundComponent: NotFoundComponent,
@@ -60,27 +66,31 @@ export const Route = createRootRoute({
 function RootComponent() {
   return (
     <RootDocument>
-      <PermissionProvider>
-        <div class="min-h-screen bg-background text-foreground">
-          <Outlet />
-        </div>
-      </PermissionProvider>
+      <ThemeProvider defaultTheme="system">
+        <PermissionProvider>
+          <div class="min-h-screen bg-background text-foreground">
+            <Outlet />
+          </div>
+        </PermissionProvider>
+      </ThemeProvider>
     </RootDocument>
   )
 }
 
-function ErrorComponent({ error }: { error: Error }) {
+function ErrorComponent(props: { error: Error }) {
   return (
     <RootDocument>
       <div class="min-h-screen flex items-center justify-center bg-background text-foreground p-4">
         <div class="text-center max-w-md">
           <h1 class="text-2xl font-bold text-red-600 mb-4">Error</h1>
-          <p class="text-gray-600 dark:text-gray-400 mb-4">Something went wrong:</p>
+          <p class="text-gray-600 dark:text-gray-400 mb-4">
+            Something went wrong:
+          </p>
           <pre class="bg-gray-100 dark:bg-gray-800 p-4 rounded text-sm overflow-auto">
-            {error.message}
+            {props.error.message}
           </pre>
           <button
-            onclick={() => window.location.reload()}
+            onClick={() => window.location.reload()}
             class="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
           >
             Reload Page
@@ -96,8 +106,12 @@ function NotFoundComponent() {
     <RootDocument>
       <div class="min-h-screen flex items-center justify-center bg-background text-foreground p-4">
         <div class="text-center max-w-md">
-          <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">404 - Page Not Found</h1>
-          <p class="text-gray-600 dark:text-gray-400 mb-8">The page you're looking for doesn't exist.</p>
+          <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+            404 - Page Not Found
+          </h1>
+          <p class="text-gray-600 dark:text-gray-400 mb-8">
+            The page you're looking for doesn't exist.
+          </p>
           <a
             href="/"
             class="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
@@ -110,7 +124,7 @@ function NotFoundComponent() {
   )
 }
 
-function RootDocument({ children }: Readonly<{ children: Solid.JSX.Element }>) {
+function RootDocument(props: Readonly<{ children: Solid.JSX.Element }>) {
   return (
     <html>
       <head>
@@ -118,7 +132,7 @@ function RootDocument({ children }: Readonly<{ children: Solid.JSX.Element }>) {
       </head>
       <body>
         <HeadContent />
-        <Solid.Suspense>{children}</Solid.Suspense>
+        <Solid.Suspense>{props.children}</Solid.Suspense>
         <Scripts />
       </body>
     </html>
