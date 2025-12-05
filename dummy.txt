@@ -1,0 +1,5 @@
+
+D:\pems\apps\api\src\routes\users.ts
+ 413:17  error    Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  570:17  error    Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  781:15  error    'newPassword' is assigned a value but never used                                                           @typescript-eslint/no-unused-vars

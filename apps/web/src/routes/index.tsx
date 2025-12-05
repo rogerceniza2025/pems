@@ -29,28 +29,21 @@ export const Route = createFileRoute('/')({
 // Theme Toggle Button Component - uses centralized theme context
 // Only this component needs isHydrated() because it reads theme state
 function ThemeToggleButton() {
-  const { resolvedTheme, toggleTheme, isHydrated } = useTheme()
+  const { resolvedTheme, toggleTheme } = useTheme()
 
   return (
-    <Show
-      when={isHydrated()}
-      fallback={
-        <div class="p-2 rounded-lg bg-card border border-border w-9 h-9 animate-pulse" />
-      }
+    <button
+      onClick={toggleTheme}
+      class="p-2 rounded-lg bg-card hover:bg-accent transition-colors duration-200 border border-border hover:border-primary"
+      title="Toggle theme"
     >
-      <button
-        onClick={toggleTheme}
-        class="p-2 rounded-lg bg-card hover:bg-accent transition-colors duration-200 border border-border hover:border-primary"
-        title="Toggle theme"
+      <Show
+        when={resolvedTheme() === 'dark'}
+        fallback={<Sun class="w-5 h-5 text-amber-500" />}
       >
-        <Show
-          when={resolvedTheme() === 'dark'}
-          fallback={<Sun class="w-5 h-5 text-amber-500" />}
-        >
-          <Moon class="w-5 h-5 text-indigo-400" />
-        </Show>
-      </button>
-    </Show>
+        <Moon class="w-5 h-5 text-indigo-400" />
+      </Show>
+    </button>
   )
 }
 

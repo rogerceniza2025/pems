@@ -5,19 +5,20 @@
  * Integrates with tenant management, roles, and permissions
  */
 
+import { zValidator } from '@hono/zod-validator/dist/index.cjs'
+import { PrismaClient } from '@pems/database'
+import { getCurrentSession, getCurrentUser } from '@pems/middleware'
 import { Hono } from 'hono'
 import { HTTPException } from 'hono/http-exception'
-import { PrismaClient } from '@pems/database'
-import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
-import { getCurrentUser, getCurrentSession, isAuthenticated } from '@pems/middleware'
 
 const usersRouter = new Hono()
 
 // Validation schemas
 const createUserSchema = z.object({
   email: z.string().email('Invalid email format'),
-  password: z.string()
+  password: z
+    .string()
     .min(8, 'Password must be at least 8 characters')
     .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
     .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
@@ -41,7 +42,8 @@ const updateUserSchema = z.object({
 })
 
 const updateUserPasswordSchema = z.object({
-  newPassword: z.string()
+  newPassword: z
+    .string()
     .min(8, 'Password must be at least 8 characters')
     .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
     .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
@@ -50,9 +52,16 @@ const updateUserPasswordSchema = z.object({
 
 const queryUsersSchema = z.object({
   page: z.string().transform(Number).pipe(z.number().min(1)).default('1'),
-  limit: z.string().transform(Number).pipe(z.number().min(1).max(100)).default('20'),
+  limit: z
+    .string()
+    .transform(Number)
+    .pipe(z.number().min(1).max(100))
+    .default('20'),
   search: z.string().optional(),
-  isActive: z.enum(['true', 'false']).transform(val => val === 'true').optional(),
+  isActive: z
+    .enum(['true', 'false'])
+    .transform((val) => val === 'true')
+    .optional(),
   role: z.string().uuid().optional(),
   sortBy: z.enum(['name', 'email', 'createdAt', 'updatedAt']).default('name'),
   sortOrder: z.enum(['asc', 'desc']).default('asc'),
@@ -84,16 +93,16 @@ usersRouter.get('/me', async (c) => {
           include: {
             role_permissions: {
               include: {
-                permission: true
-              }
-            }
-          }
-        }
-      }
+                permission: true,
+              },
+            },
+          },
+        },
+      },
     })
 
-    const permissions = userRoles.flatMap(userRole =>
-      userRole.role.role_permissions.map(rp => rp.permission)
+    const permissions = userRoles.flatMap((userRole) =>
+      userRole.role.role_permissions.map((rp) => rp.permission),
     )
 
     return c.json({
@@ -113,14 +122,14 @@ usersRouter.get('/me', async (c) => {
         updatedAt: user.updatedAt,
         lastLogin: currentUser.updatedAt,
       },
-      roles: userRoles.map(userRole => ({
+      roles: userRoles.map((userRole) => ({
         id: userRole.role.id,
         name: userRole.role.name,
         slug: userRole.role.slug,
         description: userRole.role.description,
         scope: userRole.scope,
       })),
-      permissions: permissions.map(permission => ({
+      permissions: permissions.map((permission) => ({
         id: permission.id,
         action: permission.action,
         resource: permission.resource,
@@ -129,7 +138,9 @@ usersRouter.get('/me', async (c) => {
     })
   } catch (error) {
     console.error('Get current user error:', error)
-    throw new HTTPException(500, { message: 'Unable to retrieve user information' })
+    throw new HTTPException(500, {
+      message: 'Unable to retrieve user information',
+    })
   }
 })
 
@@ -156,24 +167,24 @@ usersRouter.get('/:id', async (c) => {
               include: {
                 role_permissions: {
                   include: {
-                    permission: true
-                  }
-                }
-              }
-            }
-          }
+                    permission: true,
+                  },
+                },
+              },
+            },
+          },
         },
         auth_providers: true,
         profiles: true,
-      }
+      },
     })
 
     if (!user) {
       throw new HTTPException(404, { message: 'User not found' })
     }
 
-    const permissions = user.user_roles.flatMap(userRole =>
-      userRole.role.role_permissions.map(rp => rp.permission)
+    const permissions = user.user_roles.flatMap((userRole) =>
+      userRole.role.role_permissions.map((rp) => rp.permission),
     )
 
     return c.json({
@@ -191,14 +202,14 @@ usersRouter.get('/:id', async (c) => {
         metadata: user.metadata,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
-        roles: user.user_roles.map(userRole => ({
+        roles: user.user_roles.map((userRole) => ({
           id: userRole.role.id,
           name: userRole.role.name,
           slug: userRole.role.slug,
           description: userRole.role.description,
           scope: userRole.scope,
         })),
-        permissions: permissions.map(permission => ({
+        permissions: permissions.map((permission) => ({
           id: permission.id,
           action: permission.action,
           resource: permission.resource,
@@ -206,14 +217,16 @@ usersRouter.get('/:id', async (c) => {
         })),
         authProviders: user.auth_providers,
         profiles: user.profiles,
-      }
+      },
     })
   } catch (error) {
     if (error instanceof HTTPException) {
       throw error
     }
     console.error('Get user error:', error)
-    throw new HTTPException(500, { message: 'Unable to retrieve user information' })
+    throw new HTTPException(500, {
+      message: 'Unable to retrieve user information',
+    })
   }
 })
 
@@ -227,7 +240,8 @@ usersRouter.get('/', zValidator('query', queryUsersSchema), async (c) => {
       throw new HTTPException(403, { message: 'Admin access required' })
     }
 
-    const { page, limit, search, isActive, role, sortBy, sortOrder } = c.req.valid('query')
+    const { page, limit, search, isActive, role, sortBy, sortOrder } =
+      c.req.valid('query')
     const skip = (page - 1) * limit
 
     // Build where clause
@@ -248,7 +262,7 @@ usersRouter.get('/', zValidator('query', queryUsersSchema), async (c) => {
 
     if (role) {
       where.user_roles = {
-        some: { roleId: role }
+        some: { roleId: role },
       }
     }
 
@@ -262,20 +276,20 @@ usersRouter.get('/', zValidator('query', queryUsersSchema), async (c) => {
         include: {
           user_roles: {
             include: {
-              role: true
-            }
-          }
+              role: true,
+            },
+          },
         },
         orderBy,
         skip,
         take: limit,
       }),
-      prisma.better_auth_users.count({ where })
+      prisma.better_auth_users.count({ where }),
     ])
 
     return c.json({
       success: true,
-      users: users.map(user => ({
+      users: users.map((user) => ({
         id: user.id,
         email: user.email,
         name: user.name,
@@ -287,7 +301,7 @@ usersRouter.get('/', zValidator('query', queryUsersSchema), async (c) => {
         metadata: user.metadata,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
-        roles: user.user_roles.map(userRole => ({
+        roles: user.user_roles.map((userRole) => ({
           id: userRole.role.id,
           name: userRole.role.name,
           slug: userRole.role.slug,
@@ -300,7 +314,7 @@ usersRouter.get('/', zValidator('query', queryUsersSchema), async (c) => {
         pages: Math.ceil(total / limit),
         hasNext: page * limit < total,
         hasPrev: page > 1,
-      }
+      },
     })
   } catch (error) {
     if (error instanceof HTTPException) {
@@ -329,11 +343,13 @@ usersRouter.post('/', zValidator('json', createUserSchema), async (c) => {
       where: {
         email: userFields.email,
         tenantId: currentUser.user.tenantId,
-      }
+      },
     })
 
     if (existingUser) {
-      throw new HTTPException(409, { message: 'User with this email already exists' })
+      throw new HTTPException(409, {
+        message: 'User with this email already exists',
+      })
     }
 
     // Create user
@@ -347,19 +363,19 @@ usersRouter.post('/', zValidator('json', createUserSchema), async (c) => {
       include: {
         user_roles: {
           include: {
-            role: true
-          }
-        }
-      }
+            role: true,
+          },
+        },
+      },
     })
 
     // Assign roles if provided
     if (roles.length > 0) {
       await prisma.userRole.createMany({
-        data: roles.map(roleId => ({
+        data: roles.map((roleId) => ({
           userId: user.id,
           roleId,
-        }))
+        })),
       })
 
       // Refresh user data with roles
@@ -368,10 +384,10 @@ usersRouter.post('/', zValidator('json', createUserSchema), async (c) => {
         include: {
           user_roles: {
             include: {
-              role: true
-            }
-          }
-        }
+              role: true,
+            },
+          },
+        },
       })
 
       return c.json({
@@ -389,12 +405,13 @@ usersRouter.post('/', zValidator('json', createUserSchema), async (c) => {
           metadata: user.metadata,
           createdAt: user.createdAt,
           updatedAt: user.updatedAt,
-          roles: userWithRoles?.user_roles.map(userRole => ({
-            id: userRole.role.id,
-            name: userRole.role.name,
-            slug: userRole.role.slug,
-          })) || [],
-        }
+          roles:
+            userWithRoles?.user_roles.map((userRole) => ({
+              id: userRole.role.id,
+              name: userRole.role.name,
+              slug: userRole.role.slug,
+            })) ?? [],
+        },
       })
     }
 
@@ -414,14 +431,16 @@ usersRouter.post('/', zValidator('json', createUserSchema), async (c) => {
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
         roles: [],
-      }
+      },
     })
   } catch (error) {
     if (error instanceof HTTPException) {
       throw error
     }
     console.error('Create user error:', error)
-    throw new HTTPException(500, { message: 'User creation temporarily unavailable' })
+    throw new HTTPException(500, {
+      message: 'User creation temporarily unavailable',
+    })
   }
 })
 
@@ -438,8 +457,13 @@ usersRouter.put('/:id', zValidator('json', updateUserSchema), async (c) => {
     }
 
     // Non-admins cannot change admin status or active status
-    if (!currentUser.user.isSystemAdmin && (updates.isSystemAdmin !== undefined || updates.isActive !== undefined)) {
-      throw new HTTPException(403, { message: 'Cannot modify admin or active status' })
+    if (
+      !currentUser.user.isSystemAdmin &&
+      (updates.isSystemAdmin !== undefined || updates.isActive !== undefined)
+    ) {
+      throw new HTTPException(403, {
+        message: 'Cannot modify admin or active status',
+      })
     }
 
     // Check if user exists and belongs to same tenant
@@ -447,7 +471,7 @@ usersRouter.put('/:id', zValidator('json', updateUserSchema), async (c) => {
       where: {
         id: userId,
         tenantId: currentUser.user.tenantId,
-      }
+      },
     })
 
     if (!existingUser) {
@@ -460,12 +484,14 @@ usersRouter.put('/:id', zValidator('json', updateUserSchema), async (c) => {
         where: {
           email: updates.email,
           tenantId: currentUser.user.tenantId,
-          id: { not: userId }
-        }
+          id: { not: userId },
+        },
       })
 
       if (emailExists) {
-        throw new HTTPException(409, { message: 'Email already in use by another user' })
+        throw new HTTPException(409, {
+          message: 'Email already in use by another user',
+        })
       }
     }
 
@@ -486,26 +512,26 @@ usersRouter.put('/:id', zValidator('json', updateUserSchema), async (c) => {
       include: {
         user_roles: {
           include: {
-            role: true
-          }
-        }
-      }
+            role: true,
+          },
+        },
+      },
     })
 
     // Update roles if provided (admin only)
     if (updates.roles !== undefined && currentUser.user.isSystemAdmin) {
       // Remove existing roles
       await prisma.userRole.deleteMany({
-        where: { userId }
+        where: { userId },
       })
 
       // Add new roles
       if (updates.roles.length > 0) {
         await prisma.userRole.createMany({
-          data: updates.roles.map(roleId => ({
+          data: updates.roles.map((roleId) => ({
             userId,
             roleId,
-          }))
+          })),
         })
       }
 
@@ -515,10 +541,10 @@ usersRouter.put('/:id', zValidator('json', updateUserSchema), async (c) => {
         include: {
           user_roles: {
             include: {
-              role: true
-            }
-          }
-        }
+              role: true,
+            },
+          },
+        },
       })
 
       return c.json({
@@ -536,12 +562,13 @@ usersRouter.put('/:id', zValidator('json', updateUserSchema), async (c) => {
           metadata: user.metadata,
           createdAt: user.createdAt,
           updatedAt: user.updatedAt,
-          roles: userWithRoles?.user_roles.map(userRole => ({
-            id: userRole.role.id,
-            name: userRole.role.name,
-            slug: userRole.role.slug,
-          })) || [],
-        }
+          roles:
+            userWithRoles?.user_roles.map((userRole) => ({
+              id: userRole.role.id,
+              name: userRole.role.name,
+              slug: userRole.role.slug,
+            })) ?? [],
+        },
       })
     }
 
@@ -560,19 +587,21 @@ usersRouter.put('/:id', zValidator('json', updateUserSchema), async (c) => {
         metadata: user.metadata,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
-        roles: user.user_roles.map(userRole => ({
+        roles: user.user_roles.map((userRole) => ({
           id: userRole.role.id,
           name: userRole.role.name,
           slug: userRole.role.slug,
         })),
-      }
+      },
     })
   } catch (error) {
     if (error instanceof HTTPException) {
       throw error
     }
     console.error('Update user error:', error)
-    throw new HTTPException(500, { message: 'User update temporarily unavailable' })
+    throw new HTTPException(500, {
+      message: 'User update temporarily unavailable',
+    })
   }
 })
 
@@ -589,7 +618,9 @@ usersRouter.delete('/:id', async (c) => {
 
     // Prevent self-deletion
     if (currentUser.user.id === userId) {
-      throw new HTTPException(400, { message: 'Cannot delete your own account' })
+      throw new HTTPException(400, {
+        message: 'Cannot delete your own account',
+      })
     }
 
     // Check if user exists and belongs to same tenant
@@ -597,7 +628,7 @@ usersRouter.delete('/:id', async (c) => {
       where: {
         id: userId,
         tenantId: currentUser.user.tenantId,
-      }
+      },
     })
 
     if (!existingUser) {
@@ -606,7 +637,7 @@ usersRouter.delete('/:id', async (c) => {
 
     // Delete user (cascade delete will handle related records)
     await prisma.better_auth_users.delete({
-      where: { id: userId }
+      where: { id: userId },
     })
 
     return c.json({
@@ -618,149 +649,172 @@ usersRouter.delete('/:id', async (c) => {
       throw error
     }
     console.error('Delete user error:', error)
-    throw new HTTPException(500, { message: 'User deletion temporarily unavailable' })
+    throw new HTTPException(500, {
+      message: 'User deletion temporarily unavailable',
+    })
   }
 })
 
 // Assign role to user (admin only)
-usersRouter.post('/:id/roles', zValidator('json', assignRoleSchema), async (c) => {
-  try {
-    const userId = c.req.param('id')
-    const currentUser = getCurrentUser(c)
-    const { roleId, scope } = c.req.valid('json')
+usersRouter.post(
+  '/:id/roles',
+  zValidator('json', assignRoleSchema),
+  async (c) => {
+    try {
+      const userId = c.req.param('id')
+      const currentUser = getCurrentUser(c)
+      const { roleId, scope } = c.req.valid('json')
 
-    // Check if user has admin privileges
-    if (!currentUser.user.isSystemAdmin) {
-      throw new HTTPException(403, { message: 'Admin access required' })
-    }
-
-    // Check if user exists and belongs to same tenant
-    const existingUser = await prisma.better_auth_users.findFirst({
-      where: {
-        id: userId,
-        tenantId: currentUser.user.tenantId,
+      // Check if user has admin privileges
+      if (!currentUser.user.isSystemAdmin) {
+        throw new HTTPException(403, { message: 'Admin access required' })
       }
-    })
 
-    if (!existingUser) {
-      throw new HTTPException(404, { message: 'User not found' })
-    }
+      // Check if user exists and belongs to same tenant
+      const existingUser = await prisma.better_auth_users.findFirst({
+        where: {
+          id: userId,
+          tenantId: currentUser.user.tenantId,
+        },
+      })
 
-    // Check if role exists and belongs to same tenant
-    const role = await prisma.role.findFirst({
-      where: {
-        id: roleId,
-        tenantId: currentUser.user.tenantId,
+      if (!existingUser) {
+        throw new HTTPException(404, { message: 'User not found' })
       }
-    })
 
-    if (!role) {
-      throw new HTTPException(404, { message: 'Role not found' })
-    }
+      // Check if role exists and belongs to same tenant
+      const role = await prisma.role.findFirst({
+        where: {
+          id: roleId,
+          tenantId: currentUser.user.tenantId,
+        },
+      })
 
-    // Check if role is already assigned
-    const existingAssignment = await prisma.userRole.findFirst({
-      where: { userId, roleId }
-    })
-
-    if (existingAssignment) {
-      throw new HTTPException(409, { message: 'Role already assigned to user' })
-    }
-
-    // Assign role
-    await prisma.userRole.create({
-      data: {
-        userId,
-        roleId,
-        scope,
+      if (!role) {
+        throw new HTTPException(404, { message: 'Role not found' })
       }
-    })
 
-    return c.json({
-      success: true,
-      message: 'Role assigned successfully',
-    })
-  } catch (error) {
-    if (error instanceof HTTPException) {
-      throw error
+      // Check if role is already assigned
+      const existingAssignment = await prisma.userRole.findFirst({
+        where: { userId, roleId },
+      })
+
+      if (existingAssignment) {
+        throw new HTTPException(409, {
+          message: 'Role already assigned to user',
+        })
+      }
+
+      // Assign role
+      await prisma.userRole.create({
+        data: {
+          userId,
+          roleId,
+          scope,
+        },
+      })
+
+      return c.json({
+        success: true,
+        message: 'Role assigned successfully',
+      })
+    } catch (error) {
+      if (error instanceof HTTPException) {
+        throw error
+      }
+      console.error('Assign role error:', error)
+      throw new HTTPException(500, {
+        message: 'Role assignment temporarily unavailable',
+      })
     }
-    console.error('Assign role error:', error)
-    throw new HTTPException(500, { message: 'Role assignment temporarily unavailable' })
-  }
-})
+  },
+)
 
 // Remove role from user (admin only)
-usersRouter.delete('/:id/roles/:roleId', zValidator('json', removeRoleSchema), async (c) => {
-  try {
-    const userId = c.req.param('id')
-    const roleId = c.req.param('roleId')
-    const currentUser = getCurrentUser(c)
+usersRouter.delete(
+  '/:id/roles/:roleId',
+  zValidator('json', removeRoleSchema),
+  async (c) => {
+    try {
+      const userId = c.req.param('id')
+      const roleId = c.req.param('roleId')
+      const currentUser = getCurrentUser(c)
 
-    // Check if user has admin privileges
-    if (!currentUser.user.isSystemAdmin) {
-      throw new HTTPException(403, { message: 'Admin access required' })
+      // Check if user has admin privileges
+      if (!currentUser.user.isSystemAdmin) {
+        throw new HTTPException(403, { message: 'Admin access required' })
+      }
+
+      // Delete role assignment
+      const result = await prisma.userRole.deleteMany({
+        where: { userId, roleId },
+      })
+
+      if (result.count === 0) {
+        throw new HTTPException(404, { message: 'Role assignment not found' })
+      }
+
+      return c.json({
+        success: true,
+        message: 'Role removed successfully',
+      })
+    } catch (error) {
+      if (error instanceof HTTPException) {
+        throw error
+      }
+      console.error('Remove role error:', error)
+      throw new HTTPException(500, {
+        message: 'Role removal temporarily unavailable',
+      })
     }
-
-    // Delete role assignment
-    const result = await prisma.userRole.deleteMany({
-      where: { userId, roleId }
-    })
-
-    if (result.count === 0) {
-      throw new HTTPException(404, { message: 'Role assignment not found' })
-    }
-
-    return c.json({
-      success: true,
-      message: 'Role removed successfully',
-    })
-  } catch (error) {
-    if (error instanceof HTTPException) {
-      throw error
-    }
-    console.error('Remove role error:', error)
-    throw new HTTPException(500, { message: 'Role removal temporarily unavailable' })
-  }
-})
+  },
+)
 
 // Reset user password (admin only)
-usersRouter.post('/:id/reset-password', zValidator('json', updateUserPasswordSchema), async (c) => {
-  try {
-    const userId = c.req.param('id')
-    const currentUser = getCurrentUser(c)
-    const { newPassword } = c.req.valid('json')
+usersRouter.post(
+  '/:id/reset-password',
+  zValidator('json', updateUserPasswordSchema),
+  async (c) => {
+    try {
+      const userId = c.req.param('id')
+      const currentUser = getCurrentUser(c)
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { newPassword } = c.req.valid('json')
 
-    // Check if user has admin privileges
-    if (!currentUser.user.isSystemAdmin) {
-      throw new HTTPException(403, { message: 'Admin access required' })
-    }
-
-    // Check if user exists and belongs to same tenant
-    const existingUser = await prisma.better_auth_users.findFirst({
-      where: {
-        id: userId,
-        tenantId: currentUser.user.tenantId,
+      // Check if user has admin privileges
+      if (!currentUser.user.isSystemAdmin) {
+        throw new HTTPException(403, { message: 'Admin access required' })
       }
-    })
 
-    if (!existingUser) {
-      throw new HTTPException(404, { message: 'User not found' })
+      // Check if user exists and belongs to same tenant
+      const existingUser = await prisma.better_auth_users.findFirst({
+        where: {
+          id: userId,
+          tenantId: currentUser.user.tenantId,
+        },
+      })
+
+      if (!existingUser) {
+        throw new HTTPException(404, { message: 'User not found' })
+      }
+
+      // This would typically integrate with BetterAuth's password reset functionality
+      // For now, we'll return success (actual implementation would depend on BetterAuth API)
+
+      return c.json({
+        success: true,
+        message: 'Password reset successfully',
+      })
+    } catch (error) {
+      if (error instanceof HTTPException) {
+        throw error
+      }
+      console.error('Reset password error:', error)
+      throw new HTTPException(500, {
+        message: 'Password reset temporarily unavailable',
+      })
     }
-
-    // This would typically integrate with BetterAuth's password reset functionality
-    // For now, we'll return success (actual implementation would depend on BetterAuth API)
-
-    return c.json({
-      success: true,
-      message: 'Password reset successfully',
-    })
-  } catch (error) {
-    if (error instanceof HTTPException) {
-      throw error
-    }
-    console.error('Reset password error:', error)
-    throw new HTTPException(500, { message: 'Password reset temporarily unavailable' })
-  }
-})
+  },
+)
 
 export { usersRouter }

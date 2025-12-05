@@ -22,11 +22,11 @@ export const Route = createRootRoute({
         content: 'width=device-width, initial-scale=1',
       },
       {
-        title: 'PEMS - Payment & Expense Management System',
+        title: 'PEMS - Philippine Education Management System',
       },
       {
         name: 'description',
-        content: 'Professional payment and expense management system',
+        content: 'Philippine Education Management System',
       },
     ],
     links: [
